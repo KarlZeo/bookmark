@@ -1,0 +1,516 @@
+title: 欢迎使用
+subtitle: 个人导航站点
+
+# 指定使用的模板文件名，现有页面模板可见templates\pages
+template: home
+
+categories:
+  - name: FGO攻略
+    icon: fas fa-tools
+    sites:
+      - name: FGO WIKI
+        url: https://fgo.wiki/
+        description: FGO WIKI
+        icon: fas fa-icons
+      - name: appmedia
+        url: https://appmedia.jp/fategrandorder
+        description: appmedia
+        icon: fas fa-icons
+  - name: Anime BBS
+    icon: fas fa-tools
+    sites:
+      - name: 特摄联盟
+        url: http://bbs.temox.com:8080/
+        description: 特摄联盟
+        icon: fas fa-icons
+      - name: 天使动漫
+        url: https://www.tsdm39.com/
+        description: 天使动漫
+        icon: fas fa-icons
+      - name: 梦幻旋律论坛
+        url: https://www.astost.com/bbs/
+        description: 梦幻旋律论坛
+        icon: fas fa-icons
+      - name: vcb-studio 字幕论坛
+        url: https://bbs.acgrip.com/
+        description: vcb-s
+        icon: fas fa-icons
+  - name: BT
+    icon: fas fa-tools
+    sites:
+      - name: U2
+        url: https://u2.dmhy.org/torrents.php
+        description: U2
+        icon: fas fa-icons
+      - name: 動漫花園
+        url: https://share.dmhy.org
+        description: 動漫花園
+        icon: fas fa-icons
+      - name: Nyaa
+        url: https://nyaa.si
+        description: Nyaa
+        icon: fas fa-icons
+      - name: miobt
+        url: https://www.miobt.com/
+        description: miobt
+        icon: fas fa-icons
+      - name: Project AcgnX Torrent Global
+        url: https://www.acgnx.se
+        description: Project AcgnX Torrent Global
+        icon: fas fa-icons
+      - name: 末日動漫資源庫 - Project AcgnX Torrent Asia
+        url: https://share.acgnx.se/
+        description: 末日動漫資源庫 - Project AcgnX Torrent Asia
+        icon: fas fa-icons
+      - name: 番組、萌え
+        url: https://bangumi.moe/
+        description: 番組、萌え
+        icon: fas fa-icons
+      - name: m-team
+        url: https://kp.m-team.cc/browse
+        description: m-team
+        icon: fas fa-icons
+      - name: nc-raw
+        url: https://ouo.si/
+        description: 推子发布站
+        icon: fas fa-icons
+      - name: 蜜柑计划
+        url: https://mikanani.me/Home/Classic
+        description: 蜜柑计划
+        icon: fas fa-icons
+      - name: NYAA 里站
+        url: https://sukebei.nyaa.si/
+        description: NYAA 里站
+        icon: fas fa-icons
+      - name: (｀･ω･´) AniX.Moe (´･ω･｀)
+        url: https://www.anix.moe/
+        description: (｀･ω･´) AniX.Moe (´･ω･｀)
+        icon: fas fa-icons
+      - name: btbtt
+        url: https://www.1lou.me/
+        description: btbtt
+        icon: fas fa-icons
+      - name: thepiratebay
+        url: https://thepiratebay.org/index.html
+        description: thepiratebay
+        icon: fas fa-icons
+      - name: eztvx
+        url: https://eztvx.to/
+        description: eztvx
+        icon: fas fa-icons
+      - name: rutracker
+        url: https://rutracker.org/
+        description: rutracker
+        icon: fas fa-icons
+      - name: tgx
+        url: https://en.torrentgalaxy-official.com/
+        description: tgx
+        icon: fas fa-icons
+      - name: therarbg
+        url: https://therarbg.to/
+        description: therarbg
+        icon: fas fa-icons
+      - name: rargb
+        url: https://rargb.to/
+        description: rargb
+        icon: fas fa-icons
+      - name: 1337x
+        url: https://1337x.to/
+        description: 1337x
+        icon: fas fa-icons
+  - name: Anime
+    icon: fas fa-tools
+    sites:
+      - name: 琉璃神社
+        url: https://www.hacg.icu/
+        description: 琉璃神社
+        icon: fas fa-icons
+      - name: vcb-studio 主站
+        url: https://vcb-s.com/
+        description: vcb-studio
+        icon: fas fa-icons
+      - name: 長門番堂
+        url: https://yuc.wiki/
+        description: 長門番堂
+        icon: fas fa-icons
+      - name: 2025年07月新番表
+        url: https://acgsecrets.hk/bangumi/202507/
+        description: 2025年07月新番表
+        icon: fas fa-icons
+      - name: 2025年10月新番表
+        url: https://acgsecrets.hk/bangumi/202510/
+        description: 2025年10月新番表
+        icon: fas fa-icons
+      - name: 2026年01月新番表
+        url: https://acgsecrets.hk/bangumi/202601/
+        description: 2026年01月新番表
+        icon: fas fa-icons
+      - name: 2026年04月新番表
+        url: https://acgsecrets.hk/bangumi/202604/
+        description: 2026年04月新番表
+        icon: fas fa-icons
+      - name: 2026年07月新番表
+        url: https://acgsecrets.hk/bangumi/202607/
+        description: 2026年07月新番表
+        icon: fas fa-icons
+      - name: 2026年10月新番表
+        url: https://acgsecrets.hk/bangumi/202610/
+        description: 2026年10月新番表
+        icon: fas fa-icons
+      - name: mox.moe
+        url: https://mox.moe/
+        description: mox.moe
+        icon: fas fa-icons
+      - name: 射手网
+        url: https://assrt.net/
+        description: 射手网
+        icon: fas fa-icons
+      - name: subhd
+        url: https://subhd.tv/
+        description: subhd
+        icon: fas fa-icons
+      - name: 字幕库
+        url: https://zmk.pw/
+        description: 字幕库
+        icon: fas fa-icons
+      - name: 宝可梦资源站
+        url: https://pokemon-resource.e.cn.vc/
+        description: 宝可梦资源站
+        icon: fas fa-icons
+      - name: 琉璃神社导航站
+        url: https://liuli.app/
+        description: 琉璃神社导航站
+        icon: fas fa-icons
+  - name: Game
+    icon: fas fa-tools
+    sites:
+      - name: gamer520
+        url: https://www.gamer520.com/
+        description: gamer520
+        icon: fas fa-icons
+      - name: nxbrew
+        url: https://nxbrew.net/
+        description: nxbrew
+        icon: fas fa-icons
+      - name: ultranx
+        url: https://not.ultranx.ru/en
+        description: ultranx
+        icon: fas fa-icons
+      - name: dodi-repacks
+        url: https://dodi-repacks.site/
+        description: dodi-repacks
+        icon: fas fa-icons
+      - name: gogunlocked
+        url: https://gogunlocked.com/
+        description: gogunlocked
+        icon: fas fa-icons
+      - name: steamunlocked
+        url: https://steamunlocked.net/
+        description: steamunlocked
+        icon: fas fa-icons
+      - name: FLiNG Trainer
+        url: https://flingtrainer.com/
+        description: FLiNG Trainer
+        icon: fas fa-icons
+      - name: 小幸修改器官方网站
+        url: https://www.xiaoxingjie.com/
+        description: 小幸修改器官方网站
+        icon: fas fa-icons
+      - name: OldmanEmu
+        url: https://www.oldmantvg.net/
+        description: OldmanEmu
+        icon: fas fa-icons
+      - name: 老男人游戏网配套论坛
+        url: https://bbs.oldmantvg.net/
+        description: 老男人游戏网配套论坛
+        icon: fas fa-icons
+      - name: 奥德彪计划
+        url: https://2468c.com/
+        description: 奥德彪计划
+        icon: fas fa-icons
+      - name: nexusmods
+        url: https://www.nexusmods.com/
+        description: nexusmods
+        icon: fas fa-icons
+      - name: basedmods
+        url: https://basedmods.eth.limo/
+        description: basedmods
+        icon: fas fa-icons
+      - name: degmods
+        url: https://degmods.com/
+        description: degmods
+        icon: fas fa-icons
+      - name: skse
+        url: https://skse.silverlock.org/
+        description: skse
+        icon: fas fa-icons
+      - name: byrutgame
+        url: https://byrutgame.org/
+        description: byrutgame
+        icon: fas fa-icons
+      - name: LoversLab
+        url: https://www.loverslab.com/
+        description: LoversLab
+        icon: fas fa-icons
+      - name: GAMER520 星际通讯中心
+        url: https://www.laoquzhang.com/
+        description: GAMER520 星际通讯中心
+        icon: fas fa-icons
+      - name: GAMER520 永久防迷路
+        url: https://sway.cloud.microsoft/u2EUFKqRndqnaDGU?ref=Link
+        description: GAMER520 永久防迷路
+        icon: fas fa-icons
+      - name: bazziteos
+        url: https://bazzite.gg/
+        description: bazziteos
+        icon: fas fa-icons
+      - name: cachyos
+        url: https://cachyos.org/
+        description: cachyos
+        icon: fas fa-icons
+      - name: chimeraos
+        url: https://chimeraos.org/
+        description: chimeraos
+        icon: fas fa-icons
+      - name: xyg688
+        url: https://www.xyg688.com/
+        description: xyg688
+        icon: fas fa-icons
+      - name: CS RIN - Steam Underground
+        url: https://cs.rin.ru/
+        description: CS RIN - Steam Underground
+        icon: fas fa-icons
+      - name: elamigos.site
+        url: https://elamigos.site/
+        description: elamigos.site
+        icon: fas fa-icons
+  - name: Music
+    icon: fas fa-tools
+    sites:
+      - name: 熊猫无损音乐
+        url: https://www.xmwav.com/
+        description: 熊猫无损音乐
+        icon: fas fa-icons
+      - name: HiFiNi - 音乐磁场
+        url: https://www.hifini.com/
+        description: HiFiNi - 音乐磁场
+        icon: fas fa-icons
+  - name: Tea
+    icon: fas fa-tools
+    sites:
+      - name: V2EX
+        url: https://www.v2ex.com
+        description: V2EX
+        icon: fas fa-icons
+      - name: linux.do
+        url: https://linux.do
+        description: linux.do
+        icon: fas fa-icons
+      - name: chiphell
+        url: https://www.chiphell.com/
+        description: chiphell
+        icon: fas fa-icons
+  - name: Develop
+    icon: fas fa-tools
+    sites:
+      - name: Github
+        url: https://github.com
+        description: Github
+        icon: fas fa-icons
+      - name: Gitlab
+        url: https://gitlab.com
+        description: Gitlab
+        icon: fas fa-icons
+      - name: composerize
+        url: https://www.composerize.com/
+        description: composerize
+        icon: fas fa-icons
+      - name: Documentation Archive
+        url: https://developer.apple.com/library/archive/navigation/
+        description: Documentation Archive
+        icon: fas fa-icons
+      - name: Apple Developer Documentation
+        url: https://developer.apple.com/documentation
+        description: Apple Developer Documentation
+        icon: fas fa-icons
+  - name: Software
+    icon: fas fa-tools
+    sites:
+      - name: 精品MAC应用分享
+        url: http://xclient.info
+        description: 精品MAC应用分享
+        icon: fas fa-icons
+      - name: WK网客下载
+        url: https://www.wkhub.com
+        description: WK网客下载
+        icon: fas fa-icons
+      - name: 异次元软件世界
+        url: https://www.iplaysoft.com
+        description: 异次元软件世界
+        icon: fas fa-icons
+      - name: macdrop
+        url: https://macdrop.net/
+        description: macdrop
+        icon: fas fa-icons
+      - name: torrentmac
+        url: https://www.torrentmac.net/
+        description: torrentmac
+        icon: fas fa-icons
+      - name: minorpatch
+        url: https://www.minorpatch.com/
+        description: minorpatch
+        icon: fas fa-icons
+      - name: MacKed
+        url: https://macked.app/
+        description: MacKed
+        icon: fas fa-icons
+      - name: 4分贝
+        url: https://4fb.cn/
+        description: 4分贝
+        icon: fas fa-icons
+      - name: CyberMania
+        url: https://www.cybermania.ws/
+        description: CyberMania
+        icon: fas fa-icons
+      - name: filecr
+        url: https://filecr.com/en/
+        description: filecr
+        icon: fas fa-icons
+      - name: rutor
+        url: https://rutor.info/
+        description: rutor
+        icon: fas fa-icons
+      - name: 佛系软件
+        url: https://foxirj.com/
+        description: 佛系软件
+        icon: fas fa-icons
+      - name: monkrus
+        url: https://w16.monkrus.ws/
+        description: monkrus
+        icon: fas fa-icons
+      - name: appstorrent
+        url: https://appstorrent.ru/
+        description: appstorrent
+        icon: fas fa-icons
+      - name: Adobe-Downloader
+        url: https://github.com/X1a0He/Adobe-Downloader
+        description: Adobe-Downloader
+        icon: fas fa-icons
+  - name: Proxy
+    icon: fas fa-tools
+    sites:
+      - name: v2neo
+        url: https://v2neo.org/
+        description: v2neo
+        icon: fas fa-icons
+      - name: fastlink
+        url: https://cc03.flaff01.com/
+        description: fastlink
+        icon: fas fa-icons
+      - name: 创奇导航
+        url: https://go.cqjs.link/
+        description: 创奇导航
+        icon: fas fa-icons
+  - name: VPS
+    icon: fas fa-tools
+    sites:
+      - name: vultr
+        url: https://www.vultr.com/
+        description: vultr
+        icon: fas fa-icons
+      - name: linode
+        url: https://www.linode.com/
+        description: linode
+        icon: fas fa-icons
+      - name: digitalocean
+        url: https://www.digitalocean.com/
+        description: digitalocean
+        icon: fas fa-icons
+      - name: sakura
+        url: https://vps.sakura.ad.jp/
+        description: sakura
+        icon: fas fa-icons
+      - name: bandwagonhost
+        url: https://bandwagonhost.com/
+        description: bandwagonhost
+        icon: fas fa-icons
+  - name: DataCenter Main
+    icon: fas fa-tools
+    sites:
+      - name: Unraid1
+        url: http://192.168.31.67/
+        description: Proxmox Virtual Environment Dashboard
+        icon: fas fa-icons
+      - name: unbalance
+        url: http://192.168.31.67:7090/
+        description: unbalance
+        icon: fas fa-icons
+      - name: emby
+        url: http://192.168.31.67:8096/
+        description: emby
+        icon: fas fa-icons
+      - name: qBittorrent
+        url: http://192.168.31.67:8080/
+        description: qBittorrent
+        icon: fas fa-icons
+      - name: transmission
+        url: http://192.168.31.67:9091/
+        description: transmission
+        icon: fas fa-icons
+      - name: tinymediamanager
+        url: http://192.168.31.67:4000/
+        description: tinymediamanager
+        icon: fas fa-icons
+      - name: aria2
+        url: http://192.168.31.67:6880/
+        description: aria2
+        icon: fas fa-icons
+      - name: Plex
+        url: http://192.168.31.67:32400/
+        description: Plex
+        icon: fas fa-icons
+      - name: Home Assistant
+        url: http://192.168.31.67:8123/
+        description: Home Assistant
+        icon: fas fa-icons
+  - name: Router
+    icon: fas fa-tools
+    sites:
+      - name: OpenWrt
+        url: http://192.168.31.226/
+        description: OpenWrt
+        icon: fas fa-icons
+      - name: Clash Dashboard
+        url: http://192.168.31.226:9090/ui/zashboard/#/proxies
+        description: Clash Dashboard
+        icon: fas fa-icons
+  - name: DataCenter Backup
+    icon: fas fa-tools
+    sites:
+      - name: Unraid2
+        url: http://192.168.31.77/
+        description: Unraid Dashboard
+        icon: fas fa-icons
+      - name: unbalance
+        url: http://192.168.31.77:7090/
+        description: unbalance
+        icon: fas fa-icons
+  - name: MetaData
+    icon: fas fa-tools
+    sites:
+      - name: TMDB
+        url: https://www.themoviedb.org/
+        description: TMDB
+        icon: fas fa-icons
+      - name: TVDB
+        url: https://thetvdb.com/
+        description: TVDB
+        icon: fas fa-icons
+      - name: IMDB
+        url: https://www.imdb.com/
+        description: IMDB
+        icon: fas fa-icons
+      - name: AniDB
+        url: https://anidb.net/
+        description: AniDB
+        icon: fas fa-icons
