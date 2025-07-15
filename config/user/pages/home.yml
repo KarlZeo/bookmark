@@ -292,7 +292,11 @@ categories:
         description: 熊猫无损音乐
         icon: fas fa-icons
       - name: HiFiNi - 音乐磁场
-        url: https://www.hifini.com/
+        url: https://hifini.com.cn/
+        description: HiFiNi - 音乐磁场
+        icon: fas fa-icons
+      - name: HiFiNi - 音乐磁场
+        url: https://www.gggmusic.com/
         description: HiFiNi - 音乐磁场
         icon: fas fa-icons
   - name: Tea
