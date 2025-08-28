@@ -304,20 +304,33 @@ function ensureConfigDefaults(config) {
   result.profile.subtitle = result.profile.subtitle || 'MeNav个人导航系统';
   result.profile.description = result.profile.description || '简单易用的个人导航站点';
 
-  // 为每个类别和站点设置默认值
-  result.categories = result.categories || [];
-  result.categories.forEach(category => {
+  // 处理站点默认值的辅助函数
+  function processSiteDefaults(site) {
+    site.name = site.name || '未命名站点';
+    site.url = site.url || '#';
+    site.description = site.description || '';
+    site.icon = site.icon || 'fas fa-link';
+    site.external = typeof site.external === 'boolean' ? site.external : true;
+  }
+
+  // 处理分类默认值的辅助函数
+  function processCategoryDefaults(category) {
     category.name = category.name || '未命名分类';
     category.sites = category.sites || [];
+    category.sites.forEach(processSiteDefaults);
+  }
 
-    // 为每个站点设置默认值
-    category.sites.forEach(site => {
-      site.name = site.name || '未命名站点';
-      site.url = site.url || '#';
-      site.description = site.description || '';
-      site.icon = site.icon || 'fas fa-link';
-      site.external = typeof site.external === 'boolean' ? site.external : true;
-    });
+  // 为首页的每个类别和站点设置默认值
+  result.categories = result.categories || [];
+  result.categories.forEach(processCategoryDefaults);
+
+  // 为所有页面配置中的类别和站点设置默认值
+  Object.keys(result).forEach(key => {
+    const pageConfig = result[key];
+    // 检查是否是页面配置对象且包含categories数组
+    if (pageConfig && typeof pageConfig === 'object' && Array.isArray(pageConfig.categories)) {
+      pageConfig.categories.forEach(processCategoryDefaults);
+    }
   });
 
   return result;
@@ -406,7 +419,7 @@ function prepareRenderData(config) {
   renderData.configJSON = JSON.stringify({
     version: process.env.npm_package_version || '1.0.0',
     timestamp: new Date().toISOString(),
-    data: config
+    data: renderData // 使用经过处理的renderData而不是原始config
   });
 
   // 添加导航项的活动状态标记和子菜单
@@ -741,6 +754,7 @@ function renderPage(pageId, config) {
 
   // 页面特定的额外数据
   if (config[pageId]) {
+    // 使用已经经过ensureConfigDefaults处理的配置数据
     Object.assign(data, config[pageId]);
   }
 
