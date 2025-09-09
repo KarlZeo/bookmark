@@ -284,6 +284,10 @@ categories:
         url: https://elamigos.site/
         description: elamigos.site
         icon: fas fa-icons
+      - name: galgame资源网址
+        url: https://www.galgamezywz.com/
+        description: algame资源网址
+        icon: fas fa-icons
   - name: Music
     icon: fas fa-tools
     sites:
