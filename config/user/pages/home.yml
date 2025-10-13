@@ -177,6 +177,18 @@ categories:
         url: https://liuli.app/
         description: 琉璃神社导航站
         icon: fas fa-icons
+      - name: TV-Nihon
+        url: https://wiki.tvnihon.com/wiki/Main_Page
+        description: TV-Nihon
+        icon: fas fa-icons
+      - name: kitsuneko.net - Japanese and English anime subtitles
+        url: https://kitsunekko.net/
+        description: kitsuneko.net - Japanese and English anime subtitles
+        icon: fas fa-icons
+      - name: Jimaku
+        url: https://jimaku.cc/
+        description: Jimaku
+        icon: fas fa-icons
   - name: Game
     icon: fas fa-tools
     sites:
