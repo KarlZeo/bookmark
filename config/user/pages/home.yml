@@ -296,6 +296,10 @@ categories:
         url: https://www.galgamezywz.com/
         description: algame资源网址
         icon: fas fa-icons
+      - name: HTML5 Savegame Editors
+        url: https://www.marcrobledo.com/savegame-editors/
+        description: HTML5 Savegame Editors
+        icon: fas fa-icons
   - name: Music
     icon: fas fa-tools
     sites:
