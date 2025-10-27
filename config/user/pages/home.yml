@@ -200,6 +200,10 @@ categories:
         url: https://nxbrew.net/
         description: nxbrew
         icon: fas fa-icons
+      - name: switch618
+        url: https://www.switch618.com/
+        description: switch618
+        icon: fas fa-icons
       - name: ultranx
         url: https://not.ultranx.ru/en
         description: ultranx
@@ -299,6 +303,10 @@ categories:
       - name: HTML5 Savegame Editors
         url: https://www.marcrobledo.com/savegame-editors/
         description: HTML5 Savegame Editors
+        icon: fas fa-icons
+      - name: 618游戏地址发布页
+        url: https://www.switch618.site/
+        description: 618游戏地址发布页
         icon: fas fa-icons
   - name: Music
     icon: fas fa-tools
