@@ -308,6 +308,10 @@ categories:
         url: https://www.switch618.site/
         description: 618游戏地址发布页
         icon: fas fa-icons
+      - name: chronodivide
+        url: https://chronodivide.com/
+        description: chronodivide
+        icon: fas fa-icons
   - name: Music
     icon: fas fa-tools
     sites:
