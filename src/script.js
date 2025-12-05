@@ -53,7 +53,8 @@ window.MeNav = {
                 element.setAttribute('data-description', newData.description);
             }
             if (newData.icon) {
-                const iconElement = element.querySelector('i');
+                // 优先更新站点卡片中的回退图标（favicon模式下存在）
+                const iconElement = element.querySelector('i.icon-fallback') || element.querySelector('i');
                 if (iconElement) {
                     iconElement.className = newData.icon;
                 }
@@ -178,15 +179,40 @@ window.MeNav = {
             newSite.setAttribute('data-icon', data.icon || 'fas fa-link');
             newSite.setAttribute('data-description', data.description || '');
 
-            // 添加内容
-            newSite.innerHTML = `
-                <i class="${data.icon || 'fas fa-link'}"></i>
-                <h3>${data.name || '未命名站点'}</h3>
-                <p>${data.description || ''}</p>
-            `;
+            // 添加内容（根据图标模式渲染）
+            try {
+                const cfg = window.MeNav && typeof window.MeNav.getConfig === 'function' ? window.MeNav.getConfig() : null;
+                const iconsMode = (cfg && (cfg.data?.icons?.mode || cfg.icons?.mode)) || 'favicon';
+                if (iconsMode === 'favicon' && data.url && /^https?:\/\//i.test(data.url)) {
+                    const faviconUrl = `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(data.url)}&size=32`;
+                    newSite.innerHTML = `
+                        <i class="fas fa-circle-notch fa-spin icon-placeholder" aria-hidden="true"></i>
+                        <img class="favicon-icon" src="${faviconUrl}" alt="${(data.name || '站点')} favicon" loading="lazy" style="opacity:0;"
+                             onload="this.style.opacity='1'; this.previousElementSibling.style.display='none';"
+                             onerror="this.style.display='none'; this.previousElementSibling.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+                        <i class="fas fa-link icon-fallback" aria-hidden="true" style="display:none;"></i>
+                        <h3>${data.name || '未命名站点'}</h3>
+                        <p>${data.description || ''}</p>
+                    `;
+                } else {
+                    newSite.innerHTML = `
+                        <i class="${data.icon || 'fas fa-link'}"></i>
+                        <h3>${data.name || '未命名站点'}</h3>
+                        <p>${data.description || ''}</p>
+                    `;
+                }
+            } catch (e) {
+                newSite.innerHTML = `
+                    <i class="${data.icon || 'fas fa-link'}"></i>
+                    <h3>${data.name || '未命名站点'}</h3>
+                    <p>${data.description || ''}</p>
+                `;
+            }
 
             // 添加到DOM
             sitesGrid.appendChild(newSite);
+
+            
 
             // 移除"暂无网站"提示（如果存在）
             const emptyMessage = sitesGrid.querySelector('.empty-sites');
@@ -316,6 +342,178 @@ window.MeNav = {
     }
 };
 
+// 多层级嵌套书签功能
+window.MeNav.expandAll = function() {
+    const activePage = document.querySelector('.page.active');
+    if (activePage) {
+        activePage.querySelectorAll('.category.collapsed, .group.collapsed').forEach(element => {
+            element.classList.remove('collapsed');
+            saveToggleState(element, 'expanded');
+        });
+    }
+};
+
+window.MeNav.collapseAll = function() {
+    const activePage = document.querySelector('.page.active');
+    if (activePage) {
+        activePage.querySelectorAll('.category:not(.collapsed), .group:not(.collapsed)').forEach(element => {
+            element.classList.add('collapsed');
+            saveToggleState(element, 'collapsed');
+        });
+    }
+};
+
+// 智能切换分类展开/收起状态
+window.MeNav.toggleCategories = function() {
+    const activePage = document.querySelector('.page.active');
+    if (!activePage) return;
+    
+    const allElements = activePage.querySelectorAll('.category, .group');
+    const collapsedElements = activePage.querySelectorAll('.category.collapsed, .group.collapsed');
+    
+    // 如果收起的数量 >= 总数的一半，执行展开；否则执行收起
+    if (collapsedElements.length >= allElements.length / 2) {
+        window.MeNav.expandAll();
+        updateCategoryToggleIcon('up');
+    } else {
+        window.MeNav.collapseAll();
+        updateCategoryToggleIcon('down');
+    }
+};
+
+// 更新分类切换按钮图标
+function updateCategoryToggleIcon(state) {
+    const toggleBtn = document.getElementById('category-toggle');
+    if (!toggleBtn) return;
+    
+    const icon = toggleBtn.querySelector('i');
+    if (!icon) return;
+    
+    if (state === 'up') {
+        icon.className = 'fas fa-angle-double-up';
+        toggleBtn.setAttribute('aria-label', '收起分类');
+    } else {
+        icon.className = 'fas fa-angle-double-down';
+        toggleBtn.setAttribute('aria-label', '展开分类');
+    }
+}
+
+window.MeNav.toggleCategory = function(categoryName, subcategoryName = null, groupName = null) {
+    const selector = groupName
+        ? `[data-name="${categoryName}"] [data-name="${subcategoryName}"] [data-name="${groupName}"]`
+        : subcategoryName
+            ? `[data-name="${categoryName}"] [data-name="${subcategoryName}"]`
+            : `[data-name="${categoryName}"]`;
+            
+    const element = document.querySelector(selector);
+    if (element) {
+        toggleNestedElement(element);
+    }
+};
+
+window.MeNav.getNestedStructure = function() {
+    // 返回完整的嵌套结构数据
+    const categories = [];
+    document.querySelectorAll('.category-level-1').forEach(cat => {
+        categories.push(extractNestedData(cat));
+    });
+    return categories;
+};
+
+// 切换嵌套元素
+function toggleNestedElement(container) {
+    const isCollapsed = container.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+        container.classList.remove('collapsed');
+        saveToggleState(container, 'expanded');
+    } else {
+        container.classList.add('collapsed');
+        saveToggleState(container, 'collapsed');
+    }
+    
+    // 触发自定义事件
+    const event = new CustomEvent('nestedToggle', {
+        detail: {
+            element: container,
+            type: container.dataset.type,
+            name: container.dataset.name,
+            isCollapsed: !isCollapsed
+        }
+    });
+    document.dispatchEvent(event);
+}
+
+// 保存切换状态
+function saveToggleState(element, state) {
+    const type = element.dataset.type;
+    const name = element.dataset.name;
+    const level = element.dataset.level || '1';
+    const key = `menav-toggle-${type}-${level}-${name}`;
+    localStorage.setItem(key, state);
+}
+
+// 恢复切换状态
+function restoreToggleState(element) {
+    const type = element.dataset.type;
+    const name = element.dataset.name;
+    const level = element.dataset.level || '1';
+    const key = `menav-toggle-${type}-${level}-${name}`;
+    const savedState = localStorage.getItem(key);
+    
+    if (savedState === 'collapsed') {
+        element.classList.add('collapsed');
+    }
+}
+
+// 初始化嵌套分类
+function initializeNestedCategories() {
+    // 为所有可折叠元素添加切换功能
+    document.querySelectorAll('[data-toggle="category"], [data-toggle="group"]').forEach(header => {
+        header.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const container = this.parentElement;
+            toggleNestedElement(container);
+        });
+        
+        // 恢复保存的状态
+        restoreToggleState(header.parentElement);
+    });
+}
+
+// 提取嵌套数据
+function extractNestedData(element) {
+    const data = {
+        name: element.dataset.name,
+        type: element.dataset.type,
+        level: element.dataset.level,
+        isCollapsed: element.classList.contains('collapsed')
+    };
+    
+    // 提取子元素数据
+    const subcategories = element.querySelectorAll(':scope > .category-content > .subcategories-container > .category');
+    if (subcategories.length > 0) {
+        data.subcategories = Array.from(subcategories).map(sub => extractNestedData(sub));
+    }
+    
+    const groups = element.querySelectorAll(':scope > .category-content > .groups-container > .group');
+    if (groups.length > 0) {
+        data.groups = Array.from(groups).map(group => extractNestedData(group));
+    }
+    
+    const sites = element.querySelectorAll(':scope > .category-content > .sites-grid > .site-card, :scope > .group-content > .sites-grid > .site-card');
+    if (sites.length > 0) {
+        data.sites = Array.from(sites).map(site => ({
+            name: site.dataset.name,
+            url: site.dataset.url,
+            icon: site.dataset.icon,
+            description: site.dataset.description
+        }));
+    }
+    
+    return data;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // 先声明所有状态变量
     let isSearchActive = false;
@@ -366,6 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 搜索引擎相关元素
     const searchIcon = document.querySelector('.search-icon');
+    const searchEngineToggle = document.querySelector('.search-engine-toggle');
     const searchEngineDropdown = document.querySelector('.search-engine-dropdown');
     const searchEngineOptions = document.querySelectorAll('.search-engine-option');
 
@@ -411,6 +610,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 侧边栏折叠功能
     function toggleSidebarCollapse() {
+        // 仅在交互时启用布局相关动画，避免首屏闪烁
+        document.documentElement.classList.add('with-anim');
+
         isSidebarCollapsed = !isSidebarCollapsed;
 
         // 使用 requestAnimationFrame 确保平滑过渡
@@ -501,7 +703,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const title = card.querySelector('h3')?.textContent?.toLowerCase() || '';
                         const description = card.querySelector('p')?.textContent?.toLowerCase() || '';
                         const url = card.href || card.getAttribute('href') || '#';
-                        const icon = card.querySelector('i')?.className || '';
+                        const icon = card.querySelector('i.icon-fallback')?.className || card.querySelector('i')?.className || '';
 
                         // 将卡片信息添加到索引中
                         searchIndex.items.push({
@@ -665,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 使用更高效的搜索算法
             const matchedItems = searchIndex.items.filter(item => {
-                return item.searchText.includes(searchTerm);
+                return item.searchText.includes(searchTerm) || PinyinMatch.match(item.searchText, searchTerm);;
             });
 
             // 按页面分组结果
@@ -800,6 +1002,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     title.removeChild(title.firstChild);
                 }
                 title.appendChild(titleFragment);
+            } else if (PinyinMatch.match(title.textContent, searchTerm)) {
+                const arr = PinyinMatch.match(title.textContent, searchTerm);
+                const [start, end] = arr;
+                title.innerHTML = title.textContent.slice(0, start) +
+                    `<span class="highlight">${title.textContent.slice(start, end + 1)}</span>` +
+                    title.textContent.slice(end + 1);
             }
 
             // 安全地高亮描述中的匹配文本
@@ -846,6 +1054,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     description.removeChild(description.firstChild);
                 }
                 description.appendChild(descFragment);
+            } else if (PinyinMatch.match(description.textContent, searchTerm)) {
+                const arr = PinyinMatch.match(description.textContent, searchTerm);
+                const [start, end] = arr;
+                description.innerHTML = description.textContent.slice(0, start) +
+                    `<span class="highlight">${description.textContent.slice(start, end + 1)}</span>` +
+                    description.textContent.slice(end + 1);
             }
         } catch (error) {
             console.error('Error highlighting search term');
@@ -949,10 +1163,38 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSearchEngineUI();
 
         // 初始化搜索引擎下拉菜单事件
-        searchIcon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            searchEngineDropdown.classList.toggle('active');
-        });
+        const toggleEngineDropdown = () => {
+            const next = !searchEngineDropdown.classList.contains('active');
+            searchEngineDropdown.classList.toggle('active', next);
+            if (searchBox) {
+                searchBox.classList.toggle('dropdown-open', next);
+            }
+            if (searchEngineToggle) {
+                searchEngineToggle.setAttribute('aria-expanded', String(next));
+            }
+        };
+
+        if (searchIcon) {
+            searchIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleEngineDropdown();
+            });
+        }
+
+        if (searchEngineToggle) {
+            searchEngineToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleEngineDropdown();
+            });
+            // 键盘可访问性：Enter/Space 触发
+            searchEngineToggle.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleEngineDropdown();
+                }
+            });
+        }
 
         // 点击搜索引擎选项
         searchEngineOptions.forEach(option => {
@@ -982,6 +1224,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // 关闭下拉菜单
                     searchEngineDropdown.classList.remove('active');
+                    if (searchBox) {
+                        searchBox.classList.remove('dropdown-open');
+                    }
                 }
             });
         });
@@ -989,6 +1234,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 点击页面其他位置关闭下拉菜单
         document.addEventListener('click', () => {
             searchEngineDropdown.classList.remove('active');
+            if (searchBox) {
+                searchBox.classList.remove('dropdown-open');
+            }
         });
     }
 
@@ -1236,6 +1484,19 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // 初始化嵌套分类功能
+        initializeNestedCategories();
+        
+        // 初始化分类切换按钮
+        const categoryToggleBtn = document.getElementById('category-toggle');
+        if (categoryToggleBtn) {
+            categoryToggleBtn.addEventListener('click', function() {
+                window.MeNav.toggleCategories();
+            });
+        } else {
+            console.error('Category toggle button not found');
+        }
+        
         // 初始化搜索索引（使用requestIdleCallback或setTimeout延迟初始化，避免影响页面加载）
         if ('requestIdleCallback' in window) {
             requestIdleCallback(() => initSearchIndex());

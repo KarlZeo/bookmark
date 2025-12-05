@@ -166,6 +166,34 @@ function keys(object) {
   return Object.keys(object);
 }
 
+/**
+ * 对字符串进行URL组件编码（encodeURIComponent）
+ * @param {string} text 输入文本
+ * @returns {string} 编码后的字符串
+ * @example {{encodeURIComponent url}}
+ */
+function encodeURIComponentHelper(text) {
+  if (text === undefined || text === null) return '';
+  try {
+    return encodeURIComponent(String(text));
+  } catch (e) {
+    return '';
+  }
+}
+
+/**
+ * 数学加法运算助手函数
+ * @param {number} a 第一个数
+ * @param {number} b 第二个数
+ * @returns {number} 两数之和
+ * @example {{add level 1}}
+ */
+function add(a, b) {
+  const numA = parseInt(a, 10) || 0;
+  const numB = parseInt(b, 10) || 0;
+  return numA + numB;
+}
+
 // 导出所有工具类助手函数
 module.exports = {
   slice,
@@ -175,5 +203,7 @@ module.exports = {
   last,
   range,
   pick,
-  keys
-}; 
+  keys,
+  encodeURIComponent: encodeURIComponentHelper,
+  add
+};

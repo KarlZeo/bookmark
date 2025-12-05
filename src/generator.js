@@ -196,7 +196,21 @@ function safeLoadYamlConfig(filePath) {
 
   try {
     const fileContent = fs.readFileSync(filePath, 'utf8');
-    return yaml.load(fileContent);
+    // 使用 loadAll 而不是 load 来支持多文档 YAML 文件
+    const docs = yaml.loadAll(fileContent);
+    
+    // 如果只有一个文档，直接返回
+    if (docs.length === 1) {
+      return docs[0];
+    }
+    
+    // 如果有多个文档，返回第一个文档（忽略后面的文档）
+    if (docs.length > 1) {
+      console.warn(`Warning: Multiple documents found in ${filePath}. Using the first document only.`);
+      return docs[0];
+    }
+    
+    return null;
   } catch (error) {
     handleConfigLoadError(filePath, error);
     return null;
@@ -233,13 +247,23 @@ function loadModularConfig(dirPath) {
         if (siteConfig.fonts) config.fonts = siteConfig.fonts;
         if (siteConfig.profile) config.profile = siteConfig.profile;
         if (siteConfig.social) config.social = siteConfig.social;
+        
+        // 优先使用site.yml中的navigation配置
+        if (siteConfig.navigation) {
+            config.navigation = siteConfig.navigation;
+            console.log('使用 site.yml 中的导航配置');
+        }
     }
 
-    // 加载导航配置
-    const navConfigPath = path.join(dirPath, 'navigation.yml');
-    const navConfig = safeLoadYamlConfig(navConfigPath);
-    if (navConfig) {
-        config.navigation = navConfig;
+    // 如果site.yml中没有navigation配置，则回退到独立的navigation.yml
+    if (!config.navigation || config.navigation.length === 0) {
+        const navConfigPath = path.join(dirPath, 'navigation.yml');
+        const navConfig = safeLoadYamlConfig(navConfigPath);
+        if (navConfig) {
+            config.navigation = navConfig;
+            console.log('site.yml 中未找到导航配置，使用独立的 navigation.yml 文件');
+            console.log('提示：建议将导航配置迁移到 site.yml 中，以便统一管理');
+        }
     }
 
     // 加载页面配置
@@ -283,13 +307,37 @@ function ensureConfigDefaults(config) {
   result.site = result.site || {};
   result.navigation = result.navigation || [];
   result.fonts = result.fonts || {};
+
+  // 确保字体配置完整
+  result.fonts.title = result.fonts.title || {};
+  result.fonts.title.family = result.fonts.title.family || 'Arial';
+  result.fonts.title.weight = result.fonts.title.weight || 700;
+  result.fonts.title.source = result.fonts.title.source || 'system';
+
+  result.fonts.subtitle = result.fonts.subtitle || {};
+  result.fonts.subtitle.family = result.fonts.subtitle.family || 'Arial';
+  result.fonts.subtitle.weight = result.fonts.subtitle.weight || 500;
+  result.fonts.subtitle.source = result.fonts.subtitle.source || 'system';
+
+  result.fonts.body = result.fonts.body || {};
+  result.fonts.body.family = result.fonts.body.family || 'Arial';
+  result.fonts.body.weight = result.fonts.body.weight || 400;
+  result.fonts.body.source = result.fonts.body.source || 'system';
+
   result.profile = result.profile || {};
   result.social = result.social || [];
   result.categories = result.categories || [];
+  // 图标配置默认值
+  result.icons = result.icons || {};
+  // icons.mode: manual | favicon, 默认 favicon
+  result.icons.mode = result.icons.mode || 'favicon';
 
   // 站点基本信息默认值
   result.site.title = result.site.title || 'MeNav导航';
-  result.site.favicon = result.site.favicon || 'favicon.ico';
+  result.site.description = result.site.description || '个人网络导航站';
+  result.site.author = result.site.author || 'MeNav User';
+  result.site.logo_text = result.site.logo_text || '导航站';
+  result.site.favicon = result.site.favicon || 'menav.svg';
   result.site.logo = result.site.logo || null;
   result.site.footer = result.site.footer || '';
   result.site.theme = result.site.theme || {
@@ -877,6 +925,12 @@ function copyStaticFiles(config) {
         console.error('Error copying style.css:', e);
     }
 
+    try {
+      fs.copyFileSync('assets/pinyin-match.js', 'dist/pinyin-match.js');
+    } catch (e) {
+      console.error('Error copying pinyin-match.js:', e);
+    }
+  
     // 复制JavaScript文件
     try {
         fs.copyFileSync('src/script.js', 'dist/script.js');
