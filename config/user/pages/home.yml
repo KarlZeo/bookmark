@@ -312,6 +312,10 @@ categories:
         url: https://chronodivide.com/
         description: chronodivide
         icon: fas fa-icons
+      - name: NS Wiki
+        url: https://nswiki.cn/
+        description: NS Wiki
+        icon: fas fa-icons
   - name: Music
     icon: fas fa-tools
     sites:
