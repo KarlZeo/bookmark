@@ -169,10 +169,6 @@ categories:
         url: https://zmk.pw/
         description: 字幕库
         icon: fas fa-icons
-      - name: 宝可梦资源站
-        url: https://pokemon-resource.e.cn.vc/
-        description: 宝可梦资源站
-        icon: fas fa-icons
       - name: 琉璃神社导航站
         url: https://liuli.app/
         description: 琉璃神社导航站
@@ -296,10 +292,6 @@ categories:
         url: https://elamigos.site/
         description: elamigos.site
         icon: fas fa-icons
-      - name: galgame资源网址
-        url: https://www.galgamezywz.com/
-        description: algame资源网址
-        icon: fas fa-icons
       - name: HTML5 Savegame Editors
         url: https://www.marcrobledo.com/savegame-editors/
         description: HTML5 Savegame Editors
@@ -319,10 +311,6 @@ categories:
   - name: Music
     icon: fas fa-tools
     sites:
-      - name: 熊猫无损音乐
-        url: https://www.xmwav.com/
-        description: 熊猫无损音乐
-        icon: fas fa-icons
       - name: HiFiNi - 音乐磁场
         url: https://hifini.com.cn/
         description: HiFiNi - 音乐磁场
@@ -508,17 +496,6 @@ categories:
       - name: Home Assistant
         url: http://192.168.31.67:8123/
         description: Home Assistant
-        icon: fas fa-icons
-  - name: Router
-    icon: fas fa-tools
-    sites:
-      - name: OpenWrt
-        url: http://192.168.31.226/
-        description: OpenWrt
-        icon: fas fa-icons
-      - name: Clash Dashboard
-        url: http://192.168.31.226:9090/ui/zashboard/#/proxies
-        description: Clash Dashboard
         icon: fas fa-icons
   - name: DataCenter Backup
     icon: fas fa-tools
