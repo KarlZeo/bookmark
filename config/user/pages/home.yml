@@ -50,6 +50,10 @@ categories:
         url: https://nyaa.si
         description: Nyaa
         icon: fas fa-icons
+      - name: Anime Tosho
+        url: https://animetosho.org/
+        description: Anime Tosho
+        icon: fas fa-icons
       - name: miobt
         url: https://www.miobt.com/
         description: miobt
