@@ -41,7 +41,7 @@ security:
 # - system: 只使用本地/系统字体，不额外发起请求
 fonts:
   source: css
-  cssUrl: 'https://fontsapi.zeoseven.com/292/main/result.css'
+  cssUrl: "https://fontsapi.zeoseven.com/292/main/result.css"
   preload: true # 可选：使用 preload+onload 的方式非阻塞加载字体 CSS（更利于首屏性能）
   family: LXGW WenKai
   weight: normal
@@ -81,7 +81,7 @@ rss:
 # - username：你的 GitHub 用户名（例如 torvalds）
 # - heatmapColor：热力图主题色（不带 #，例如 339af0）
 github:
-  username: 'rbetree' # 你的 GitHub 用户名（例如 torvalds；为空则 projects 页不展示热力图）
+  username: "rbetree" # 你的 GitHub 用户名（例如 torvalds；为空则 projects 页不展示热力图）
   heatmapColor: 339af0
   cacheDir: dev # projects 仓库元信息缓存目录（默认 dev，仓库默认 gitignore）
 

@@ -4,25 +4,32 @@ author: KarlZeo
 favicon: favicon.ico
 logo_text: 蓝白胖次
 
+icons:
+  mode: favicon
+  region: cn
+security:
+  allowedSchemes:
+    - http
+    - https
+    - mailto
+    - tel
 fonts:
-  title:
-    family: Poppins
-    weight: 600
-    source: google
-  subtitle:
-    family: Quicksand
-    weight: 500
-    source: google
-  body:
-    family: Noto Sans SC
-    weight: 400
-    source: google
-    
+  source: css
+  cssUrl: "https://fontsapi.zeoseven.com/292/main/result.css"
+  preload: true # 可选：使用 preload+onload 的方式非阻塞加载字体 CSS（更利于首屏性能）
+  family: LXGW WenKai
+  weight: normal
 profile:
   title: 来，细数你的罪恶吧！
   subtitle: さぁ、お前の罪を数えろ！
   description: 蓝白胖次
 
+rss:
+  enabled: false
+github:
+  username: "KarlZeo" # 你的 GitHub 用户名（例如 torvalds；为空则 projects 页不展示热力图）
+  heatmapColor: 339af0
+  cacheDir: dev # projects 仓库元信息缓存目录（默认 dev，仓库默认 gitignore）
 social:
   - name: GitHub
     url: https://github.com
@@ -32,4 +39,13 @@ social:
     icon: fab fa-twitter
   - name: Steam
     url: https://steam.com
-    icon: fab fa-steam 
+    icon: fab fa-steam
+navigation:
+  - name: 首页
+    icon: fas fa-home
+    id: home
+    active: true
+  - name: 快捷导航
+    icon: fas fa-link
+    id: links
+    active: true
