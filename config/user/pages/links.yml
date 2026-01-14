@@ -1,0 +1,50 @@
+# 默认页面配置（请勿直接修改）。
+# 建议复制到 config/user/pages/projects.yml 并按需调整。
+title: 链接快捷导航 # 页面标题
+subtitle: 常用链接快速导航 # 页面副标题
+
+# 指定使用的模板文件名，现有页面模板可见 templates/pages（不含 .hbs）
+template: projects
+
+# 页面分类与站点列表
+#
+# projects 模板采用“代码仓库风”卡片（repo 风格）。
+# 统计信息（language/stars/forks）为自动获取数据：
+# - 运行 `npm run sync-projects` 会联网抓取 GitHub 仓库信息，并写入 dev/ 缓存（仓库默认 gitignore）
+# - `npm run build` 默认不联网；缓存缺失时卡片仅展示标题与描述
+categories:
+  - name: Github常用项目导航
+    icon: fas fa-code # 分类图标（Font Awesome）
+    sites:
+      - name: decky-lsfg-vk
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Decky plugin to streamline installation and usage of lsfg-vk; the Lossless Scaling compatibility layer for linux
+        url: https://github.com/xXJSONDeruloXx/decky-lsfg-vk
+      - name: Decky-Framegen
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Steam Deck Plugin to apply Framegen mods to games by replacing DLSS DLL with FSR3 DLL
+        url: https://github.com/xXJSONDeruloXx/Decky-Framegen
+      - name: DeckyClash
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Light-weight Clash/Mihomo proxy client for Steam OS
+        url: https://github.com/chenx-dust/DeckyClash
+      - name: CheatDeck
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: A launch options manager allows you to run games with cheats and trainers.
+        url: https://github.com/SheffeyG/CheatDeck
+      - name: ludusavi
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Backup tool for PC game saves
+        url: https://github.com/mtkennerly/ludusavi
+      - name: decky-ludusavi
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Rudimentary ludusavi interface as a decky plugin.
+        url: https://github.com/GedasFX/decky-ludusavi
+      - name: unifideck
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: A Decky Loader plugin that brings together games from Steam, Epic Games Store, GOG and Amazon into a single, unified library experience on your Steam Deck.
+        url: https://github.com/mubaraknumann/unifideck
+      - name: proton-ge-custom
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Compatibility tool for Steam Play based on Wine and additional components
+        url: https://github.com/GloriousEggroll/proton-ge-custom

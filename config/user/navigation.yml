@@ -2,3 +2,7 @@
   icon: fas fa-home
   id: home
   active: true
+- name: 快捷导航
+  icon: fas fa-link
+  id: links
+  active: true
