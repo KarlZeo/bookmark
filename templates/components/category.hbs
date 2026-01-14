@@ -1,18 +1,33 @@
 <section class="category {{#if level}}category-level-{{level}}{{else}}category-level-1{{/if}}"
-         id="{{name}}"
+         id="{{#if slug}}{{slug}}{{else}}{{name}}{{/if}}"
          data-type="category"
+         data-id="{{#if slug}}{{slug}}{{else}}{{name}}{{/if}}"
          data-name="{{name}}"
          data-icon="{{icon}}"
          data-level="{{#if level}}{{level}}{{else}}1{{/if}}"
          data-container="categories">
     
-    <div class="category-header" data-toggle="category">
+    <div class="category-header"{{#if subcategories}} data-toggle="category"{{else}}{{#if groups}} data-toggle="category"{{else}}{{#if sites}} data-toggle="category"{{/if}}{{/if}}{{/if}}>
         <h{{#if level}}{{add level 1}}{{else}}2{{/if}} data-editable="category-name">
             <i class="{{icon}}"></i>
             {{name}}
-            <span class="toggle-icon">
-                <i class="fas fa-chevron-down"></i>
-            </span>
+            {{#if subcategories}}
+                <span class="toggle-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            {{else}}
+                {{#if groups}}
+                    <span class="toggle-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                {{else}}
+                    {{#if sites}}
+                        <span class="toggle-icon">
+                            <i class="fas fa-chevron-down"></i>
+                        </span>
+                    {{/if}}
+                {{/if}}
+            {{/if}}
         </h{{#if level}}{{add level 1}}{{else}}2{{/if}}>
     </div>
     
@@ -20,7 +35,11 @@
         {{#if subcategories}}
             <div class="subcategories-container" data-container="subcategories">
                 {{#each subcategories}}
-                    {{> category level=2}}
+                    {{#if ../level}}
+                        {{> category level=(add ../level 1)}}
+                    {{else}}
+                        {{> category level=2}}
+                    {{/if}}
                 {{/each}}
             </div>
         {{/if}}
@@ -37,7 +56,7 @@
             <div class="sites-grid" data-container="sites">
                 {{#if sites.length}}
                     {{#each sites}}
-                        {{> site-card}}
+                        {{> site-card style=@root.siteCardStyle}}
                     {{/each}}
                 {{else}}
                     <p class="empty-sites">暂无网站</p>

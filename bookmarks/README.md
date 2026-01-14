@@ -3,8 +3,11 @@
 ## 目录
 
 - [目录概述](#目录概述)
-- [功能说明](#功能说明)
+- [书签导入功能](#书签导入功能)
+- [配置加载优先级（完全替换）](#配置加载优先级完全替换)
+- [MarksVault 扩展集成](#marksvault-扩展集成)
 - [书签导入流程](#书签导入流程)
+- [确定性输出](#确定性输出)
 - [支持的浏览器](#支持的浏览器)
 - [书签格式要求](#书签格式要求)
 - [文件处理机制](#文件处理机制)
@@ -13,7 +16,7 @@
 
 `bookmarks` 目录是 MeNav 项目中用于存放浏览器导出的书签文件的专用目录。该目录与书签导入功能直接关联，用于自动将浏览器书签转换为 MeNav 配置文件，从而快速生成个人导航站点。
 
-## 功能说明
+## 书签导入功能
 
 书签导入功能允许用户：
 
@@ -23,6 +26,23 @@
 - 无需手动编辑即可批量导入网站链接
 
 这一功能极大简化了网站内容的初始设置过程，特别适合需要迁移大量书签的用户。
+
+## 配置加载优先级（完全替换）
+
+书签页配置同样遵循项目的“完全替换”策略：系统只会选择一套配置目录加载，不会把 `user` 与 `_default` 混合合并。
+
+- 若存在 `config/user/`：书签页配置应位于 `config/user/pages/bookmarks.yml`（通常由导入脚本生成）
+- 否则：使用 `config/_default/pages/bookmarks.yml`（默认示例）
+
+> 提示：一旦创建 `config/user/`，`config/_default/` 会被完全忽略，因此不要指望从默认配置“兜底补齐缺失项”。
+
+## MarksVault 扩展集成
+
+[MarksVault](https://github.com/rbetree/MarksVault) 浏览器扩展可与 MeNav 集成，实现书签自动同步：
+
+- **一键推送书签**：扩展将书签 HTML 文件推送到仓库的 `bookmarks/` 目录
+- **自动化处理**：GitHub Actions 检测到书签文件后自动运行导入脚本生成配置
+- **自动清理**：处理完成后会删除已导入的 HTML 文件，避免重复处理
 
 ## 书签导入流程
 
@@ -34,6 +54,11 @@
    ```bash
    npm run import-bookmarks
    ```
+   - 若 `config/user/` 不存在，导入脚本会先从 `config/_default/` 初始化一份用户配置（因为配置采用“完全替换”策略，需要完整配置才能正常生成站点）。
+   （可选）若希望生成结果保持确定性（便于版本管理，减少时间戳导致的无意义 diff）：
+   ```bash
+   MENAV_BOOKMARKS_DETERMINISTIC=1 npm run import-bookmarks
+   ```
 4. 系统自动解析书签文件内容
 5. 根据书签文件夹结构生成分类
 6. 生成配置文件保存到 `config/user/pages/bookmarks.yml`
@@ -43,6 +68,16 @@
    ```
 
 > **重要说明**：在本地开发中，`npm run dev` 命令**不会**自动处理书签文件。您必须先手动运行 `npm run import-bookmarks` 命令处理书签，然后再运行 `npm run dev` 查看效果。这与 GitHub Actions 中的自动处理流程不同，请务必注意。
+
+## 确定性输出
+
+默认情况下，导入脚本会在生成的 `bookmarks.yml` 顶部写入时间戳注释，导致每次导入都会产生 diff。
+
+若你希望生成结果尽量稳定（只有书签内容变化才产生 diff），可使用环境变量开启确定性输出：
+
+```bash
+MENAV_BOOKMARKS_DETERMINISTIC=1 npm run import-bookmarks
+```
 
 ## 支持的浏览器
 
@@ -89,6 +124,7 @@ MeNav 书签导入功能支持从以下浏览器导出的书签文件：
 4. **图标分配**：
    - 根据URL自动匹配合适的 Font Awesome 图标
    - 为每个链接和分类分配图标
+   - 当 `icons.mode: favicon` 时，页面通常会优先显示站点 favicon；配置里的 `icon` 主要用于回退显示或在 `icons.mode: manual` 时使用（详见 `config/README.md`）
 
 5. **配置生成**：
    - 创建符合 MeNav 配置格式的 YAML 文件

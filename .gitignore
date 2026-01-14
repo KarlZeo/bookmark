@@ -12,6 +12,7 @@ dist/
 .cursorindexingignore
 .cursor
 .spec-workflow/
+.serena/
 
 # 系统文件
 .DS_Store
@@ -38,3 +39,4 @@ tests/fixtures/
 # SpecStory explanation file
 .specstory/.what-is-this.md
 AGENTS.md
+/.claude

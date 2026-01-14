@@ -30,10 +30,13 @@ templates/
 ├── layouts/      # 布局模板 - 定义页面整体结构
 │   └── default.hbs   # 默认布局
 ├── pages/        # 页面模板 - 对应不同页面内容
-│   ├── home.hbs      # 首页
+│   ├── page.hbs      # 通用页面模板（默认/回退模板；普通页面常用）
+│   ├── projects.hbs  # 项目页（repo 风格卡片）
+│   ├── articles.hbs  # 文章页（RSS 聚合/只读文章条目）
 │   ├── bookmarks.hbs # 书签页
-│   └── ...
+│   └── search-results.hbs # 搜索结果页（内置）
 ├── components/   # 组件模板 - 可复用的界面元素
+│   ├── page-header.hbs  # 统一标题区（首页/非首页/书签更新时间/项目热力图）
 │   ├── navigation.hbs   # 导航组件
 │   ├── site-card.hbs    # 站点卡片组件
 │   ├── category.hbs     # 分类组件
@@ -88,21 +91,24 @@ templates/
 **位置**: `templates/pages/`
 
 **主要页面**:
-- `home.hbs` - 首页
+- `page.hbs` - 通用页面模板（默认/回退模板；普通页面常用）
 - `bookmarks.hbs` - 书签页
+- `projects.hbs` - 项目页
+- `articles.hbs` - 文章页
 - `search-results.hbs` - 搜索结果
 - 其他自定义页面
 
-**示例** (`home.hbs`):
+> 说明：MeNav 不再依赖 `home.hbs` 作为首页模板。
+> “首页/默认打开页”由 `site.yml -> navigation` 的**第一项**决定；首页可使用任意页面模板，具体取决于该页面配置（`pages/<homePageId>.yml` 的 `template` 字段与回退规则）。
+
+**示例** (`page.hbs`):
 ```handlebars
-<div class="welcome-section">
-    <h2>{{profile.title}}</h2>
-    <h3>{{profile.subtitle}}</h3>
-    <p class="subtitle">{{profile.description}}</p>
+<div class="page-template page-template-{{pageId}}">
+    {{> page-header}}
+    {{#each categories}}
+        {{> category}}
+    {{/each}}
 </div>
-{{#each categories}}
-    {{> category}}
-{{/each}}
 ```
 
 ### 组件模板
@@ -111,36 +117,49 @@ templates/
 
 **位置**: `templates/components/`
 
+> 说明：生成器启动时会自动扫描 `templates/components/` 下的所有 `.hbs` 并注册为 Handlebars partial（partial 名称=文件名去掉 `.hbs`）。因此新增组件后无需手动“注册步骤”，可直接通过 `{{> component-name}}` 引用。
+
 **主要组件**:
+- `page-header.hbs` - 统一页面标题区（首页/非首页/书签更新时间/项目热力图）
 - `navigation.hbs` - 导航菜单
 - `site-card.hbs` - 站点卡片
 - `category.hbs` - 分类容器（支持多层级嵌套）
 - `group.hbs` - 分组容器（支持多层级嵌套）
 - `social-links.hbs` - 社交链接
-- `search-results.hbs` - 搜索结果展示
 
-**示例** (`site-card.hbs`):
+**示例** (`site-card.hbs`，精简展示关键结构):
 ```handlebars
 {{#if url}}
-<a href="{{url}}" class="site-card{{#if style}} site-card-{{style}}{{/if}}" title="{{name}} - {{description}}" {{#if external}}target="_blank" rel="noopener"{{/if}}>
-    <i class="{{#if icon}}{{icon}}{{else}}fas fa-link{{/if}}"></i>
-    <h3>{{#if name}}{{name}}{{else}}未命名站点{{/if}}</h3>
-    <p>{{description}}</p>
+<a href="{{url}}"
+   class="site-card{{#if style}} site-card-{{style}}{{/if}}"
+   {{#if external}}target="_blank" rel="noopener"{{/if}}
+   data-type="{{#if type}}{{type}}{{else}}site{{/if}}"
+   data-name="{{name}}"
+   data-url="{{url}}">
+    <div class="site-card-icon">...</div>
+    <div class="site-card-content">
+        <h3>{{#if name}}{{name}}{{else}}未命名站点{{/if}}</h3>
+        <p>{{description}}</p>
+    </div>
 </a>
 {{/if}}
 ```
+
+说明：
+- `type=article`：用于 articles Phase 2 的只读文章条目卡片（仍保留 `data-*` 结构；扩展解析应以 `data-type="article"` 区分类型）
+- `style=repo`：用于 projects 的代码仓库风卡片（展示 language/stars/forks 等只读元信息）
 
 ### 多层级嵌套模板组件
 
 #### category.hbs - 分类容器组件
 
-`category.hbs` 是支持多层级嵌套的核心组件，可以递归渲染分类和子分类结构。
+`category.hbs` 是多层级嵌套的核心组件，可渲染 `categories -> subcategories -> groups -> sites` 的结构；更深一层的 `subgroups` 由 `group.hbs` 负责渲染。
 
 **功能特性**:
-- 支持无限层级的分类嵌套
-- 自动计算标题层级（h2, h3, h4...）
-- 根据层级自动应用对应的CSS类
-- 支持三种内容类型：子分类、分组、站点
+- 支持 2~4 层嵌套（`categories -> subcategories -> groups -> subgroups -> sites`，其中 `subgroups` 可选）
+- 自动计算标题层级（h2/h3/h4/h5）
+- 根据层级自动应用对应的 CSS 类（如 `category-level-2`、`group-level-4`）
+- 分类容器支持三种内容：子分类、分组、站点（分组内可继续包含子分组）
 
 **递归渲染原理**:
 通过在模板内部调用自身实现递归渲染：
@@ -171,6 +190,7 @@ templates/
 
 **功能特性**:
 - 支持在分类内创建站点分组
+- 支持子分组（`subgroups`，用于第 4 层结构）
 - 自动应用层级样式
 - 支持展开/折叠功能
 - 与category.hbs保持一致的层级系统
@@ -188,7 +208,7 @@ templates/
 
 #### 多层级嵌套结构示例
 
-典型的四层级结构：分类 → 子分类 → 分组 → 站点
+典型的（最多 4 层）结构：分类 → 子分类 → 分组 → 子分组 → 站点（`subgroups` 可选）
 
 ```yaml
 # 配置示例
@@ -201,13 +221,16 @@ categories:
         groups:
           - name: "框架"
             icon: "fas fa-cubes"
-            sites:
-              - name: "React"
-                url: "https://reactjs.org"
+            subgroups:
+              - name: "React生态"
                 icon: "fab fa-react"
-              - name: "Vue"
-                url: "https://vuejs.org"
-                icon: "fab fa-vuejs"
+                sites:
+                  - name: "React"
+                    url: "https://reactjs.org"
+                    icon: "fab fa-react"
+                  - name: "Next.js"
+                    url: "https://nextjs.org"
+                    icon: "fas fa-triangle"
 ```
 
 对应的模板渲染：
@@ -224,22 +247,32 @@ categories:
         <div class="category-header">
           <h3><i class="fas fa-laptop-code"></i> 前端开发</h3>
         </div>
-        <div class="category-content">
-          <div class="groups-container">
-            <!-- 使用 group.hbs，默认 level=3 -->
-            <div class="group group-level-3" data-level="3">
-              <div class="group-header">
-                <h4><i class="fas fa-cubes"></i> 框架</h4>
-              </div>
-              <div class="group-content">
-                <div class="sites-grid">
-                  <!-- 渲染站点卡片 -->
-                  {{> site-card site}}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+	        <div class="category-content">
+	          <div class="groups-container">
+	            <!-- 使用 group.hbs，默认 level=3 -->
+	            <div class="group group-level-3" data-level="3">
+	              <div class="group-header">
+	                <h4><i class="fas fa-cubes"></i> 框架</h4>
+	              </div>
+	              <div class="group-content">
+	                <div class="subgroups-container">
+	                  <!-- group.hbs 渲染 subgroups，level=4 -->
+	                  <div class="group group-level-4" data-level="4">
+	                    <div class="group-header">
+	                      <h5><i class="fab fa-react"></i> React生态</h5>
+	                    </div>
+	                    <div class="group-content">
+	                      <div class="sites-grid">
+	                        <!-- 渲染站点卡片 -->
+	                        {{> site-card site}}
+	                      </div>
+	                    </div>
+	                  </div>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+	        </div>
       </section>
     </div>
   </div>
@@ -251,42 +284,54 @@ categories:
 - **层级1 (level=1)**: 顶级分类，使用h2标题
 - **层级2 (level=2)**: 子分类，使用h3标题
 - **层级3 (level=3)**: 分组，使用h4标题
-- **层级4+**: 更深层级，继续递增标题层级
+- **层级4 (level=4)**: 子分组，使用h5标题（用于 4 层结构）
 
 每个层级都有对应的CSS类：
-- `category-level-1`, `category-level-2`, ...
-- `group-level-1`, `group-level-2`, ...
+- `category-level-1`, `category-level-2`
+- `group-level-3`, `group-level-4`
 
 这种设计确保了：
 1. 语义化的HTML结构
 2. 一致的视觉层级
-3. 可扩展的嵌套深度
+3. 可预测的嵌套深度（当前导入脚本与样式保证到 level=4）
 4. 灵活的样式定制
 
 ### 站点图标渲染（favicon/manual）
 
 当启用 `icons.mode: favicon`（默认）时，站点卡片会优先显示站点 favicon；当 URL 非 http/https、加载失败或网络受限，则自动回退到 Font Awesome 图标。相关助手：`ifHttpUrl`（条件）与 `encodeURIComponent`（工具）。
 
+站点级覆盖（可选，写在每个 `sites[]` 节点上）：
+- `faviconUrl`：为单站点指定图标链接（优先级最高，失败回退到手动图标；本地路径建议以 `assets/` 开头，构建会复制到 `dist/` 同路径）
+- `forceIconMode: favicon | manual`：强制该站点使用指定模式（不设置则跟随全局 `icons.mode`）
+- 优先级：`faviconUrl` > `forceIconMode` > 全局 `icons.mode`
+
+> 注意：用于根据站点 URL 生成 faviconV2 地址的模板 helper 已更名为 `faviconV2Url`，从而避免与站点字段 `faviconUrl` 同名冲突；自定义模板如需生成 faviconV2 地址，请使用 `{{faviconV2Url url}}`。如需强制读取站点字段 `faviconUrl`，也可使用 `{{lookup . "faviconUrl"}}`（推荐在复杂上下文中显式读取字段）。
+
 示例（与内置组件实现保持一致）：
 
 ```handlebars
 {{#if url}}
-  <a href="{{url}}" class="site-card" title="{{name}} - {{#if description}}{{description}}{{else}}{{url}}{{/if}}" {{#if external}}target="_blank" rel="noopener"{{/if}}>
+<a href="{{url}}" class="site-card{{#if style}} site-card-{{style}}{{/if}}"
+   {{#if external}}target="_blank" rel="noopener"{{/if}}
+   data-type="site"
+   data-name="{{name}}"
+   data-url="{{url}}"
+   data-icon="{{#if icon}}{{icon}}{{else}}fas fa-link{{/if}}"
+   data-description="{{#if description}}{{description}}{{else}}{{extractDomain url}}{{/if}}">
     {{#ifEquals @root.icons.mode "favicon"}}
       {{#ifHttpUrl url}}
-        <i class="fas fa-circle-notch fa-spin icon-placeholder" aria-hidden="true"></i>
-        <img
-          class="favicon-icon"
-          src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{encodeURIComponent url}}&size=32"
-          alt="{{name}} favicon"
-          loading="lazy"
-          {{!-- 可选：降低引用者信息外泄 --}}
-          {{!-- referrerpolicy="no-referrer" --}}
-          style="opacity:0;"
-          onload="this.style.opacity='1'; this.previousElementSibling.style.display='none';"
-          onerror="this.style.display='none'; this.previousElementSibling.style.display='none'; this.nextElementSibling.style.display='inline-block';"
-        />
-        <i class="fas fa-link icon-fallback" aria-hidden="true" style="display:none;"></i>
+        <div class="icon-container">
+          <i class="fas fa-circle-notch fa-spin icon-placeholder" aria-hidden="true"></i>
+          <img
+            class="favicon-icon"
+            src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{encodeURIComponent url}}&size=32"
+            alt="{{name}} favicon"
+            loading="lazy"
+            onload="this.classList.add('loaded'); this.previousElementSibling.classList.add('hidden');"
+            onerror="this.classList.add('error'); this.previousElementSibling.classList.add('hidden'); this.nextElementSibling.classList.add('visible');"
+          />
+          <i class="fas fa-link icon-fallback" aria-hidden="true"></i>
+        </div>
       {{else}}
         <i class="{{#if icon}}{{icon}}{{else}}fas fa-link{{/if}}"></i>
       {{/ifHttpUrl}}
@@ -294,12 +339,14 @@ categories:
       <i class="{{#if icon}}{{icon}}{{else}}fas fa-link{{/if}}"></i>
     {{/ifEquals}}
     <h3>{{#if name}}{{name}}{{else}}未命名站点{{/if}}</h3>
-    <p>{{#if description}}{{description}}{{else}}{{url}}{{/if}}</p>
-  </a>
+    <p>{{#if description}}{{description}}{{else}}{{extractDomain url}}{{/if}}</p>
+</a>
 {{/if}}
 ```
 
-提示：关于 `icons.mode` 与隐私说明，请参见 README 的“网站图标模式（icons.mode）”章节与“近期更新”。
+提示：关于 `icons.mode` 的配置与隐私说明，请参见：
+- `config/README.md` 的 `site.yml 常用字段`：[`../config/README.md#siteyml-常用字段`](../config/README.md#siteyml-%E5%B8%B8%E7%94%A8%E5%AD%97%E6%AE%B5)
+- 根目录 `README.md` 的“近期更新”：[`../README.md#近期更新`](../README.md#%E8%BF%91%E6%9C%9F%E6%9B%B4%E6%96%B0)
 
 ## 模板数据流
 
@@ -317,6 +364,15 @@ MeNav 模板系统的数据流如下：
 - `categories` - 分类和站点数据
 - `profile` - 个人资料数据
 - `social` - 社交链接数据
+
+常见派生字段（由生成器注入，供模板差异化使用）：
+- `homePageId`：首页页面 ID（始终等于 `navigation` 第一项的 `id`）
+- `pageId`：当前页面 ID（用于 `.page-template-{{pageId}}` 等）
+- `pageMeta.updatedAt/updatedAtSource`：仅 bookmarks 模板页用于“update: YYYY-MM-DD | from: ...”展示
+- `projectsMeta.heatmap`：仅 projects 模板页用于右侧 GitHub 热力图展示（需要配置 `site.github.username`）
+- `articlesItems/articlesCategories`：仅 articles 模板页（Phase 2）用于渲染只读文章条目（RSS 缓存存在时）
+
+> 提示：页面模板是“页面内容片段”，不要包含 `<!DOCTYPE html>` 等整页骨架；整页骨架由 `layouts/default.hbs` 负责。
 
 ## 模板使用示例
 
@@ -407,7 +463,7 @@ categories:
 ### 添加新页面
 
 1. 在 `templates/pages/` 创建新的 `.hbs` 文件
-2. 在 `config/_default/site.yml` 的 `navigation` 部分添加页面配置
+2. 在 `config/user/site.yml` 的 `navigation` 部分添加页面配置（配置采用“完全替换”策略，推荐使用 user 配置）
 3. 页面内容可引用现有组件或创建新组件
 
 示例：

@@ -12,14 +12,14 @@
  */
 function formatDate(date, format) {
   if (!date) return '';
-  
+
   // 将字符串转换为日期对象
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   if (!(dateObj instanceof Date) || isNaN(dateObj)) {
     return '';
   }
-  
+
   // 获取日期组件
   const year = dateObj.getFullYear();
   const month = dateObj.getMonth() + 1;
@@ -27,10 +27,10 @@ function formatDate(date, format) {
   const hours = dateObj.getHours();
   const minutes = dateObj.getMinutes();
   const seconds = dateObj.getSeconds();
-  
+
   // 格式化日期字符串
   if (!format) format = 'YYYY-MM-DD';
-  
+
   return format
     .replace('YYYY', year)
     .replace('MM', month.toString().padStart(2, '0'))
@@ -49,13 +49,13 @@ function formatDate(date, format) {
  */
 function limit(text, length) {
   if (!text) return '';
-  
+
   text = String(text);
-  
+
   if (text.length <= length) {
     return text;
   }
-  
+
   return text.substring(0, length) + '...';
 }
 
@@ -99,17 +99,17 @@ function json(obj) {
  */
 function extractDomain(url) {
   if (!url) return '';
-  
+
   try {
     // 移除协议部分 (http://, https://, etc.)
     let domain = String(url).replace(/^[a-zA-Z]+:\/\//, '');
-    
+
     // 移除路径、查询参数和锚点
     domain = domain.split('/')[0].split('?')[0].split('#')[0];
-    
+
     // 移除端口号（如果有）
     domain = domain.split(':')[0];
-    
+
     return domain;
   } catch (e) {
     return String(url);
@@ -123,5 +123,5 @@ module.exports = {
   toLowerCase,
   toUpperCase,
   json,
-  extractDomain
+  extractDomain,
 };

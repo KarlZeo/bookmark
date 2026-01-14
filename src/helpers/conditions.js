@@ -39,25 +39,25 @@ function ifNotEquals(v1, v2, options) {
 function ifCond(v1, operator, v2, options) {
   switch (operator) {
     case '==':
-      return (v1 == v2) ? options.fn(this) : options.inverse(this);
+      return v1 == v2 ? options.fn(this) : options.inverse(this);
     case '===':
-      return (v1 === v2) ? options.fn(this) : options.inverse(this);
+      return v1 === v2 ? options.fn(this) : options.inverse(this);
     case '!=':
-      return (v1 != v2) ? options.fn(this) : options.inverse(this);
+      return v1 != v2 ? options.fn(this) : options.inverse(this);
     case '!==':
-      return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+      return v1 !== v2 ? options.fn(this) : options.inverse(this);
     case '<':
-      return (v1 < v2) ? options.fn(this) : options.inverse(this);
+      return v1 < v2 ? options.fn(this) : options.inverse(this);
     case '<=':
-      return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+      return v1 <= v2 ? options.fn(this) : options.inverse(this);
     case '>':
-      return (v1 > v2) ? options.fn(this) : options.inverse(this);
+      return v1 > v2 ? options.fn(this) : options.inverse(this);
     case '>=':
-      return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+      return v1 >= v2 ? options.fn(this) : options.inverse(this);
     case '&&':
-      return (v1 && v2) ? options.fn(this) : options.inverse(this);
+      return v1 && v2 ? options.fn(this) : options.inverse(this);
     case '||':
-      return (v1 || v2) ? options.fn(this) : options.inverse(this);
+      return v1 || v2 ? options.fn(this) : options.inverse(this);
     default:
       return options.inverse(this);
   }
@@ -74,19 +74,19 @@ function isEmpty(value, options) {
   if (value === null || value === undefined) {
     return options.fn(this);
   }
-  
+
   if (typeof value === 'string' && value.trim() === '') {
     return options.fn(this);
   }
-  
+
   if (Array.isArray(value) && value.length === 0) {
     return options.fn(this);
   }
-  
+
   if (typeof value === 'object' && Object.keys(value).length === 0) {
     return options.fn(this);
   }
-  
+
   return options.inverse(this);
 }
 
@@ -98,9 +98,9 @@ function isEmpty(value, options) {
  * @example {{#isNotEmpty items}}有内容{{else}}无内容{{/isNotEmpty}}
  */
 function isNotEmpty(value, options) {
-  return isEmpty(value, { 
+  return isEmpty(value, {
     fn: options.inverse,
-    inverse: options.fn
+    inverse: options.fn,
   });
 }
 
@@ -113,7 +113,7 @@ function isNotEmpty(value, options) {
  * @example {{#and isPremium isActive}}高级活跃用户{{else}}其他用户{{/and}}
  */
 function and(a, b, options) {
-  return (a && b) ? options.fn(this) : options.inverse(this);
+  return a && b ? options.fn(this) : options.inverse(this);
 }
 
 /**
@@ -125,7 +125,7 @@ function and(a, b, options) {
  * @example {{#or isPremium isAdmin}}有权限{{else}}无权限{{/or}}
  */
 function or(a, b, options) {
-  return (a || b) ? options.fn(this) : options.inverse(this);
+  return a || b ? options.fn(this) : options.inverse(this);
 }
 
 /**
@@ -137,14 +137,14 @@ function or(a, b, options) {
 function orHelper() {
   // 最后一个参数是options对象
   const options = arguments[arguments.length - 1];
-  
+
   // 检查是否至少有一个为true的参数
   for (let i = 0; i < arguments.length - 1; i++) {
     if (arguments[i]) {
       return options.fn(this);
     }
   }
-  
+
   return options.inverse(this);
 }
 
@@ -184,5 +184,5 @@ module.exports = {
   or,
   orHelper,
   not,
-  ifHttpUrl
+  ifHttpUrl,
 };

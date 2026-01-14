@@ -13,15 +13,15 @@
  */
 function slice(array, start, end) {
   if (!array) return [];
-  
+
   if (typeof array === 'string') {
     return end ? array.slice(start, end) : array.slice(start);
   }
-  
+
   if (Array.isArray(array)) {
     return end ? array.slice(start, end) : array.slice(start);
   }
-  
+
   return [];
 }
 
@@ -34,14 +34,14 @@ function slice(array, start, end) {
 function concat() {
   const args = Array.from(arguments);
   const options = args.pop(); // 最后一个参数是Handlebars的options对象
-  
+
   // 过滤掉非数组参数
-  const validArrays = args.filter(arg => Array.isArray(arg));
-  
+  const validArrays = args.filter((arg) => Array.isArray(arg));
+
   if (validArrays.length === 0) {
     return [];
   }
-  
+
   return Array.prototype.concat.apply([], validArrays);
 }
 
@@ -53,15 +53,15 @@ function concat() {
  */
 function size(value) {
   if (!value) return 0;
-  
+
   if (Array.isArray(value) || typeof value === 'string') {
     return value.length;
   }
-  
+
   if (typeof value === 'object') {
     return Object.keys(value).length;
   }
-  
+
   return 0;
 }
 
@@ -75,7 +75,7 @@ function first(array) {
   if (!array || !Array.isArray(array) || array.length === 0) {
     return undefined;
   }
-  
+
   return array[0];
 }
 
@@ -89,7 +89,7 @@ function last(array) {
   if (!array || !Array.isArray(array) || array.length === 0) {
     return undefined;
   }
-  
+
   return array[array.length - 1];
 }
 
@@ -103,19 +103,19 @@ function last(array) {
  */
 function range(start, end, step = 1) {
   const result = [];
-  
+
   if (typeof start !== 'number' || typeof end !== 'number') {
     return result;
   }
-  
+
   if (step <= 0) {
     step = 1;
   }
-  
+
   for (let i = start; i <= end; i += step) {
     result.push(i);
   }
-  
+
   return result;
 }
 
@@ -129,26 +129,26 @@ function range(start, end, step = 1) {
 function pick() {
   const args = Array.from(arguments);
   const options = args.pop(); // 最后一个参数是Handlebars的options对象
-  
+
   if (args.length < 1) {
     return {};
   }
-  
+
   const obj = args[0];
   const keys = args.slice(1);
-  
+
   if (!obj || typeof obj !== 'object') {
     return {};
   }
-  
+
   const result = {};
-  
-  keys.forEach(key => {
+
+  keys.forEach((key) => {
     if (obj.hasOwnProperty(key)) {
       result[key] = obj[key];
     }
   });
-  
+
   return result;
 }
 
@@ -162,7 +162,7 @@ function keys(object) {
   if (!object || typeof object !== 'object') {
     return [];
   }
-  
+
   return Object.keys(object);
 }
 
@@ -194,6 +194,112 @@ function add(a, b) {
   return numA + numB;
 }
 
+/**
+ * 根据 icons.region 配置生成 favicon URL
+ * @param {string} url 站点 URL
+ * @param {Object} options Handlebars options 对象
+ * @returns {string} favicon URL
+ * @example {{faviconV2Url url}}
+ */
+function faviconV2Url(url, options) {
+  if (!url) return '';
+
+  const region = options.data.root.icons?.region || 'com';
+  const domain = region === 'cn' ? 't3.gstatic.cn' : 't3.gstatic.com';
+
+  try {
+    const encodedUrl = encodeURIComponent(String(url));
+    return `https://${domain}/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodedUrl}&size=32`;
+  } catch (e) {
+    return '';
+  }
+}
+
+/**
+ * 根据 icons.region 配置生成 favicon 回退 URL
+ * @param {string} url 站点 URL
+ * @param {Object} options Handlebars options 对象
+ * @returns {string} favicon 回退 URL
+ * @example {{faviconFallbackUrl url}}
+ */
+function faviconFallbackUrl(url, options) {
+  if (!url) return '';
+
+  const region = options.data.root.icons?.region || 'com';
+  const domain = region === 'cn' ? 't3.gstatic.com' : 't3.gstatic.cn';
+
+  try {
+    const encodedUrl = encodeURIComponent(String(url));
+    return `https://${domain}/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodedUrl}&size=32`;
+  } catch (e) {
+    return '';
+  }
+}
+
+/**
+ * 安全 URL 输出：用于 href 等场景，防止 javascript: 等危险 scheme 变成可点击链接
+ * - 默认允许：http/https/mailto/tel + 相对链接（# / ./ ../ ?）
+ * - 允许通过 site.security.allowedSchemes 扩展白名单（例如 obsidian/vscode）
+ * @param {string} url 输入 URL
+ * @param {Object} options Handlebars options 对象
+ * @returns {string} 安全的 URL（不安全时返回 #）
+ * @example <a href="{{safeUrl url}}">...</a>
+ */
+function safeUrl(url, options) {
+  const raw = String(url || '').trim();
+  if (!raw) return '#';
+
+  // 允许相对链接
+  if (
+    raw.startsWith('#') ||
+    raw.startsWith('/') ||
+    raw.startsWith('./') ||
+    raw.startsWith('../') ||
+    raw.startsWith('?')
+  ) {
+    return raw;
+  }
+
+  // 拒绝协议相对 URL（//example.com），避免绕过策略
+  if (raw.startsWith('//')) {
+    console.warn(`[WARN] 已拦截不安全 URL（协议相对形式）：${raw}`);
+    return '#';
+  }
+
+  const allowedFromConfig =
+    options &&
+    options.data &&
+    options.data.root &&
+    options.data.root.site &&
+    options.data.root.site.security &&
+    options.data.root.site.security.allowedSchemes;
+
+  const allowedSchemes =
+    Array.isArray(allowedFromConfig) && allowedFromConfig.length > 0
+      ? allowedFromConfig
+          .map((s) =>
+            String(s || '')
+              .trim()
+              .toLowerCase()
+              .replace(/:$/, '')
+          )
+          .filter(Boolean)
+      : ['http', 'https', 'mailto', 'tel'];
+
+  try {
+    const parsed = new URL(raw);
+    const scheme = String(parsed.protocol || '')
+      .toLowerCase()
+      .replace(/:$/, '');
+    if (allowedSchemes.includes(scheme)) return raw;
+    console.warn(`[WARN] 已拦截不安全 URL scheme：${raw}`);
+    return '#';
+  } catch (e) {
+    console.warn(`[WARN] 已拦截无法解析的 URL：${raw}`);
+    return '#';
+  }
+}
+
 // 导出所有工具类助手函数
 module.exports = {
   slice,
@@ -205,5 +311,8 @@ module.exports = {
   pick,
   keys,
   encodeURIComponent: encodeURIComponentHelper,
-  add
+  add,
+  faviconV2Url,
+  faviconFallbackUrl,
+  safeUrl,
 };

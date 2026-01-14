@@ -1,37 +1,251 @@
 # 默认页面配置（请勿直接修改）。
 # 建议复制到 config/user/pages/bookmarks.yml 并按需调整。
 # 说明：该页面通常由“书签导入工具”自动生成，手工修改时请保持字段结构一致。
-title: 我的书签
-subtitle: 从浏览器导入的书签收藏
+title: 书签
+subtitle: bookmarks
 
 # 指定使用的模板文件名，现有页面模板可见 templates/pages（不含 .hbs）
+# 提示：bookmarks 模板页面标题区会自动显示“内容更新：YYYY-MM-DD（git|mtime）”，无需额外配置
 template: bookmarks
 
-# 页面分类与站点列表（大量示例项，按需删减）
 categories:
-  - name: 技术资源
-    icon: fas fa-folder # 分类图标
+  - name: '常用网站'
+    icon: 'fas fa-star'
     sites:
-      - name: GitHub                      # 站点名称
-        url: https://github.com/          # http/https URL（favicon 模式将尝试加载站点图标）
-        icon: fab fa-github               # 手动图标（manual 模式显示；favicon 失败时回退）
-        description: "从书签导入: GitHub" # 描述
-      - name: Stack Overflow
-        url: https://stackoverflow.com/
-        icon: fab fa-stack-overflow
-        description: "从书签导入: Stack Overflow"
-      - name: MDN Web Docs
-        url: https://developer.mozilla.org/
-        icon: fas fa-link
-        description: "从书签导入: MDN Web Docs"
-  - name: 社交媒体
-    icon: fas fa-folder
-    sites:
-      - name: Twitter
-        url: https://twitter.com/
-        icon: fab fa-twitter
-        description: "从书签导入: Twitter"
-      - name: LinkedIn
-        url: https://www.linkedin.com/
-        icon: fab fa-linkedin
-        description: "从书签导入: LinkedIn" 
+      - name: 'GitHub'
+        url: 'https://github.com/'
+        icon: 'fab fa-github'
+        description: '代码托管平台'
+      - name: 'Stack Overflow'
+        url: 'https://stackoverflow.com/'
+        icon: 'fab fa-stack-overflow'
+        description: '程序员问答社区'
+      - name: 'MDN Web Docs'
+        url: 'https://developer.mozilla.org/'
+        icon: 'fas fa-book'
+        description: 'Web开发文档'
+
+  - name: '社交媒体'
+    icon: 'fas fa-share-alt'
+    groups:
+      - name: '国际平台'
+        icon: 'fas fa-globe'
+        sites:
+          - name: 'Twitter'
+            url: 'https://twitter.com/'
+            icon: 'fab fa-twitter'
+            description: '微博客社交平台'
+          - name: 'LinkedIn'
+            url: 'https://www.linkedin.com/'
+            icon: 'fab fa-linkedin'
+            description: '职业社交网络'
+          - name: 'Facebook'
+            url: 'https://www.facebook.com/'
+            icon: 'fab fa-facebook'
+            description: '社交网络服务'
+      - name: '国内平台'
+        icon: 'fas fa-map-marker-alt'
+        sites:
+          - name: '微博'
+            url: 'https://weibo.com/'
+            icon: 'fas fa-comment'
+            description: '中文社交媒体平台'
+          - name: '知乎'
+            url: 'https://www.zhihu.com/'
+            icon: 'fas fa-question-circle'
+            description: '中文问答社区'
+          - name: 'B站'
+            url: 'https://www.bilibili.com/'
+            icon: 'fas fa-video'
+            description: '弹幕视频网站'
+
+  - name: '技术资源'
+    icon: 'fas fa-laptop-code'
+    subcategories:
+      - name: '前端开发'
+        icon: 'fas fa-code'
+        groups:
+          - name: '框架库'
+            icon: 'fas fa-cube'
+            sites:
+              - name: 'React'
+                url: 'https://reactjs.org/'
+                icon: 'fab fa-react'
+                description: 'React官方文档'
+              - name: 'Vue.js'
+                url: 'https://vuejs.org/'
+                icon: 'fab fa-vuejs'
+                description: 'Vue.js官方文档'
+              - name: 'Angular'
+                url: 'https://angular.io/'
+                icon: 'fab fa-angular'
+                description: 'Angular官方文档'
+          - name: '状态管理'
+            icon: 'fas fa-database'
+            sites:
+              - name: 'Redux'
+                url: 'https://redux.js.org/'
+                icon: 'fas fa-database'
+                description: 'Redux状态管理'
+              - name: 'Vuex'
+                url: 'https://vuex.vuejs.org/'
+                icon: 'fas fa-database'
+                description: 'Vue状态管理'
+              - name: 'MobX'
+                url: 'https://mobx.js.org/'
+                icon: 'fas fa-react'
+                description: '响应式状态管理'
+          - name: '构建工具'
+            icon: 'fas fa-tools'
+            sites:
+              - name: 'Webpack'
+                url: 'https://webpack.js.org/'
+                icon: 'fas fa-cube'
+                description: '模块打包工具'
+              - name: 'Vite'
+                url: 'https://vitejs.dev/'
+                icon: 'fas fa-bolt'
+                description: '下一代前端构建工具'
+              - name: 'Rollup'
+                url: 'https://rollupjs.org/'
+                icon: 'fas fa-compress'
+                description: '模块打包器'
+      - name: '后端开发'
+        icon: 'fas fa-server'
+        groups:
+          - name: 'Node.js生态'
+            icon: 'fab fa-node-js'
+            sites:
+              - name: 'Express'
+                url: 'https://expressjs.com/'
+                icon: 'fas fa-server'
+                description: 'Node.js Web框架'
+              - name: 'Koa'
+                url: 'https://koajs.com/'
+                icon: 'fas fa-leaf'
+                forceIconMode: manual
+                description: '下一代Node.js框架'
+              - name: 'NestJS'
+                url: 'https://nestjs.com/'
+                icon: 'fas fa-home'
+                description: 'Node.js企业级框架'
+          - name: 'Python框架'
+            icon: 'fab fa-python'
+            sites:
+              - name: 'Django'
+                url: 'https://www.djangoproject.com/'
+                icon: 'fab fa-python'
+                description: 'Python Web框架'
+              - name: 'Flask'
+                url: 'https://flask.palletsprojects.com/'
+                icon: 'fas fa-flask'
+                description: 'Python微框架'
+              - name: 'FastAPI'
+                url: 'https://fastapi.tiangolo.com/'
+                icon: 'fas fa-bolt'
+                description: '现代Python Web框架'
+
+  - name: '设计资源'
+    icon: 'fas fa-palette'
+    subcategories:
+      - name: 'UI设计工具'
+        icon: 'fas fa-paint-brush'
+        groups:
+          - name: '原型设计'
+            icon: 'fas fa-drafting-compass'
+            sites:
+              - name: 'Figma'
+                url: 'https://www.figma.com/'
+                icon: 'fab fa-figma'
+                description: '协作式UI设计工具'
+              - name: 'Sketch'
+                url: 'https://www.sketch.com/'
+                icon: 'fab fa-sketch'
+                description: 'Mac平台UI设计工具'
+              - name: 'Adobe XD'
+                url: 'https://www.adobe.com/products/xd.html'
+                icon: 'fab fa-adobe'
+                description: 'Adobe UI设计工具'
+          - name: '设计系统'
+            icon: 'fas fa-th-large'
+            sites:
+              - name: 'Ant Design'
+                url: 'https://ant.design/'
+                icon: 'fas fa-th'
+                forceIconMode: manual
+                description: '企业级UI设计语言'
+              - name: 'Material Design'
+                url: 'https://material.io/design'
+                icon: 'fas fa-cube'
+                description: 'Google设计系统'
+              - name: 'Bootstrap'
+                url: 'https://getbootstrap.com/'
+                icon: 'fab fa-bootstrap'
+                description: '响应式CSS框架'
+      - name: '视觉资源'
+        icon: 'fas fa-image'
+        groups:
+          - name: '图标库'
+            icon: 'fas fa-icons'
+            sites:
+              - name: 'Font Awesome'
+                url: 'https://fontawesome.com/'
+                icon: 'fab fa-font-awesome'
+                description: '图标库'
+              - name: 'Iconfont'
+                url: 'https://www.iconfont.cn/'
+                icon: 'fas fa-icons'
+                description: '阿里巴巴图标库'
+              - name: 'Feather Icons'
+                url: 'https://feathericons.com/'
+                icon: 'fas fa-feather'
+                description: '简洁的图标库'
+          - name: '配色方案'
+            icon: 'fas fa-palette'
+            sites:
+              - name: 'Coolors'
+                url: 'https://coolors.co/'
+                icon: 'fas fa-palette'
+                description: '在线配色方案生成器'
+              - name: 'Adobe Color'
+                url: 'https://color.adobe.com/'
+                icon: 'fab fa-adobe'
+                description: 'Adobe配色工具'
+              - name: 'Paletton'
+                url: 'https://paletton.com/'
+                icon: 'fas fa-palette'
+                description: '配色方案设计工具'
+
+  - name: '开发工具'
+    icon: 'fas fa-tools'
+    groups:
+      - name: '代码编辑器'
+        icon: 'fas fa-code'
+        sites:
+          - name: 'Visual Studio Code'
+            url: 'https://code.visualstudio.com/'
+            icon: 'fas fa-code'
+            description: '微软代码编辑器'
+          - name: 'Sublime Text'
+            url: 'https://www.sublimetext.com/'
+            icon: 'fas fa-file-code'
+            description: '轻量级代码编辑器'
+          - name: 'WebStorm'
+            url: 'https://www.jetbrains.com/webstorm/'
+            icon: 'fab fa-js'
+            description: 'JetBrains前端IDE'
+      - name: '版本控制'
+        icon: 'fas fa-code-branch'
+        sites:
+          - name: 'GitHub'
+            url: 'https://github.com/'
+            icon: 'fab fa-github'
+            description: '代码托管平台'
+          - name: 'GitLab'
+            url: 'https://gitlab.com/'
+            icon: 'fab fa-gitlab'
+            description: 'Git代码管理平台'
+          - name: 'Bitbucket'
+            url: 'https://bitbucket.org/'
+            icon: 'fab fa-bitbucket'
+            description: 'Atlassian代码托管'

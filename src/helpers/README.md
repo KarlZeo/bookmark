@@ -179,6 +179,14 @@ MeNav 的助手函数分为四类：
 {{json this}}
 ```
 
+#### extractDomain
+
+从 URL 中提取“干净的域名”（不包含协议、路径与查询串），常用于站点描述兜底显示：
+
+```handlebars
+{{extractDomain url}}
+```
+
 ### 条件判断函数
 
 #### ifEquals / ifNotEquals
@@ -309,6 +317,22 @@ MeNav 的助手函数分为四类：
 {{#each (keys object)}}
     <li>{{this}}</li>
 {{/each}}
+```
+
+#### encodeURIComponent
+
+对字符串做 URL 组件编码，常用于拼接第三方请求参数（例如 favicon 的 `url=` 参数）：
+
+```handlebars
+{{encodeURIComponent url}}
+```
+
+#### add
+
+数字加法，用于根据层级动态计算标题级别等场景：
+
+```handlebars
+<h{{add level 1}}>...</h{{add level 1}}>
 ```
 
 ### 核心函数

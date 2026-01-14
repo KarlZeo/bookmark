@@ -1,0 +1,143 @@
+# 默认页面配置（请勿直接修改）。
+# 建议复制到 config/user/pages/common.yml 并按需调整。
+title: 常用网站 # 页面标题
+subtitle: Common website # 页面副标题
+
+# 指定使用的模板文件名，现有页面模板可见 templates/pages（不含 .hbs）
+# 说明：推荐使用通用模板 page；首页由“导航第一项”决定
+template: page
+
+# 页面分类与站点列表
+categories:
+  - name: 置顶
+    icon: fas fa-star # 分类图标
+    sites:
+      - name: Linux.do # 站点名称
+        url: https://linux.do/ # http/https URL（favicon 模式将尝试加载站点图标）
+        icon: fab fa-linux # 手动图标：manual 模式使用；favicon 模式下作为回退
+        description: 新的理想型社区 # 站点描述
+      - name: Menav
+        url: https://rbetree.github.io/menav
+        icon: fas fa-star
+        description: 个人导航站
+        faviconUrl: assets/menav.svg
+      - name: Google
+        url: https://www.google.com
+        icon: fab fa-google
+        description: 全球最大的搜索引擎
+      - name: GitHub
+        url: https://www.github.com
+        icon: fab fa-github
+        description: 代码托管平台
+      - name: Stack Overflow
+        url: https://stackoverflow.com
+        icon: fab fa-stack-overflow
+        description: 程序员问答社区
+      - name: ChatGPT
+        url: https://chat.openai.com
+        icon: fas fa-robot
+        description: AI智能助手
+      - name: YouTube
+        url: https://www.youtube.com
+        icon: fab fa-youtube
+        description: 视频分享平台
+      - name: Twitter
+        url: https://twitter.com
+        icon: fab fa-twitter
+        description: 社交媒体平台
+      - name: Reddit
+        url: https://www.reddit.com
+        icon: fab fa-reddit
+        description: 社区讨论平台
+  - name: 学习资源
+    icon: fas fa-graduation-cap
+    sites:
+      - name: 哔哩哔哩
+        url: https://www.bilibili.com
+        icon: fas fa-play-circle
+        description: 视频学习平台
+      - name: 掘金
+        url: https://juejin.cn
+        icon: fas fa-book
+        description: 高质量技术社区
+      - name: LeetCode
+        url: https://leetcode.cn
+        icon: fas fa-code
+        description: 算法刷题平台
+  - name: 设计资源
+    icon: fas fa-palette
+    sites:
+      - name: Figma
+        url: https://www.figma.com
+        icon: fab fa-figma
+        description: 在线设计工具
+      - name: Dribbble
+        url: https://dribbble.com
+        icon: fab fa-dribbble
+        description: 设计师社区
+      - name: IconFont
+        url: https://www.iconfont.cn
+        icon: fas fa-icons
+        description: 图标资源库
+      - name: Adobe XD
+        url: https://www.adobe.com/products/xd.html
+        icon: fab fa-adobe
+        description: UI/UX设计工具
+      - name: Sketch
+        url: https://www.sketch.com
+        icon: fas fa-pencil-ruler
+        description: 矢量设计工具
+      - name: Canva
+        url: https://www.canva.com
+        icon: fas fa-paint-brush
+        description: 在线平面设计
+  - name: 在线工具
+    icon: fas fa-wrench
+    sites:
+      - name: JSON Editor
+        url: https://jsoneditoronline.org
+        icon: fas fa-code-branch
+        description: JSON在线编辑器
+      - name: Can I Use
+        url: https://caniuse.com
+        icon: fas fa-browser
+        description: 浏览器兼容性查询
+      - name: TinyPNG
+        url: https://tinypng.com
+        icon: fas fa-compress
+        description: 图片压缩工具
+      - name: Carbon
+        url: https://carbon.now.sh
+        icon: fas fa-code
+        description: 代码图片生成器
+      - name: Excalidraw
+        url: https://excalidraw.com
+        icon: fas fa-pencil-alt
+        description: 手绘风格图表工具
+  - name: 云服务平台
+    icon: fas fa-cloud
+    sites:
+      - name: Cloudflare
+        url: https://www.cloudflare.com
+        icon: fas fa-cloud
+        description: CDN与安全服务
+      - name: Vercel
+        url: https://vercel.com
+        icon: fas fa-server
+        description: 前端部署平台
+      - name: Netlify
+        url: https://www.netlify.com
+        icon: fas fa-globe
+        description: 静态网站托管
+      - name: AWS
+        url: https://aws.amazon.com
+        icon: fab fa-aws
+        description: 亚马逊云服务
+      - name: Azure
+        url: https://azure.microsoft.com
+        icon: fab fa-microsoft
+        description: 微软云平台
+      - name: Google Cloud
+        url: https://cloud.google.com
+        icon: fab fa-google
+        description: 谷歌云平台
