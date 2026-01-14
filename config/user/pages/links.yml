@@ -44,6 +44,10 @@ categories:
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: A Decky Loader plugin that brings together games from Steam, Epic Games Store, GOG and Amazon into a single, unified library experience on your Steam Deck.
         url: https://github.com/mubaraknumann/unifideck
+      - name: decky-wine-cellar
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: A Decky Loader plugin to manage Steam Play compatibility tools.
+        url: https://github.com/FlashyReese/decky-wine-cellar
       - name: proton-ge-custom
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: Compatibility tool for Steam Play based on Wine and additional components
