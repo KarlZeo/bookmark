@@ -56,10 +56,13 @@ MeNav 的助手函数分为四类：
 
 ```handlebars
 {{#ifHttpUrl url}}
-  {{!-- 只有 http/https 才尝试加载 favicon --}}
-  <img src="https://t3.gstatic.com/faviconV2?url={{encodeURIComponent url}}&size=32" alt="{{name}} favicon" />
+  {{! 只有 http/https 才尝试加载 favicon }}
+  <img
+    src='https://t3.gstatic.com/faviconV2?url={{encodeURIComponent url}}&size=32&drop_404_icon=true'
+    alt='{{name}} favicon'
+  />
 {{else}}
-  <i class="fas fa-link"></i>
+  <i class='fas fa-link'></i>
 {{/ifHttpUrl}}
 ```
 
@@ -79,8 +82,13 @@ MeNav 的助手函数分为四类：
 对字符串进行 URL 组件编码（同名于浏览器 API，用作模板内联助手），适用于将动态 URL 参数安全拼接到查询串：
 
 ```handlebars
-{{!-- 构造第三方 Favicon API 的 url 参数 --}}
-<img src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&url={{encodeURIComponent url}}&size=32" alt="favicon" />
+{{! 构造第三方 Favicon API 的 url 参数 }}
+<img
+  src='https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&url={{encodeURIComponent
+    url
+  }}&size=32&drop_404_icon=true'
+  alt='favicon'
+/>
 ```
 
 ### 核心函数
@@ -101,7 +109,7 @@ MeNav 的助手函数分为四类：
 用于生成内容的助手函数：
 
 ```handlebars
-{{formatDate created "YYYY-MM-DD"}}
+{{formatDate created 'YYYY-MM-DD'}}
 {{limit description 100}}
 {{json data}}
 ```
@@ -111,14 +119,14 @@ MeNav 的助手函数分为四类：
 用于控制结构的助手函数：
 
 ```handlebars
-{{#ifEquals type "article"}}
-    <span class="badge">文章</span>
+{{#ifEquals type 'article'}}
+  <span class='badge'>文章</span>
 {{else}}
-    <span class="badge">页面</span>
+  <span class='badge'>页面</span>
 {{/ifEquals}}
 
 {{#each (range 1 5)}}
-    <span>{{this}}</span>
+  <span>{{this}}</span>
 {{/each}}
 ```
 
@@ -128,7 +136,7 @@ MeNav 的助手函数分为四类：
 
 ```handlebars
 {{#each (slice items 0 5)}}
-    <li>{{toUpperCase name}}</li>
+  <li>{{toUpperCase name}}</li>
 {{/each}}
 ```
 
@@ -141,12 +149,16 @@ MeNav 的助手函数分为四类：
 格式化日期：
 
 ```handlebars
-{{formatDate date "YYYY-MM-DD"}}  {{!-- 2023-05-15 --}}
-{{formatDate date "YYYY年MM月DD日"}}  {{!-- 2023年05月15日 --}}
-{{formatDate date "YYYY-MM-DD HH:mm:ss"}}  {{!-- 2023-05-15 14:30:00 --}}
+{{formatDate date 'YYYY-MM-DD'}}
+{{! 2023-05-15 }}
+{{formatDate date 'YYYY年MM月DD日'}}
+{{! 2023年05月15日 }}
+{{formatDate date 'YYYY-MM-DD HH:mm:ss'}}
+{{! 2023-05-15 14:30:00 }}
 ```
 
 支持的格式：
+
 - `YYYY`: 四位年份
 - `MM`: 两位月份
 - `DD`: 两位日期
@@ -159,7 +171,7 @@ MeNav 的助手函数分为四类：
 限制文本长度，超出部分显示省略号：
 
 ```handlebars
-{{limit "这是一段很长的文本内容" 5}}  {{!-- 这是一段... --}}
+{{limit '这是一段很长的文本内容' 5}} {{! 这是一段... }}
 ```
 
 #### toLowerCase / toUpperCase
@@ -167,8 +179,10 @@ MeNav 的助手函数分为四类：
 转换文本大小写：
 
 ```handlebars
-{{toLowerCase "Hello"}}  {{!-- hello --}}
-{{toUpperCase "world"}}  {{!-- WORLD --}}
+{{toLowerCase 'Hello'}}
+{{! hello }}
+{{toUpperCase 'world'}}
+{{! WORLD }}
 ```
 
 #### json
@@ -194,10 +208,10 @@ MeNav 的助手函数分为四类：
 比较两个值是否相等/不相等：
 
 ```handlebars
-{{#ifEquals status "active"}}
-    当前状态：活跃
+{{#ifEquals status 'active'}}
+  当前状态：活跃
 {{else}}
-    当前状态：非活跃
+  当前状态：非活跃
 {{/ifEquals}}
 ```
 
@@ -206,14 +220,17 @@ MeNav 的助手函数分为四类：
 通用条件比较：
 
 ```handlebars
-{{#ifCond count ">" 0}}
-    有 {{count}} 个项目
+{{#ifCond count '>' 0}}
+  有
+  {{count}}
+  个项目
 {{else}}
-    没有项目
+  没有项目
 {{/ifCond}}
 ```
 
 支持的运算符：
+
 - `==`, `===`, `!=`, `!==`
 - `<`, `<=`, `>`, `>=`
 - `&&`, `||`
@@ -224,13 +241,13 @@ MeNav 的助手函数分为四类：
 
 ```handlebars
 {{#isEmpty items}}
-    <p>暂无数据</p>
+  <p>暂无数据</p>
 {{else}}
-    <ul>
-        {{#each items}}
-            <li>{{this}}</li>
-        {{/each}}
-    </ul>
+  <ul>
+    {{#each items}}
+      <li>{{this}}</li>
+    {{/each}}
+  </ul>
 {{/isEmpty}}
 ```
 
@@ -240,15 +257,15 @@ MeNav 的助手函数分为四类：
 
 ```handlebars
 {{#and isPremium isActive}}
-    高级活跃用户
+  高级活跃用户
 {{/and}}
 
 {{#or isPremium isAdmin}}
-    有访问权限
+  有访问权限
 {{/or}}
 
 {{#not isDisabled}}
-    此功能可用
+  此功能可用
 {{/not}}
 ```
 
@@ -260,7 +277,7 @@ MeNav 的助手函数分为四类：
 
 ```handlebars
 {{#each (slice array 0 3)}}
-    <li>{{this}}</li>
+  <li>{{this}}</li>
 {{/each}}
 ```
 
@@ -270,7 +287,7 @@ MeNav 的助手函数分为四类：
 
 ```handlebars
 {{#each (concat array1 array2)}}
-    <li>{{this}}</li>
+  <li>{{this}}</li>
 {{/each}}
 ```
 
@@ -287,8 +304,10 @@ MeNav 的助手函数分为四类：
 获取数组的第一个/最后一个元素：
 
 ```handlebars
-第一项: {{first items}}
-最后一项: {{last items}}
+第一项:
+{{first items}}
+最后一项:
+{{last items}}
 ```
 
 #### range
@@ -297,7 +316,7 @@ MeNav 的助手函数分为四类：
 
 ```handlebars
 {{#each (range 1 5)}}
-    <span>{{this}}</span>
+  <span>{{this}}</span>
 {{/each}}
 ```
 
@@ -306,7 +325,7 @@ MeNav 的助手函数分为四类：
 从对象中选择指定的属性：
 
 ```handlebars
-{{json (pick user "name" "email")}}
+{{json (pick user 'name' 'email')}}
 ```
 
 #### keys
@@ -315,7 +334,7 @@ MeNav 的助手函数分为四类：
 
 ```handlebars
 {{#each (keys object)}}
-    <li>{{this}}</li>
+  <li>{{this}}</li>
 {{/each}}
 ```
 
@@ -382,7 +401,7 @@ module.exports = {
   toLowerCase,
   toUpperCase,
   json,
-  formatNumber // 添加新函数
+  formatNumber, // 添加新函数
 };
 ```
 
@@ -398,7 +417,7 @@ const newHelpers = require('./new-helpers');
 
 function registerAllHelpers(handlebars) {
   // 现有注册代码...
-  
+
   // 注册新的助手函数
   Object.entries(newHelpers).forEach(([name, helper]) => {
     handlebars.registerHelper(name, helper);
@@ -425,4 +444,4 @@ function registerAllHelpers(handlebars) {
 
 4. **避免副作用** - 助手函数应为纯函数，不修改传入的数据
 
-5. **保持简单** - 每个助手函数应只完成一个明确的任务 
+5. **保持简单** - 每个助手函数应只完成一个明确的任务

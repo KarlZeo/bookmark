@@ -106,7 +106,6 @@ jobs:
           git commit -m "chore(bookmarks): 导入书签并写回用户配置"
           git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" HEAD:${{ github.ref_name }}
       # --- 书签处理步骤结束 ---
-
       # --- 网站构建和部署步骤 ---
       # 同步时效性数据（best-effort）：projects 仓库信息、articles RSS 聚合
       # 说明：
@@ -129,17 +128,25 @@ jobs:
           else
             echo "Warning: favicon.ico not found in dist directory"
             # 暂时改为警告，避免因为图标问题阻止部署
-            # exit 1 
+            # exit 1
           fi
 
+      # GitHub Pages 部署步骤（仅在启用时执行）
+      # 说明：
+      # - 如果你使用 Vercel/Cloudflare Pages 等第三方平台部署，可以跳过这些步骤
+      # - 设置 repository variable ENABLE_GITHUB_PAGES=false 来禁用 GitHub Pages 部署
+      # - 默认启用 GitHub Pages 部署以保持向后兼容
       - name: Setup Pages
+        if: ${{ vars.ENABLE_GITHUB_PAGES != 'false' }}
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
+        if: ${{ vars.ENABLE_GITHUB_PAGES != 'false' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'dist'
 
       - name: Deploy to GitHub Pages
+        if: ${{ vars.ENABLE_GITHUB_PAGES != 'false' }}
         id: deployment
         uses: actions/deploy-pages@v4

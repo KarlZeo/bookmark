@@ -6,19 +6,20 @@
   "homepage": "https://rbetree.github.io/menav",
   "scripts": {
     "generate": "node src/generator.js",
-    "dev": "npm run sync-projects && npm run sync-articles && node src/generator.js && serve dist -l 5173",
-    "dev:offline": "node src/generator.js && serve dist -l 5173",
+    "dev": "node ./scripts/dev.js",
+    "dev:offline": "node ./scripts/dev-offline.js",
     "clean": "node ./scripts/clean.js",
-    "build": "npm run clean && npm run generate",
+    "build": "node ./scripts/build.js",
     "sync-articles": "node ./scripts/sync-articles.js",
     "sync-projects": "node ./scripts/sync-projects.js",
     "import-bookmarks": "node src/bookmark-processor.js",
-    "test": "node --test test/*.js",
+    "test": "node ./scripts/test.js",
     "lint": "node ./scripts/lint.js",
-    "format": "prettier --write \"src/**/*.js\" \"scripts/**/*.js\" \"test/**/*.js\" \".github/**/*.yml\" \"*.{md,json}\" \"config/**/*.md\" \"config/**/*.yml\"",
-    "format:check": "prettier --check \"src/**/*.js\" \"scripts/**/*.js\" \"test/**/*.js\" \".github/**/*.yml\" \"*.{md,json}\" \"config/**/*.md\" \"config/**/*.yml\"",
+    "format": "node ./scripts/format.js --write",
+    "format:check": "node ./scripts/format.js --check",
     "format:check:changed": "node ./scripts/format-check-changed.js",
-    "check": "npm run lint && npm test && npm run build"
+    "check": "node ./scripts/check.js",
+    "prepare": "husky"
   },
   "keywords": [
     "navigation",
@@ -28,16 +29,24 @@
   "author": "Your Name",
   "license": "AGPL-3.0-only",
   "dependencies": {
-    "js-yaml": "^4.1.1",
     "handlebars": "^4.7.8",
+    "js-yaml": "^4.1.1",
+    "markdown-it": "^14.1.0",
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {
     "esbuild": "^0.27.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.4.2",
     "serve": "^14.2.5"
   },
   "overrides": {
     "brace-expansion": "1.1.12"
+  },
+  "lint-staged": {
+    "**/*.js": "node ./node_modules/prettier/bin/prettier.cjs --write --ignore-unknown",
+    "**/*.{yml,yaml,md,css}": "node ./node_modules/prettier/bin/prettier.cjs --write --ignore-unknown",
+    "**/!(package-lock).json": "node ./node_modules/prettier/bin/prettier.cjs --write --ignore-unknown"
   }
 }

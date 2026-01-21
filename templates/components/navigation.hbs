@@ -6,10 +6,10 @@
             <i class="{{icon}}"></i>
         </div>
         <span class="nav-text" data-editable="nav-item-name">{{name}}</span>
-        {{#if submenu}}<i class="fas fa-chevron-down submenu-toggle"></i>{{/if}}
     </a>
     {{#if submenu}}
     <div class="submenu">
+        <div class="submenu-header">{{name}}</div>
         {{#each submenu}}
         <a href="?page={{../id}}#{{#if slug}}{{slug}}{{else}}{{name}}{{/if}}" class="submenu-item" data-page="{{../id}}" data-category="{{name}}" data-category-id="{{#if slug}}{{slug}}{{else}}{{name}}{{/if}}">
             <i class="{{icon}}"></i>

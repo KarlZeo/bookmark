@@ -2,6 +2,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
+const { createLogger, isVerbose, startTimer } = require('../src/generator/utils/logger');
+
+const log = createLogger('format:check:changed');
+
 function runGit(args, cwd, options = {}) {
   const { allowFailure = false, stdio } = options;
   try {
@@ -103,17 +107,13 @@ function collectChangedFiles(repoRoot, range) {
   const baseExists = gitObjectExists(repoRoot, range.base);
   const headExists = gitObjectExists(repoRoot, range.head);
   if (!baseExists || !headExists) {
-    console.warn(
-      '格式检查：检测到 diff range 所需提交缺失，尝试补全 git 历史（避免浅克隆导致失败）'
-    );
+    log.warn('检测到 diff range 所需提交缺失，尝试补全 git 历史（避免浅克隆导致失败）');
     tryFetchMoreHistory(repoRoot);
   }
 
   const output = runGit(diffArgs, repoRoot, { allowFailure: true });
   if (!output) {
-    console.warn(
-      '格式检查：无法计算 revision range，回退为 HEAD 变更文件（可能仅覆盖最后一次提交）'
-    );
+    log.warn('无法计算 revision range，回退为 HEAD 变更文件（可能仅覆盖最后一次提交）');
     return collectHeadChangedFiles(repoRoot);
   }
 
@@ -149,8 +149,8 @@ function shouldCheckFile(filePath) {
 
   if (normalized === 'package-lock.json') return false;
 
-  // 这两个文件历史上未统一为 Prettier 风格；避免为了启用检查产生巨量格式化 diff
-  if (normalized === 'src/generator.js' || normalized === 'src/script.js') return false;
+  // 这些文件历史上未统一为 Prettier 风格；避免为了启用检查产生巨量格式化 diff
+  if (normalized === 'src/generator/main.js' || normalized === 'src/runtime/index.js') return false;
 
   // 与现有 npm scripts 的检查范围对齐：不检查 docs/ 与 templates/
   const allowedRoots = ['src/', 'scripts/', 'test/', '.github/', 'config/'];
@@ -175,6 +175,9 @@ function resolvePrettierBin(repoRoot) {
 
 function main() {
   const repoRoot = path.resolve(__dirname, '..');
+  const elapsedMs = startTimer();
+
+  log.info('开始');
 
   const event = tryReadGithubEvent(process.env.GITHUB_EVENT_PATH);
   const range = getDiffRangeFromGithubEvent(event);
@@ -186,21 +189,33 @@ function main() {
   const filesToCheck = candidateFiles.filter(shouldCheckFile);
 
   if (filesToCheck.length === 0) {
-    console.log('格式检查：未发现需要检查的文件，跳过。');
+    log.ok('未发现需要检查的文件，跳过');
     return;
   }
 
   const prettierBin = resolvePrettierBin(repoRoot);
   if (!prettierBin) {
-    console.error('格式检查失败：未找到 prettier，可先运行 npm ci / npm install。');
+    log.error('未找到 prettier，可先运行 npm ci / npm install');
     process.exitCode = 1;
     return;
   }
 
-  console.log(`格式检查：共 ${filesToCheck.length} 个文件`);
-  filesToCheck.forEach((filePath) => console.log(`- ${filePath}`));
+  log.info('准备检查文件格式', { files: filesToCheck.length });
+  if (isVerbose()) {
+    filesToCheck.forEach((filePath) => log.info('待检查', { file: filePath }));
+  }
 
-  execFileSync(prettierBin, ['--check', ...filesToCheck], { cwd: repoRoot, stdio: 'inherit' });
+  try {
+    execFileSync(prettierBin, ['--check', ...filesToCheck], { cwd: repoRoot, stdio: 'inherit' });
+    log.ok('通过', { ms: elapsedMs(), files: filesToCheck.length });
+  } catch (error) {
+    log.error('未通过', {
+      ms: elapsedMs(),
+      files: filesToCheck.length,
+      exit: error && error.status ? error.status : 1,
+    });
+    process.exitCode = error && error.status ? error.status : 1;
+  }
 }
 
 main();

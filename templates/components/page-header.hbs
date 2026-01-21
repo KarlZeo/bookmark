@@ -1,5 +1,5 @@
 {{!-- page-header.hbs - 统一页面标题区（可选显示书签页内容更新时间） --}}
-<div class="welcome-section{{#ifCond projectsMeta '&&' projectsMeta.heatmap}} welcome-section-with-side{{/ifCond}}">
+<div class="welcome-section">
     <div class="welcome-section-main">
         {{#ifEquals pageId @root.homePageId}}
             <h2 data-editable="profile-title">{{title}}</h2>
@@ -19,18 +19,5 @@
         {{/ifEquals}}
     </div>
 
-    {{#if projectsMeta}}
-    {{#if projectsMeta.heatmap}}
-    <div class="welcome-section-side">
-        <div class="heatmap-container" title="我的 GitHub 贡献热力图">
-            <a href="{{safeUrl projectsMeta.heatmap.profileUrl}}" target="_blank" rel="noopener">
-                <img class="heatmap-img"
-                     src="{{projectsMeta.heatmap.imageUrl}}"
-                     alt="Github Chart"
-                     loading="lazy" />
-            </a>
-        </div>
-    </div>
-    {{/if}}
-    {{/if}}
+
 </div>

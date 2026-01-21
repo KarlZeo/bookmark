@@ -507,6 +507,19 @@ server {
 - 设置构建命令为`npm run build`
 - 设置输出目录为`dist`
 
+**如果您只使用第三方平台部署（不使用 GitHub Pages）**：
+
+为避免 GitHub Actions 中的 Pages 配置错误，您可以禁用 GitHub Pages 部署步骤：
+
+1. 进入仓库的 Settings -> Secrets and variables -> Actions
+2. 点击 "Variables" 标签页
+3. 点击 "New repository variable"
+4. 名称填写：`ENABLE_GITHUB_PAGES`
+5. 值填写：`false`
+6. 点击 "Add variable"
+
+设置后，GitHub Actions 仍会自动构建网站（包括书签处理、RSS 同步等），但会跳过 GitHub Pages 部署步骤，避免报错。第三方平台（如 Vercel/Cloudflare Pages）会自动检测到代码变化并部署。
+
 > 如果你希望在构建时刷新“时效性数据”（RSS 文章聚合、projects 仓库统计），请将构建命令改为：
 >
 > ```bash

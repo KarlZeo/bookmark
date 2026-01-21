@@ -23,9 +23,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Format check (changed files)
-        run: npm run format:check:changed
-
       - name: Lint
         run: npm run lint
 
