@@ -133,6 +133,10 @@ categories:
         url: https://vcb-s.com/
         description: vcb-studio
         icon: fas fa-icons
+      - name: Ani Anime
+        url: https://openani.an-i.workers.dev/
+        description: Ani Anime
+        icon: fas fa-icons
       - name: 長門番堂
         url: https://yuc.wiki/
         description: 長門番堂
