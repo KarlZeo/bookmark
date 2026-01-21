@@ -3,6 +3,9 @@ const fs = require('fs');
 const path = require('path');
 
 const { loadConfig } = require('../src/generator.js');
+const { createLogger, isVerbose, startTimer } = require('../src/generator/utils/logger');
+
+const log = createLogger('sync:projects');
 
 const DEFAULT_SETTINGS = {
   enabled: true,
@@ -153,9 +156,9 @@ async function loadLanguageColors(settings, cacheBaseDir) {
       return colors;
     }
   } catch (error) {
-    console.warn(
-      `[WARN] 获取语言颜色表失败（将不输出 languageColor）：${String(error && error.message ? error.message : error)}`
-    );
+    log.warn('获取语言颜色表失败（将不输出 languageColor）', {
+      message: String(error && error.message ? error.message : error),
+    });
   }
 
   return {};
@@ -209,11 +212,14 @@ async function runPool(items, concurrency, worker) {
 }
 
 async function main() {
+  const elapsedMs = startTimer();
   const config = loadConfig();
   const settings = getSettings(config);
 
+  log.info('开始');
+
   if (!settings.enabled) {
-    console.log('[INFO] projects 仓库同步已禁用（PROJECTS_ENABLED=false）');
+    log.ok('projects 仓库同步已禁用，跳过', { env: 'PROJECTS_ENABLED=false' });
     return;
   }
 
@@ -226,9 +232,14 @@ async function main() {
   const pages = findProjectsPages(config);
 
   if (!pages.length) {
-    console.log('[INFO] 未找到 template=projects 的页面，跳过同步');
+    log.ok('未找到 template=projects 的页面，跳过同步');
     return;
   }
+
+  log.info('准备同步 projects 页面缓存', { pages: pages.length });
+
+  let pageSuccess = 0;
+  let pageFailed = 0;
 
   for (const { pageId, page } of pages) {
     const categories = Array.isArray(page.categories) ? page.categories : [];
@@ -244,7 +255,7 @@ async function main() {
     const repoList = Array.from(unique.values());
 
     if (!repoList.length) {
-      console.log(`[INFO] 页面 ${pageId}：未发现 GitHub 仓库链接，跳过`);
+      log.ok('页面未发现 GitHub 仓库链接，跳过', { page: pageId });
       continue;
     }
 
@@ -258,9 +269,10 @@ async function main() {
         return meta;
       } catch (error) {
         failed += 1;
-        console.warn(
-          `[WARN] 拉取失败：${repo.canonicalUrl}（${String(error && error.message ? error.message : error)}）`
-        );
+        log.warn('拉取仓库元信息失败（best-effort）', {
+          repo: repo.canonicalUrl,
+          message: String(error && error.message ? error.message : error),
+        });
         return null;
       }
     });
@@ -280,13 +292,24 @@ async function main() {
     const cachePath = path.join(cacheBaseDir, `${pageId}.repo-cache.json`);
     fs.writeFileSync(cachePath, JSON.stringify(payload, null, 2), 'utf8');
 
-    console.log(
-      `[INFO] 页面 ${pageId}：同步完成（成功 ${success} / 失败 ${failed}），写入缓存 ${cachePath}`
-    );
+    if (failed === 0) pageSuccess += 1;
+    else pageFailed += 1;
+
+    log.ok('页面同步完成', {
+      page: pageId,
+      success,
+      failed,
+      cache: cachePath,
+    });
   }
+
+  log.ok('完成', { ms: elapsedMs(), pages: pages.length, pageSuccess, pageFailed });
 }
 
 main().catch((error) => {
-  console.error('[ERROR] projects 同步异常：', error);
+  log.error('执行异常（best-effort，不阻断后续 build）', {
+    message: error && error.message ? error.message : String(error),
+  });
+  if (isVerbose() && error && error.stack) console.error(error.stack);
   process.exitCode = 0; // best-effort：不阻断后续 build
 });

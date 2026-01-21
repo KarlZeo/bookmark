@@ -2,6 +2,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
+const { createLogger } = require('../src/generator/utils/logger');
+
+const log = createLogger('lint');
+
 function collectJsFiles(rootDir) {
   const files = [];
 
@@ -39,7 +43,7 @@ function main() {
   const jsFiles = targetDirs.flatMap((dir) => collectJsFiles(dir)).sort();
 
   if (jsFiles.length === 0) {
-    console.log('未发现需要检查的 .js 文件，跳过。');
+    log.ok('未发现需要检查的 .js 文件，跳过');
     return;
   }
 
@@ -50,17 +54,15 @@ function main() {
       execFileSync(process.execPath, ['--check', filePath], { stdio: 'inherit' });
     } catch (error) {
       hasError = true;
-      console.error(`\n语法检查失败：${relativePath}`);
-      if (error && error.status) {
-        console.error(`退出码：${error.status}`);
-      }
+      log.error('语法检查失败', { file: relativePath, exit: error && error.status });
     }
   });
 
   if (hasError) {
+    log.error('语法检查未通过', { files: jsFiles.length });
     process.exitCode = 1;
   } else {
-    console.log(`语法检查通过：${jsFiles.length} 个文件`);
+    log.ok('语法检查通过', { files: jsFiles.length });
   }
 }
 

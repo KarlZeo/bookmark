@@ -13,4 +13,3 @@ test('P1-5：404.html 回跳应将 /<id> 转为 ?page=<id>（并支持仓库前�
   assert.ok(html.includes('segments.length === 2'), '应支持仓库站点 /<repo>/<id>');
   assert.ok(html.includes('l.replace(target)'), '应使用 location.replace 执行回跳');
 });
-

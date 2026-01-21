@@ -1,6 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const { FileError, wrapAsyncError } = require('./generator/utils/errors');
+const { createLogger, isVerbose, startTimer } = require('./generator/utils/logger');
+
+const log = createLogger('import-bookmarks');
 
 // 书签文件夹路径 - 使用相对路径
 const BOOKMARKS_DIR = 'bookmarks';
@@ -25,16 +29,12 @@ function ensureUserConfigInitialized() {
 
   if (fs.existsSync(CONFIG_DEFAULT_DIR)) {
     fs.cpSync(CONFIG_DEFAULT_DIR, CONFIG_USER_DIR, { recursive: true });
-    console.log(
-      '[INFO] 检测到 config/user 不存在，已从 config/_default 初始化用户配置（完全替换策略需要完整配置）。'
-    );
+    log.info('config/user 不存在，已从 config/_default 初始化用户配置（完全替换策略）');
     return { initialized: true, source: '_default' };
   }
 
   fs.mkdirSync(CONFIG_USER_DIR, { recursive: true });
-  console.log(
-    '[WARN] 未找到默认配置目录 config/_default，已创建空的 config/user 目录；建议补齐 site.yml 与 pages/*.yml。'
-  );
+  log.warn('未找到 config/_default，已创建空的 config/user；建议补齐 site.yml 与 pages/*.yml');
   return { initialized: true, source: 'empty' };
 }
 
@@ -48,12 +48,12 @@ function ensureUserSiteYmlExists() {
       fs.mkdirSync(CONFIG_USER_DIR, { recursive: true });
     }
     fs.copyFileSync(DEFAULT_SITE_YML, USER_SITE_YML);
-    console.log('[INFO] 未找到 config/user/site.yml，已从 config/_default/site.yml 复制一份。');
+    log.info('未找到 config/user/site.yml，已从 config/_default/site.yml 复制');
     return true;
   }
 
-  console.log(
-    '[WARN] 未找到可用的 site.yml，无法自动更新导航；请手动在 config/user/site.yml 添加 navigation（含 id: bookmarks）。'
+  log.warn(
+    '未找到可用的 site.yml，无法自动更新导航；请在 config/user/site.yml 添加 navigation（含 id: bookmarks）'
   );
   return false;
 }
@@ -184,7 +184,7 @@ function getLatestBookmarkFile() {
     // 确保书签目录存在
     if (!fs.existsSync(BOOKMARKS_DIR)) {
       fs.mkdirSync(BOOKMARKS_DIR, { recursive: true });
-      console.log('[WARN] 书签目录为空，未找到HTML文件');
+      log.warn('bookmarks 目录不存在，已创建；未找到 HTML 书签文件', { dir: BOOKMARKS_DIR });
       return null;
     }
 
@@ -194,7 +194,7 @@ function getLatestBookmarkFile() {
       .filter((file) => file.toLowerCase().endsWith('.html'));
 
     if (files.length === 0) {
-      console.log('[WARN] 未找到任何HTML书签文件');
+      log.warn('未找到任何 HTML 书签文件', { dir: BOOKMARKS_DIR });
       return null;
     }
 
@@ -209,11 +209,12 @@ function getLatestBookmarkFile() {
     const latestFile = fileStats[0].file;
     const latestFilePath = path.join(BOOKMARKS_DIR, latestFile);
 
-    console.log('[INFO] 选择最新的书签文件:', latestFile);
+    log.info('选择最新的书签文件', { file: latestFile });
 
     return latestFilePath;
   } catch (error) {
-    console.error('[ERROR] 查找书签文件时出错:', error);
+    log.error('查找书签文件时出错', { message: error && error.message ? error.message : error });
+    if (isVerbose() && error && error.stack) console.error(error.stack);
     return null;
   }
 }
@@ -611,11 +612,11 @@ function parseBookmarks(htmlContent) {
     /<DT><H3[^>]*PERSONAL_TOOLBAR_FOLDER[^>]*>([^<]+)<\/H3>/i
   );
   if (!bookmarkBarMatch) {
-    console.log('[WARN] 未找到书签栏文件夹（PERSONAL_TOOLBAR_FOLDER），使用备用方案');
+    log.warn('未找到书签栏文件夹（PERSONAL_TOOLBAR_FOLDER），使用备用方案');
     // 备用方案：使用第一个 <DL><p> 标签
     const firstDLMatch = htmlContent.match(/<DL><p>/i);
     if (!firstDLMatch) {
-      console.log('[ERROR] 未找到任何书签容器');
+      log.error('未找到任何书签容器');
       bookmarks.categories = [];
     } else {
       const dlStart = firstDLMatch.index + firstDLMatch[0].length;
@@ -650,7 +651,7 @@ function parseBookmarks(htmlContent) {
     const remainingAfterBar = htmlContent.substring(bookmarkBarStart);
     const dlMatch = remainingAfterBar.match(/<DL><p>/i);
     if (!dlMatch) {
-      console.log('[ERROR] 未找到书签栏的内容容器 <DL><p>');
+      log.error('未找到书签栏的内容容器 <DL><p>');
       bookmarks.categories = [];
     } else {
       const bookmarkBarContentStart = bookmarkBarStart + dlMatch.index + dlMatch[0].length;
@@ -690,11 +691,11 @@ function parseBookmarks(htmlContent) {
     }
   }
 
-  console.log(`[INFO] 解析完成 - 共找到 ${bookmarks.categories.length} 个顶层分类`);
+  log.info('解析完成', { categories: bookmarks.categories.length });
 
   // 如果存在根路径书签，创建"根目录书签"特殊分类并插入到首位
   if (rootSites.length > 0) {
-    console.log(`[INFO] 创建"根目录书签"特殊分类，包含 ${rootSites.length} 个书签`);
+    log.info('创建"根目录书签"特殊分类', { sites: rootSites.length });
     const rootCategory = {
       name: '根目录书签',
       icon: 'fas fa-star',
@@ -704,7 +705,7 @@ function parseBookmarks(htmlContent) {
 
     // 插入到数组首位
     bookmarks.categories.unshift(rootCategory);
-    console.log(`[INFO] "根目录书签"已插入到分类列表首位`);
+    log.info('"根目录书签"已插入到分类列表首位');
   }
 
   return bookmarks;
@@ -741,7 +742,10 @@ ${yamlString}`;
 
     return yamlWithComment;
   } catch (error) {
-    console.error('Error generating YAML:', error);
+    log.error('生成 YAML 失败', {
+      message: error && error.message ? error.message : String(error),
+    });
+    if (isVerbose() && error && error.stack) console.error(error.stack);
     return null;
   }
 }
@@ -767,46 +771,44 @@ function updateNavigationWithBookmarks() {
 
 // 主函数
 async function main() {
-  console.log('========================================');
-  console.log('[INFO] 书签处理脚本启动');
-  console.log('[INFO] 时间:', new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
-  console.log('========================================\n');
+  const elapsedMs = startTimer();
+  log.info('开始', { version: process.env.npm_package_version });
 
   // 获取最新的书签文件
-  console.log('[步骤 1/5] 查找书签文件...');
+  log.info('查找书签文件', { dir: BOOKMARKS_DIR });
   const bookmarkFile = getLatestBookmarkFile();
   if (!bookmarkFile) {
-    console.log('[WARN] 未找到书签文件，已跳过处理（将HTML书签文件放入 bookmarks/ 后再运行）。');
+    log.ok('未找到书签文件，跳过', { dir: BOOKMARKS_DIR });
     return;
   }
-  console.log('[SUCCESS] 找到书签文件\n');
+  log.ok('找到书签文件', { file: bookmarkFile });
 
   try {
     // 读取文件内容
-    console.log('[步骤 2/5] 读取书签文件...');
+    log.info('读取书签文件', { file: bookmarkFile });
     const htmlContent = fs.readFileSync(bookmarkFile, 'utf8');
-    console.log('[SUCCESS] 文件读取成功，大小:', htmlContent.length, '字符\n');
+    log.ok('读取成功', { chars: htmlContent.length });
 
     // 解析书签
-    console.log('[步骤 3/5] 解析书签结构...');
+    log.info('解析书签结构');
     const bookmarks = parseBookmarks(htmlContent);
     if (bookmarks.categories.length === 0) {
-      console.error('[ERROR] HTML文件中未找到书签分类，处理终止');
+      log.error('HTML 文件中未找到书签分类，处理终止');
       return;
     }
-    console.log('[SUCCESS] 解析完成\n');
+    log.ok('解析完成', { categories: bookmarks.categories.length });
 
     // 生成YAML
-    console.log('[步骤 4/5] 生成YAML配置...');
+    log.info('生成 YAML 配置');
     const yamlContent = generateBookmarksYaml(bookmarks);
     if (!yamlContent) {
-      console.error('[ERROR] YAML生成失败，处理终止');
+      log.error('YAML 生成失败，处理终止');
       return;
     }
-    console.log('[SUCCESS] YAML生成成功\n');
+    log.ok('YAML 生成成功');
 
     // 保存文件
-    console.log('[步骤 5/5] 保存配置文件...');
+    log.info('写入配置文件', { path: MODULAR_OUTPUT_FILE });
     try {
       // 完全替换策略：若尚未初始化用户配置，则先从默认配置初始化一份完整配置
       ensureUserConfigInitialized();
@@ -821,52 +823,69 @@ async function main() {
 
       // 验证文件是否确实被创建
       if (!fs.existsSync(MODULAR_OUTPUT_FILE)) {
-        console.error(`[ERROR] 文件未能创建: ${MODULAR_OUTPUT_FILE}`);
-        process.exit(1);
+        throw new FileError('文件未能创建', MODULAR_OUTPUT_FILE, [
+          '检查目录权限是否正确',
+          '确认磁盘空间是否充足',
+          '尝试手动创建目录: mkdir -p config/user/pages',
+        ]);
       }
 
-      console.log('[SUCCESS] 文件保存成功');
-      console.log('[INFO] 输出文件:', MODULAR_OUTPUT_FILE, '\n');
+      log.ok('写入成功', { path: MODULAR_OUTPUT_FILE });
 
       // 更新导航
-      console.log('[附加步骤] 更新导航配置...');
+      log.info('更新导航配置（确保包含 bookmarks 入口）');
       const navUpdateResult = updateNavigationWithBookmarks();
       if (navUpdateResult.updated) {
-        console.log(`[SUCCESS] 导航配置已更新（${navUpdateResult.target}）\n`);
+        log.ok('导航配置已更新', {
+          target: navUpdateResult.target,
+          reason: navUpdateResult.reason,
+        });
       } else if (navUpdateResult.reason === 'already_present') {
-        console.log('[INFO] 导航配置已包含书签入口，无需更新\n');
-      } else if (navUpdateResult.reason === 'no_navigation_config') {
-        console.log(
-          '[WARN] 未找到可更新的导航配置文件；请确认 config/user/site.yml 存在且包含 navigation\n'
-        );
+        log.ok('导航配置已包含书签入口，无需更新', { target: navUpdateResult.target });
+      } else if (navUpdateResult.reason === 'no_site_yml') {
+        log.warn('未找到可用的 site.yml，无法自动更新导航', { path: USER_SITE_YML });
+      } else if (navUpdateResult.reason === 'navigation_not_array') {
+        log.warn('site.yml 中 navigation 不是数组，无法自动更新导航', { path: USER_SITE_YML });
       } else if (navUpdateResult.reason === 'error') {
-        console.log('[WARN] 导航更新失败，请手动检查配置文件格式（详见错误信息）\n');
-        console.error(navUpdateResult.error);
+        log.warn('导航更新失败，请手动检查配置文件格式（详见错误信息）');
+        if (navUpdateResult.error) {
+          log.warn('导航更新错误详情', {
+            message: navUpdateResult.error.message
+              ? navUpdateResult.error.message
+              : String(navUpdateResult.error),
+          });
+          if (isVerbose() && navUpdateResult.error.stack)
+            console.error(navUpdateResult.error.stack);
+        }
       } else {
-        console.log('[INFO] 导航配置无需更新\n');
+        log.info('导航配置无需更新', { reason: navUpdateResult.reason });
       }
     } catch (writeError) {
-      console.error(`[ERROR] 写入文件时出错:`, writeError);
-      console.error('[ERROR] 错误堆栈:', writeError.stack);
-      process.exit(1);
+      throw new FileError('写入文件时出错', MODULAR_OUTPUT_FILE, [
+        '检查文件路径是否正确',
+        '确认目录权限是否正确',
+        `错误详情: ${writeError.message}`,
+      ]);
     }
 
-    console.log('========================================');
-    console.log('[SUCCESS] 书签处理完成！');
-    console.log('========================================');
+    log.ok('完成', { ms: elapsedMs(), output: MODULAR_OUTPUT_FILE });
   } catch (error) {
-    console.error('[FATAL] 处理书签文件时发生错误:', error);
-    console.error('[ERROR] 错误堆栈:', error.stack);
-    process.exit(1);
+    // 如果是自定义错误，直接抛出
+    if (error instanceof FileError) {
+      throw error;
+    }
+    // 否则包装为 FileError
+    throw new FileError('处理书签文件时发生错误', null, [
+      '检查书签 HTML 文件格式是否正确',
+      '确认配置目录结构是否完整',
+      `错误详情: ${error.message}`,
+    ]);
   }
 }
 
 // 启动处理
 if (require.main === module) {
-  main().catch((err) => {
-    console.error('Unhandled error in bookmark processing:', err);
-    process.exit(1);
-  });
+  wrapAsyncError(main)();
 }
 
 module.exports = {

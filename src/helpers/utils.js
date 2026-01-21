@@ -209,7 +209,8 @@ function faviconV2Url(url, options) {
 
   try {
     const encodedUrl = encodeURIComponent(String(url));
-    return `https://${domain}/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodedUrl}&size=32`;
+    // drop_404_icon=true：缺失 favicon 时返回空 404，避免“小地球”占位图并可靠触发 <img onerror> 回退
+    return `https://${domain}/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodedUrl}&size=32&drop_404_icon=true`;
   } catch (e) {
     return '';
   }
@@ -230,7 +231,8 @@ function faviconFallbackUrl(url, options) {
 
   try {
     const encodedUrl = encodeURIComponent(String(url));
-    return `https://${domain}/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodedUrl}&size=32`;
+    // drop_404_icon=true：缺失 favicon 时返回空 404，避免“小地球”占位图并可靠触发 <img onerror> 回退
+    return `https://${domain}/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodedUrl}&size=32&drop_404_icon=true`;
   } catch (e) {
     return '';
   }

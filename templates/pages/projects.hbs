@@ -2,6 +2,12 @@
 <div class="page-template page-template-projects">
     {{> page-header}}
 
+    {{#if projectsMeta}}
+    {{#if projectsMeta.heatmap}}
+        {{> github-heatmap username=projectsMeta.heatmap.username html=projectsMeta.heatmap.html}}
+    {{/if}}
+    {{/if}}
+
     {{#each categories}}
         {{> category}}
     {{/each}}

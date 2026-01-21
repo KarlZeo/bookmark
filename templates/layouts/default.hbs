@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme-mode="{{#if site.theme.mode}}{{site.theme.mode}}{{else}}dark{{/if}}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,26 @@
         (function() {
             // 读取并应用主题设置
             var savedTheme = localStorage.getItem('theme');
+            var defaultThemeMode = document.documentElement.getAttribute('data-theme-mode') || 'dark';
+            defaultThemeMode = String(defaultThemeMode).trim().toLowerCase();
+            var shouldUseLight = false;
+
             if (savedTheme === 'light') {
+                shouldUseLight = true;
+            } else if (savedTheme === 'dark') {
+                shouldUseLight = false;
+            } else if (defaultThemeMode === 'light') {
+                shouldUseLight = true;
+            } else if (defaultThemeMode === 'system') {
+                try {
+                    shouldUseLight =
+                        window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+                } catch (e) {
+                    shouldUseLight = false;
+                }
+            }
+
+            if (shouldUseLight) {
                 document.documentElement.classList.add('theme-preload');
             }
 
@@ -34,7 +53,9 @@
         })();
     </script>
     <link rel="stylesheet" href="style.css">
+  {{!-- github-calendar 已迁移为构建期抓取并注入（避免 runtime 依赖 unpkg + 代理服务） --}}
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></noscript>
 </head>
@@ -75,6 +96,7 @@
                     {{{navigation}}}
                     {{/if}}
                 </div>
+                <div class="sidebar-submenu-panel" aria-label="页面分类" data-container="sidebar-submenu"></div>
             </div>
 
 	            <div class="sidebar-social" data-container="social-links">
@@ -195,6 +217,7 @@
         {{{configJSON}}}
     </script>
     <script src="pinyin-match.js"></script>
+  {{!-- github-calendar 已迁移为构建期抓取并注入（避免 runtime 依赖 unpkg + 代理服务） --}}
     <script src="script.js"></script>
 </body>
 </html>

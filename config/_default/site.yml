@@ -34,6 +34,13 @@ security:
   # 示例：
   # allowedSchemes: [http, https, mailto, tel, obsidian, vscode]
 
+# 主题设置：默认明暗模式（可选）
+# - mode: dark | light | system
+#   - dark/light：首屏默认主题；用户点击按钮切换后会写入 localStorage 并覆盖该默认值
+#   - system：跟随系统 prefers-color-scheme；用户手动切换后同样会写入 localStorage 并停止跟随
+theme:
+  mode: dark # 可选: dark | light | system（默认 dark）
+
 # 字体设置：全站基础字体
 # - source: css | google | system
 # - css: 通过 cssUrl 引入第三方字体 CSS
@@ -82,7 +89,7 @@ rss:
 # - heatmapColor：热力图主题色（不带 #，例如 339af0）
 github:
   username: 'rbetree' # 你的 GitHub 用户名（例如 torvalds；为空则 projects 页不展示热力图）
-  heatmapColor: 339af0
+  heatmapColor: 37b24d
   cacheDir: dev # projects 仓库元信息缓存目录（默认 dev，仓库默认 gitignore）
 
 # 社交媒体链接：显示在侧边栏底部；可按需增删
@@ -114,3 +121,6 @@ navigation:
   - name: 书签
     icon: fas fa-bookmark
     id: bookmarks
+  - name: 关于
+    icon: fas fa-file-alt
+    id: content

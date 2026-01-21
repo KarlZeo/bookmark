@@ -20,9 +20,7 @@ test('P1-7：页面内不应注入整站 configJSON，应仅保留扩展元信�
     const config = loadConfig();
     const html = generateHTML(config);
 
-    const match = html.match(
-      /<script id="menav-config-data"[^>]*>([\s\S]*?)<\/script>/m
-    );
+    const match = html.match(/<script id="menav-config-data"[^>]*>([\s\S]*?)<\/script>/m);
     assert.ok(match, '应输出 menav-config-data 脚本块');
 
     const raw = String(match[1] || '').trim();
@@ -53,4 +51,3 @@ test('P1-7：页面内不应注入整站 configJSON，应仅保留扩展元信�
     assert.ok(!/"sites"\s*:/.test(raw), '不应包含 sites 字段');
   });
 });
-

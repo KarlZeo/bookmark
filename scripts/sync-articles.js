@@ -6,6 +6,9 @@ const net = require('node:net');
 const Parser = require('rss-parser');
 
 const { loadConfig } = require('../src/generator.js');
+const { createLogger, isVerbose, startTimer } = require('../src/generator/utils/logger');
+
+const log = createLogger('sync:articles');
 
 const DEFAULT_RSS_SETTINGS = {
   enabled: true,
@@ -488,7 +491,7 @@ async function processSourceSite(sourceSite, settings, parser, deadlineTs) {
     throw lastError || new Error('未找到可用 Feed');
   };
 
-  const startedAt = Date.now();
+  const elapsedMs = startTimer();
   for (let i = 0; i <= settings.fetch.maxRetries; i += 1) {
     try {
       // eslint-disable-next-line no-await-in-loop
@@ -501,7 +504,7 @@ async function processSourceSite(sourceSite, settings, parser, deadlineTs) {
           status: 'success',
           error: '',
           fetchedAt: new Date().toISOString(),
-          durationMs: Date.now() - startedAt,
+          durationMs: elapsedMs(),
         },
         articles: res.articles,
       };
@@ -518,7 +521,7 @@ async function processSourceSite(sourceSite, settings, parser, deadlineTs) {
       status: 'failed',
       error: lastError ? String(lastError.message || lastError) : '未知错误',
       fetchedAt: new Date().toISOString(),
-      durationMs: Date.now() - startedAt,
+      durationMs: elapsedMs(),
     },
     articles: [],
   };
@@ -582,6 +585,7 @@ async function syncArticlesForPage(pageId, pageConfig, config, settings) {
         pageConfig && Array.isArray(pageConfig.categories) ? pageConfig.categories : []
       );
 
+  const elapsedMs = startTimer();
   const startedAt = Date.now();
   const deadlineTs = startedAt + settings.fetch.totalTimeoutMs;
 
@@ -635,7 +639,7 @@ async function syncArticlesForPage(pageId, pageConfig, config, settings) {
       failedSites,
       skippedSites,
       totalArticles: limitedArticles.length,
-      durationMs: Date.now() - startedAt,
+      durationMs: elapsedMs(),
     },
   };
 
@@ -670,43 +674,63 @@ function pickArticlesPages(config, onlyPageId) {
 }
 
 async function main() {
+  const elapsedMs = startTimer();
   const args = process.argv.slice(2);
   const pageArgIndex = args.findIndex((a) => a === '--page');
   const onlyPageId = pageArgIndex >= 0 ? args[pageArgIndex + 1] : null;
+
+  log.info('开始', { page: onlyPageId || '' });
 
   const config = loadConfig();
   const settings = getRssSettings(config);
 
   if (!settings.enabled) {
-    console.log('[INFO] RSS 已禁用（RSS_ENABLED=false），跳过。');
+    log.ok('RSS 已禁用，跳过', { env: 'RSS_ENABLED=false' });
     return;
   }
 
   const pages = pickArticlesPages(config, onlyPageId);
   if (pages.length === 0) {
-    console.log('[INFO] 未找到需要同步的 articles 页面。');
+    log.ok('未找到需要同步的 articles 页面，跳过');
     return;
   }
 
-  console.log(`[INFO] 准备同步 ${pages.length} 个 articles 页面缓存…`);
+  log.info('准备同步 articles 页面缓存', { pages: pages.length });
+
+  let success = 0;
+  let failed = 0;
 
   for (const { pageId, pageConfig } of pages) {
     try {
       // eslint-disable-next-line no-await-in-loop
       const { cachePath, cache } = await syncArticlesForPage(pageId, pageConfig, config, settings);
-      console.log(
-        `[INFO] 已生成缓存：${cachePath}（articles=${cache.stats.totalArticles}, sites=${cache.stats.totalSites}）`
-      );
+      success += 1;
+      log.ok('已生成缓存', {
+        page: pageId,
+        cache: cachePath,
+        articles: cache && cache.stats ? cache.stats.totalArticles : '',
+        sites: cache && cache.stats ? cache.stats.totalSites : '',
+      });
     } catch (e) {
-      console.warn(`[WARN] 页面 ${pageId} 同步失败：${e.message || e}`);
+      failed += 1;
+      log.warn('页面同步失败，已跳过（best-effort）', {
+        page: pageId,
+        message: e && e.message ? e.message : String(e),
+      });
+      if (isVerbose() && e && e.stack) console.error(e.stack);
       // best-effort：不阻断其他页面/后续 build
     }
   }
+
+  log.ok('完成', { ms: elapsedMs(), pages: pages.length, success, failed });
 }
 
 if (require.main === module) {
   main().catch((err) => {
-    console.error('[ERROR] sync-articles 执行失败：', err);
+    log.error('执行失败（best-effort，不阻断后续 build/deploy）', {
+      message: err && err.message ? err.message : String(err),
+    });
+    if (isVerbose() && err && err.stack) console.error(err.stack);
     // best-effort：不阻断后续 build/deploy（错误已输出到日志，便于排查）
     process.exitCode = 0;
   });

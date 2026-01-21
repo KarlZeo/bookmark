@@ -1,0 +1,29 @@
+# 依赖和构建产物
+node_modules/
+dist/
+dev/
+
+# npm lockfile（避免提交时产生大面积格式化 diff）
+package-lock.json
+
+# Git 配置文件
+.gitattributes
+.gitignore
+
+# Husky hooks（shell 脚本，不需要 Prettier 格式化）
+.husky/
+
+# 缓存文件
+*.cache
+.cache/
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+
+# 文档文件（保留排版灵活性，避免代码示例被格式化）
+**/README.md
+src/**/*.md
