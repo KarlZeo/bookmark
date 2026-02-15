@@ -169,6 +169,9 @@ function applyHomePageTitles(data, pageId, config) {
     if (config.profile.title !== undefined) data.title = config.profile.title;
     if (config.profile.subtitle !== undefined) data.subtitle = config.profile.subtitle;
   }
+
+  data.isHome = pageId === homePageId;
+  data.homePageId = homePageId;
 }
 
 function preparePageData(pageId, config) {

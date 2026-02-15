@@ -143,6 +143,7 @@ templates/
 **主要组件**:
 
 - `page-header.hbs` - 统一页面标题区（首页/非首页/书签更新时间/项目热力图）
+- `home-dashboard.hbs` - 首页仪表盘（时钟卡片、TODO 待办卡片）
 - `navigation.hbs` - 导航菜单
 - `site-card.hbs` - 站点卡片
 - `category.hbs` - 分类容器（支持多层级嵌套）

@@ -1,0 +1,613 @@
+/* ============================================
+   Sidebar Component
+   ============================================ */
+
+/* 侧边栏样式 */
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--sidebar-bg);
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  box-shadow: 2px 0 10px var(--shadow-color);
+  z-index: 100;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  height: var(--app-height, 100vh);
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  grid-template-areas:
+    'header'
+    'content'
+    'social'
+    'footer';
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-color) transparent;
+  overflow-y: hidden;
+  transition: background-color var(--transition-normal);
+}
+
+/* 侧边栏折叠状态 */
+.sidebar.collapsed {
+  width: var(--sidebar-collapsed-width);
+  overflow-x: hidden;
+}
+
+/* 优化侧边栏折叠时的Logo部分 */
+.sidebar.collapsed .logo {
+  padding: 1.2rem 0.5rem 0.6rem;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  height: 3.75rem;
+  /* 确保与展开状态高度一致 */
+  margin-bottom: 0.8rem;
+  /* 收起态同样拉开与按钮的间距 */
+}
+
+/* 调整折叠侧边栏的部分元素间距 */
+.sidebar.collapsed .nav-section {
+  gap: 2px;
+}
+
+/* 折叠状态下隐藏底部版权区域（不占位） */
+.sidebar.collapsed .sidebar-footer {
+  padding: 0;
+  height: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  border: none;
+}
+
+/* 侧边栏头部区域 */
+.sidebar .logo {
+  grid-area: header;
+  padding: 1.2rem 1.2rem 0.6rem;
+  /* 调整上下padding更紧凑 */
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  /* 防止内容溢出 */
+  position: relative;
+  /* 添加相对定位，作为按钮的参考 */
+  height: 3.75rem;
+  /* 固定高度 60px */
+  margin-bottom: 0.8rem;
+  /* 与下方按钮区域拉开间距 */
+  transition: padding 0.3s ease;
+  /* 添加padding过渡，避免突变 */
+}
+
+.logo-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  flex: 1;
+  padding-right: 2.2rem;
+  /* 预留右侧折叠按钮空间 */
+}
+
+.logo-brand h1 {
+  padding-left: 0;
+}
+
+.logo-image {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed .logo-image {
+  display: none;
+}
+
+.logo h1 {
+  font-size: 1.4rem;
+  color: var(--text-bright);
+  margin-bottom: 0;
+  padding-left: 0.5rem;
+  letter-spacing: 0.5px;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+/* 侧边栏折叠按钮 */
+.sidebar-toggle {
+  background: transparent;
+  border: none;
+  color: var(--accent-color);
+  height: 28px;
+  width: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  /* 只过渡背景色，移除all避免位置过渡 */
+  padding: 0;
+  flex-shrink: 0;
+  /* 防止按钮被压缩 */
+  position: absolute;
+  /* 在两种状态下都使用绝对定位 */
+  right: 1.2rem;
+  /* 展开状态下固定在右侧 */
+  top: 60%;
+  transform: translateY(-50%);
+  /* 垂直居中 */
+}
+
+.sidebar-toggle .toggle-icon {
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar-toggle:hover {
+  background: var(--secondary-bg);
+}
+
+.sidebar-toggle:active {
+  background: var(--secondary-bg);
+}
+
+/* 收起状态下按钮居中 */
+.sidebar.collapsed .sidebar-toggle {
+  left: 50%;
+  /* 水平居中 */
+  right: auto;
+  /* 移除右侧定位 */
+  transform: translate(-50%, -50%);
+  /* 同时水平和垂直居中 */
+}
+
+.sidebar.collapsed .sidebar-toggle:hover {
+  background: var(--secondary-bg);
+}
+
+.sidebar.collapsed .sidebar-toggle:active {
+  background: var(--secondary-bg);
+}
+
+/* 侧边栏折叠状态下的按钮图标旋转180度 */
+.sidebar.collapsed .toggle-icon {
+  transform: rotate(180deg);
+}
+
+/* 侧边栏内容区域：导航项常驻显示，分类列表在独立面板内滚动 */
+.sidebar-content {
+  grid-area: content;
+  min-height: 0;
+  /* 允许在 CSS Grid 内正确收缩与滚动，避免把 footer 挤出可视区域 */
+  overflow: hidden;
+  /* 导航项常驻显示，分类列表在独立面板内滚动 */
+  padding: 0 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  /* 从1rem减小到0.6rem */
+}
+
+.sidebar-content::-webkit-scrollbar {
+  display: none;
+  /* Webkit browsers（默认不滚动，保留兼容） */
+}
+
+/* 展开态：子菜单不在导航项内部展开，改在独立面板展示（避免把"页面列表"挤出首屏） */
+.sidebar:not(.collapsed) .nav-item-wrapper > .submenu {
+  display: none;
+}
+
+/* 侧边栏：页面分类面板（容器本身可滚动，隐藏滚动条） */
+.sidebar-submenu-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 0 0.6rem;
+  /* 移除顶部 padding，避免标题上方出现缝隙 */
+  scrollbar-width: none;
+  /* Firefox 隐藏滚动条 */
+}
+
+.sidebar-submenu-panel:empty {
+  display: none;
+}
+
+.sidebar-submenu-panel::-webkit-scrollbar {
+  display: none;
+  /* Webkit 浏览器隐藏滚动条 */
+}
+
+/* 面板内的 submenu 始终可见（不依赖 wrapper.expanded） */
+.sidebar-submenu-panel .submenu {
+  max-height: none;
+  overflow: visible;
+  opacity: 1;
+  visibility: visible;
+  margin-left: 0;
+  transition: none;
+}
+
+/* 折叠状态下的内容区域调整 */
+.sidebar.collapsed .sidebar-content {
+  padding: 0 0.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  /* 隐藏滚动条 */
+}
+
+.sidebar.collapsed .sidebar-content::-webkit-scrollbar {
+  display: none;
+  /* 隐藏WebKit浏览器的滚动条 */
+}
+
+.sidebar.collapsed .sidebar-submenu-panel {
+  display: none;
+}
+
+/* 子菜单标题：默认隐藏（在导航栏内折叠时） */
+.submenu-header {
+  display: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  padding: 0.8rem 1rem 0.6rem;
+  margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--border-color);
+  transition:
+    color var(--transition-normal),
+    background-color var(--transition-normal),
+    border-bottom-color var(--transition-normal);
+  opacity: 0.8;
+}
+
+/* 当子菜单在面板中显示时：显示标题并固定在顶部 */
+.sidebar-submenu-panel .submenu-header {
+  display: block;
+  position: sticky;
+  top: 0;
+  margin-top: 0;
+  margin-bottom: 0.2rem;
+  /* 覆盖基础样式的 margin-bottom */
+  background-color: var(--sidebar-bg);
+  opacity: 1;
+  /* 覆盖基础样式的半透明，确保背景完全不透明 */
+  z-index: 1;
+  /* 确保标题在滚动时覆盖下方内容 */
+}
+
+/* 子菜单项样式优化 */
+.submenu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 1rem;
+  color: var(--nav-item-color);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+  margin-bottom: 2px;
+  font-size: 0.95rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.submenu-item i {
+  width: 1.4rem;
+  text-align: center;
+  font-size: 1rem;
+  opacity: 0.8;
+  transition: transform var(--transition-normal);
+}
+
+.submenu-item span {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 悬浮状态 */
+.submenu-item:hover {
+  background-color: var(--secondary-bg);
+  color: var(--text-bright);
+  padding-left: 1.2rem;
+  /* 悬浮时轻微右移增加动感 */
+}
+
+.submenu-item:hover i {
+  transform: scale(1.1);
+  color: var(--accent-color);
+  opacity: 1;
+}
+
+/* 激活状态 */
+.submenu-item.active {
+  background-color: rgba(var(--accent-rgb), 0.15);
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.submenu-item.active i {
+  color: var(--accent-color);
+  opacity: 1;
+}
+
+/* 在激活状态左侧添加指示条 */
+.submenu-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 60%;
+  width: 3px;
+  background-color: var(--accent-color);
+  border-radius: 0 2px 2px 0;
+}
+
+/* 折叠状态下的Logo文本 */
+.sidebar.collapsed .logo h1 {
+  opacity: 0;
+  transform: translateX(-20px);
+  width: 0;
+  visibility: hidden;
+  /* 确保完全隐藏，防止干扰布局 */
+  pointer-events: none;
+  /* 禁用交互，避免影响布局 */
+}
+
+/* 导航区域样式 */
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  /* wrapper 之间不需要 gap，由 nav-item 的 margin 控制 */
+  flex: 0 0 auto;
+  /* 不伸缩，根据内容大小 */
+  overflow: visible;
+  /* 导航项不滚动，保持常驻显示 */
+}
+
+.section-title {
+  font-size: 1rem;
+  color: var(--accent-color);
+  padding: 0.4rem 0.5rem;
+  /* 减小上下padding */
+  margin-bottom: 0.2rem;
+  /* 增大与下方按钮组的间距 */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.section-title i {
+  font-size: 1.2rem;
+}
+
+/* 调整侧边栏折叠状态下的章节标题 */
+.sidebar.collapsed .section-title {
+  justify-content: center;
+  /* 统一与展开态的垂直间距 */
+  padding: 0.4rem 0;
+  text-align: center;
+  margin-bottom: 0.2rem;
+  /* 与展开态保持一致且更大 */
+}
+
+.sidebar.collapsed .section-title i {
+  margin: 0 auto;
+  font-size: 1.2rem;
+}
+
+/* 折叠状态下的导航项布局优化 */
+.sidebar.collapsed .nav-section {
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.sidebar.collapsed .nav-item {
+  padding: 0;
+  justify-content: center;
+  width: 2.75rem;
+  /* 增大按钮方块尺寸 44px */
+  height: 2.75rem;
+  /* 增大按钮方块尺寸 44px */
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: var(--radius-md);
+  /* 略增圆角 */
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.sidebar.collapsed .nav-item i {
+  font-size: 1.25rem;
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar.collapsed .nav-item .icon-container {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 折叠状态下的导航项文本 */
+.sidebar.collapsed .nav-item .nav-text,
+.sidebar.collapsed .nav-item .external-icon {
+  opacity: 0;
+  transform: translateX(-10px);
+  width: 0;
+  display: none;
+  /* 完全移除，防止干扰布局 */
+  visibility: hidden;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 0.9rem;
+  margin-bottom: 0.4rem;
+  /* 导航按钮之间的间距 */
+  color: var(--nav-item-color);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition:
+    background-color var(--transition-normal),
+    color var(--transition-normal),
+    box-shadow var(--transition-normal);
+  position: relative;
+}
+
+.nav-item-wrapper:last-child .nav-item {
+  margin-bottom: 0;
+  /* 最后一个导航按钮不需要底部间距 */
+}
+
+.nav-item .icon-container {
+  width: 24px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: var(--spacing-md);
+  transition: margin var(--transition-normal);
+}
+
+.nav-item .nav-text {
+  flex: 1;
+  transition:
+    opacity var(--transition-normal),
+    transform var(--transition-normal);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.nav-item .external-icon {
+  font-size: 0.9rem;
+  opacity: 0.6;
+  margin-left: 0.5rem;
+  transition: all var(--transition-normal);
+}
+
+.nav-item:hover {
+  background-color: var(--secondary-bg);
+  color: var(--text-bright);
+}
+
+.nav-item:hover .external-icon {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.nav-item.active {
+  background-color: var(--secondary-bg);
+  color: var(--text-bright);
+}
+
+.nav-item i {
+  width: 20px;
+  text-align: center;
+}
+
+/* 折叠状态下：底部区域不可见且不可交互 */
+.sidebar.collapsed .sidebar-footer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* 主内容区域 - 修复滚动条问题 */
+main.content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding: 1.5rem 1rem;
+  background-color: var(--bg-color);
+  position: relative;
+  height: var(--app-height, 100vh);
+  /* 固定高度（移动端避免 100vh 问题） */
+  overflow-y: auto;
+  /* 使用auto替代scroll，只在需要时显示滚动条 */
+  overflow-x: hidden;
+  width: calc(100vw - var(--sidebar-width));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 防止"有无滚动条"导致内容横向平移（支持的浏览器会稳定预留滚动条槽位） */
+  scrollbar-gutter: stable;
+  /* 自定义滚动条颜色（Firefox） */
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-color) transparent;
+}
+
+/* 自定义滚动条（Chromium / Safari） */
+main.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+main.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+main.content::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-color);
+  border-radius: var(--radius-full);
+  /* 用透明边框制造"内边距"，更贴合卡片阴影风格 */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+main.content::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-hover-color);
+}
+
+/* 回退：不支持 scrollbar-gutter 的浏览器，强制始终显示滚动条以避免横向抖动 */
+@supports not (scrollbar-gutter: stable) {
+  main.content {
+    overflow-y: scroll;
+  }
+}
+
+/* 优化内容区域在侧边栏折叠状态下的边距 */
+body main.content.expanded {
+  margin-left: var(--sidebar-collapsed-width);
+  width: calc(100vw - var(--sidebar-collapsed-width));
+}
+
+/* 仅在交互时启用布局相关过渡，避免首帧闪烁 */
+.with-anim .sidebar {
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
+}
+
+.with-anim main.content {
+  transition:
+    background-color 0.3s ease,
+    margin-left 0.3s ease,
+    width 0.3s ease;
+}

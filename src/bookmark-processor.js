@@ -198,14 +198,47 @@ function getLatestBookmarkFile() {
       return null;
     }
 
-    // 获取文件状态，按最后修改时间排序
-    const fileStats = files.map((file) => ({
-      file,
-      mtime: fs.statSync(path.join(BOOKMARKS_DIR, file)).mtime,
-    }));
+    // GitHub Actions checkout 会导致文件 mtime 大量相同；改用文件名时间戳优先排序
+    const parseFilenameTimestamp = (filename) => {
+      const base = path.basename(filename);
 
-    // 找出最新的文件
-    fileStats.sort((a, b) => b.mtime - a.mtime);
+      // 格式1: selective-bookmarks-2026-01-24T07-31-00.html
+      const isoMatch = base.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})/);
+      if (isoMatch) {
+        const [, year, month, day, hour, minute, second] = isoMatch;
+        return Date.UTC(
+          Number(year),
+          Number(month) - 1,
+          Number(day),
+          Number(hour),
+          Number(minute),
+          Number(second)
+        );
+      }
+
+      // 格式2: bookmarks_20260124.html
+      const dateMatch = base.match(/(\d{4})(\d{2})(\d{2})/);
+      if (dateMatch) {
+        const [, year, month, day] = dateMatch;
+        return Date.UTC(Number(year), Number(month) - 1, Number(day));
+      }
+
+      return 0;
+    };
+
+    // 按文件名时间戳排序，无法解析的使用文件系统 mtime 作为回退
+    const fileStats = files.map((file) => {
+      const filenameTimestamp = parseFilenameTimestamp(file);
+      const mtime = fs.statSync(path.join(BOOKMARKS_DIR, file)).mtime.getTime();
+      return {
+        file,
+        timestamp: filenameTimestamp || mtime,
+      };
+    });
+
+    // 找出最新的文件（时间戳大的在前）；相等时用文件名做稳定排序
+    fileStats.sort((a, b) => b.timestamp - a.timestamp || a.file.localeCompare(b.file));
+
     const latestFile = fileStats[0].file;
     const latestFilePath = path.join(BOOKMARKS_DIR, latestFile);
 

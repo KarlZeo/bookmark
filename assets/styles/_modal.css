@@ -1,0 +1,152 @@
+/* Modal & Forms */
+
+/* 模态框样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.active {
+  display: flex;
+  animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+.modal-content {
+  background-color: var(--sidebar-bg);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  width: 90%;
+  max-width: 520px;
+  position: relative;
+  box-shadow: 0 8px 32px var(--shadow-color);
+  transform: scale(0.95);
+  opacity: 0;
+  animation: modalContentShow 0.3s ease-out forwards;
+  transition: background-color 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.modal-header h3 {
+  color: var(--text-bright);
+  font-size: 1.3rem;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: var(--spacing-sm);
+  transition: all var(--transition-normal);
+  border-radius: var(--radius-md);
+}
+
+.close-modal:hover {
+  color: var(--text-bright);
+  background-color: var(--secondary-bg);
+}
+
+/* 表单样式 */
+.site-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.form-group label {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  letter-spacing: 0.2px;
+  transition: color 0.3s ease;
+}
+
+.form-group input,
+.form-group select {
+  background-color: var(--secondary-bg);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+  box-shadow: 0 2px 6px var(--shadow-color);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  background-color: var(--secondary-bg);
+  border-color: var(--accent-color);
+  box-shadow: 0 2px 8px rgba(118, 148, 185, 0.15);
+}
+
+.form-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all var(--transition-normal);
+  transition-timing-function: var(--transition-bounce);
+  box-shadow: 0 2px 6px var(--shadow-color);
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: var(--white-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(118, 148, 185, 0.2);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-bg);
+  color: var(--text-muted);
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-bg);
+  color: var(--text-bright);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}

@@ -125,6 +125,65 @@ function generateHTML(config) {
   }
 }
 
+/**
+ * 使用 esbuild bundle 模式合并 CSS @import
+ * 注意：transformSync 不支持 bundle，必须用 buildSync
+ * @param {string} srcPath - 源 CSS 文件路径
+ * @param {string} destPath - 目标文件路径
+ * @returns {boolean} 是否成功
+ */
+function tryBundleCss(srcPath, destPath) {
+  let esbuild;
+  try {
+    esbuild = require('esbuild');
+  } catch {
+    return false;
+  }
+
+  try {
+    // buildSync 需要绝对路径
+    const absoluteSrc = path.resolve(srcPath);
+    const absoluteDest = path.resolve(destPath);
+
+    esbuild.buildSync({
+      entryPoints: [absoluteSrc],
+      outfile: absoluteDest,
+      bundle: true, // 关键：合并 @import
+      minify: true,
+      logLevel: 'silent',
+    });
+    return true;
+  } catch (error) {
+    const log = createLogger('assets');
+    log.warn('CSS bundle 失败，降级为复制', {
+      message: error && error.message ? error.message : String(error),
+    });
+    if (isVerbose() && error && error.stack) console.error(error.stack);
+    return false;
+  }
+}
+
+/**
+ * 递归复制目录（降级方案：当 esbuild 不可用时复制 styles 目录）
+ * @param {string} src - 源目录
+ * @param {string} dest - 目标目录
+ */
+function copyDirRecursive(src, dest) {
+  if (!fs.existsSync(src)) return;
+  fs.mkdirSync(dest, { recursive: true });
+
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      copyDirRecursive(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
 function tryMinifyStaticAsset(srcPath, destPath, loader) {
   let esbuild;
   try {
@@ -162,10 +221,13 @@ function copyStaticFiles(config) {
     fs.mkdirSync('dist', { recursive: true });
   }
 
-  // 复制 CSS 文件
+  // 复制 CSS 文件（支持模块化 @import）
   try {
-    if (!tryMinifyStaticAsset('assets/style.css', 'dist/style.css', 'css')) {
+    if (!tryBundleCss('assets/style.css', 'dist/style.css')) {
+      // 降级：复制入口 + styles 目录
       fs.copyFileSync('assets/style.css', 'dist/style.css');
+      copyDirRecursive('assets/styles', 'dist/styles');
+      log.warn('CSS 未合并，浏览器将发起多个请求');
     }
   } catch (e) {
     log.error('复制 style.css 失败', { message: e && e.message ? e.message : String(e) });
