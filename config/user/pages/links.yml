@@ -52,3 +52,22 @@ categories:
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: Compatibility tool for Steam Play based on Wine and additional components
         url: https://github.com/GloriousEggroll/proton-ge-custom
+  - name: Switch相关导航
+    icon: fas fa-code # 分类图标（Font Awesome）
+    sites:
+      - name: ryujinx
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: ryujinx模拟器
+        url: https://git.ryujinx.app/ryubing/ryujinx
+      - name: eden
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: eden模拟器
+        url: https://git.eden-emu.dev/eden-emu/eden
+      - name: Atmosphere
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: switch大气层
+        url: https://github.com/Atmosphere-NX/Atmosphere
+      - name: nsz
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: nsz格式格式转换器
+        url: https://github.com/nicoboss/nsz
