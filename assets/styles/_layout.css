@@ -1,0 +1,101 @@
+/* ============================================
+   Page Layout & Containers
+   ============================================ */
+
+/* 页面容器 */
+.page {
+  position: relative;
+  width: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.page.active {
+  display: flex;
+}
+
+/* 页面模板容器（friends/articles/projects 等） */
+.page-template {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+}
+
+/* 欢迎区域 - Design A (Minimalist) */
+.welcome-section {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin: 0 auto 1.2rem auto;
+  padding: 0 var(--spacing-lg);
+  text-align: left;
+  position: relative;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.welcome-section-main {
+  flex: 1;
+  min-width: 220px;
+}
+
+.welcome-section-side {
+  flex: 0 0 auto;
+}
+
+.welcome-section h2 {
+  font-size: 1.75rem;
+  color: var(--text-bright);
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+.welcome-section h3 {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.3px;
+  color: var(--text-muted);
+  position: relative;
+  display: block;
+}
+
+.welcome-section h3::before {
+  display: none;
+}
+
+.welcome-section .subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+/* bookmarks：标题后追加"更新时间"小字 */
+.welcome-title-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.welcome-title-row h2 {
+  margin: 0;
+}
+
+.page-updated-inline {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  opacity: 0.85;
+  white-space: nowrap;
+}

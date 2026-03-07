@@ -1,0 +1,238 @@
+/* ============================================
+   Base Styles & Global Reset
+   ============================================ */
+
+/* 可访问性：视觉隐藏但保留屏幕阅读器可读 */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 主题切换按钮 - 调整为 iOS 风格 */
+.theme-toggle {
+  position: fixed;
+  bottom: var(--spacing-xl);
+  right: var(--spacing-xl);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-lg);
+  background: rgba(var(--card-bg-rgb), 0.65);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  transition-timing-function: var(--transition-bounce);
+  z-index: 100;
+  box-shadow: 0 4px 16px var(--shadow-color);
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px);
+  background: rgba(var(--card-bg-rgb), 0.75);
+  box-shadow: 0 6px 20px var(--shadow-color);
+  color: var(--accent-color);
+}
+
+.theme-toggle:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.theme-toggle i {
+  font-size: 18px;
+}
+
+/* 全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 全局 Focus Visible 样式 */
+:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* 导航项 Focus 样式 */
+.nav-item:focus-visible,
+.submenu-item:focus-visible,
+.site-card:focus-visible,
+.theme-toggle:focus-visible,
+.category-toggle:focus-visible,
+.menu-toggle:focus-visible,
+.search-toggle:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+  z-index: 10;
+}
+
+/* 通用滚动条样式 */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  /* Firefox */
+  scrollbar-color: var(--scrollbar-color) transparent;
+  /* Firefox */
+}
+
+/* Webkit滚动条样式（Chrome, Safari, Edge等） */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 7px;
+  /* 统一滚动条宽度 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-color);
+  /* 使用变量 */
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-hover-color);
+  /* 使用变量 */
+}
+
+/* 防止滚动条导致的布局偏移 */
+html {
+  overflow-y: hidden;
+  /* 改为hidden，移除强制显示的滚动条 */
+  scrollbar-width: thin;
+  /* Firefox */
+  /* 明确 rem 基准字号：便于用 rem 统一管理字号（1rem = 16px） */
+  font-size: 16px;
+}
+
+/* 搜索高亮样式 */
+.highlight {
+  background-color: var(--highlight-bg);
+  border-radius: var(--radius-sm);
+  padding: 0 2px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+body {
+  font-family: var(
+    --font-body,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Noto Sans',
+    'Helvetica Neue',
+    Arial,
+    sans-serif
+  );
+  font-weight: var(--font-weight-body, normal);
+  line-height: 1.6;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: var(--app-height, 100vh);
+  overflow: hidden;
+  /* 防止body滚动 */
+  padding-right: 0 !important;
+  /* 防止滚动条导致的布局偏移 */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* 布局 */
+.layout {
+  display: flex;
+  min-height: var(--app-height, 100vh);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  /* 防止layout滚动 */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* 确保加载后立即显示 */
+body.loaded .layout {
+  opacity: 1;
+}
+
+/* 移动端基础样式 */
+.mobile-buttons {
+  display: none;
+  position: fixed;
+  top: var(--spacing-md);
+  top: calc(env(safe-area-inset-top) + var(--spacing-md));
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 0 var(--spacing-md);
+  padding-left: calc(env(safe-area-inset-left) + var(--spacing-md));
+  padding-right: calc(env(safe-area-inset-right) + var(--spacing-md));
+  justify-content: space-between;
+  z-index: 910;
+  pointer-events: none;
+}
+
+.menu-toggle,
+.search-toggle {
+  background: var(--sidebar-bg);
+  border: none;
+  color: var(--text-color);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s var(--transition-bounce);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  pointer-events: auto;
+}
+
+.menu-toggle:hover,
+.search-toggle:hover {
+  background: var(--secondary-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.menu-toggle:active,
+.search-toggle:active {
+  transform: translateY(0);
+}
+
+/* 遮罩层 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 950;
+  /* 调整遮罩层z-index，处于按钮与弹出面板之间 */
+}
+
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+}

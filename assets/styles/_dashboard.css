@@ -1,0 +1,371 @@
+/* Dashboard (Clock & Todo) */
+
+/* =========================================
+   Home Dashboard Styles
+   ========================================= */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  /* Mobile first: stack vertically */
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+@media (min-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 5fr 7fr;
+    /* Desktop: 5/12 - 7/12 ratio like 1.html */
+    align-items: stretch;
+    /* Stretch to align bottoms */
+    gap: var(--spacing-lg);
+    /* Reduced gap */
+    margin-bottom: var(--spacing-lg);
+    /* Reduced margin */
+  }
+}
+
+/* --- Left Column: Welcome & Clock --- */
+.dashboard-intro {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* Match grid row height */
+  gap: var(--spacing-md);
+  /* Reduced gap */
+  justify-content: space-between;
+  /* Spread welcome and clock */
+}
+
+.dashboard-welcome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.welcome-title {
+  font-size: 3.5rem;
+  font-family: var(--font-heading, var(--font-body, sans-serif));
+  font-weight: 800;
+  /* Extra Bold */
+  font-style: normal;
+  /* Remove italic */
+  text-transform: uppercase;
+  /* Pop Style */
+  letter-spacing: -0.03em;
+  /* Tight spacing */
+  color: var(--text-color);
+  /* Use primary text color, accent reserved for highlights */
+  line-height: 0.95;
+  margin: 0;
+  padding-left: var(--spacing-xl);
+  /* Shift right */
+}
+
+.welcome-subtitle {
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+  /* Accent color for subtitle */
+  font-weight: 600;
+  margin-top: 1rem;
+  padding-left: var(--spacing-xl);
+  opacity: 0.9;
+}
+
+@media (min-width: 768px) {
+  .welcome-title {
+    font-size: 3.5rem;
+    padding-left: 2rem;
+    /* Reduced from 5rem */
+  }
+
+  .welcome-subtitle {
+    font-size: 1.125rem;
+    padding-left: 2rem;
+  }
+}
+
+/* Clock Card - Apple Style: Flat + Soft Shadow */
+.dashboard-clock-card {
+  position: relative;
+  background-color: var(--card-bg-gradient-1);
+  /* Solid color, no gradient needed for flat look */
+  border: 0.5px solid var(--border-color);
+  /* Very subtle border */
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  box-shadow: 0 8px 24px var(--shadow-color);
+  /* Soft, diffused shadow */
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+  overflow: hidden;
+  padding: var(--spacing-xl);
+  /* More padding for spatial luxury */
+}
+
+body.light-theme .dashboard-clock-card {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  /* Lighter shadow for light mode */
+}
+
+.clock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 1;
+}
+
+.clock-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.clock-main {
+  align-self: flex-end;
+  /* Time at bottom right */
+  z-index: 1;
+}
+
+.clock-time {
+  font-size: 3.5rem;
+  /* Reduced from 4.5rem to prevent overflow */
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1;
+  font-family: var(--font-body);
+  letter-spacing: -0.02em;
+}
+
+.clock-greeting {
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.2rem;
+}
+
+.clock-week {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.clock-date {
+  font-size: 1.25rem;
+  /* Reduced from 1.5rem */
+  color: var(--text-muted);
+  font-family: var(--font-body);
+}
+
+/* --- Right Column: Stats / Todo --- */
+.dashboard-stats {
+  height: 100%;
+  min-height: 300px;
+}
+
+.dashboard-panel {
+  background-color: var(--card-bg-gradient-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  display: flex;
+  height: 310px;
+  /* Increased from 280px to align with clock card better */
+  overflow: hidden;
+  box-shadow: 4px 4px 0px 0px rgba(255, 255, 255, 0.15);
+  transition: box-shadow 0.2s ease;
+}
+
+body.light-theme .dashboard-panel {
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.2);
+}
+
+.panel-sidebar {
+  width: 4rem;
+  background-color: var(--sidebar-bg);
+  border-right: 4px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* Icon at top, button at bottom */
+  align-items: center;
+  padding: var(--spacing-md) 0;
+}
+
+.panel-static-icon {
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  padding: 0.5rem;
+}
+
+.panel-icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  transition: color 0.2s;
+}
+
+.panel-icon-btn:hover {
+  color: var(--accent-color);
+}
+
+.panel-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+.panel-content {
+  flex: 1;
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Todo Items */
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: 4px 0;
+  /* Tighter spacing */
+  cursor: pointer;
+  transition: opacity 0.2s;
+  opacity: 1;
+  position: relative;
+}
+
+.todo-item:hover .todo-delete-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.todo-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--text-muted);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.todo-checkbox.checked {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.todo-checkbox.checked span {
+  font-size: 0.8rem;
+}
+
+.todo-text {
+  font-size: 1.1rem;
+  color: var(--text-bright);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.todo-item.done .todo-text {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* Delete Button */
+.todo-delete-btn {
+  opacity: 0;
+  pointer-events: none;
+  background: none;
+  border: none;
+  color: var(--error-color);
+  padding: 0 0.5rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-size: 0.85rem;
+}
+
+/* Todo Input Area */
+.todo-input-container {
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  /* Ensure full width */
+  margin-top: auto;
+  /* Push to bottom if flex child */
+}
+
+.todo-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--border-color);
+  color: var(--text-bright);
+  padding: 0.4rem 0;
+  font-size: 1rem;
+  font-family: var(--font-body);
+}
+
+.todo-input:focus {
+  outline: none;
+  border-bottom-color: var(--accent-color);
+}
+
+.todo-add-btn-small {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+/* Light Mode Overrides for Specific Dashboard Colors if needed */
+
+@media (max-width: 768px) {
+  /* 移动端隐藏首页的时间卡片和Todo面板 */
+  .dashboard-clock-card,
+  .dashboard-stats {
+    display: none !important;
+  }
+
+  /* 调整移动端首页欢迎语布局 */
+  .dashboard-intro {
+    height: auto;
+    gap: 0;
+    margin-bottom: var(--spacing-md);
+  }
+
+  /* 适当减小欢迎语字号 */
+  .welcome-title {
+    font-size: 2.5rem;
+    padding-left: 1rem;
+  }
+
+  .welcome-subtitle {
+    padding-left: 1rem;
+    margin-top: 0.5rem;
+  }
+}
