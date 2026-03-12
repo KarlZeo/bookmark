@@ -205,7 +205,11 @@ categories:
         description: switch618
         icon: fas fa-icons
       - name: 非线性列车
-        url: https://www.juij.fun/
+        url: https://juij.fun/
+        description: 非线性列车
+        icon: fas fa-icons
+      - name: 非线性列车镜像站
+        url: https://h.juij.fun/
         description: 非线性列车
         icon: fas fa-icons
       - name: ultranx
