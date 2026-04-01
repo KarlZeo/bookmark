@@ -20,6 +20,10 @@ categories:
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: Decky plugin to streamline installation and usage of lsfg-vk; the Lossless Scaling compatibility layer for linux
         url: https://github.com/xXJSONDeruloXx/decky-lsfg-vk
+      - name: decky-dlss-enabler
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: DLSS Enabler patch/unpatcher for SteamOS game mode
+        url: https://github.com/xXJSONDeruloXx/decky-dlss-enabler
       - name: Decky-Framegen
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: Steam Deck Plugin to apply Framegen mods to games by replacing DLSS DLL with FSR3 DLL
