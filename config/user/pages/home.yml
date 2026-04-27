@@ -233,8 +233,12 @@ categories:
         description: 小幸修改器官方网站
         icon: fas fa-icons
       - name: OldmanEmu
-        url: https://www.oldmantvg.net/
+        url: https://www.oldmanemu.org/
         description: OldmanEmu
+        icon: fas fa-icons
+      - name: oldwomanemu
+        url: https://oldwomanemu.com/
+        description: oldwomanemu
         icon: fas fa-icons
       - name: 老机库
         url: https://laojiku.com/
