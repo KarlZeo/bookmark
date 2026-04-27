@@ -236,6 +236,10 @@ categories:
         url: https://www.oldmanemu.org/
         description: OldmanEmu
         icon: fas fa-icons
+      - name: OldmanEmuBBS
+        url: https://8.147.134.144/old
+        description: OldmanEmuBBS
+        icon: fas fa-icons
       - name: oldwomanemu
         url: https://oldwomanemu.com/
         description: oldwomanemu
