@@ -1,25 +1,33 @@
 {
   "name": "menav",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A personal navigation website",
-  "main": "src/generator.js",
+  "main": "src/lib/index.ts",
+  "engines": {
+    "node": ">=22.12"
+  },
   "homepage": "https://rbetree.github.io/menav",
   "scripts": {
-    "generate": "node src/generator.js",
-    "dev": "node ./scripts/dev.js",
-    "dev:offline": "node ./scripts/dev-offline.js",
-    "clean": "node ./scripts/clean.js",
-    "build": "node ./scripts/build.js",
-    "sync-articles": "node ./scripts/sync-articles.js",
-    "sync-projects": "node ./scripts/sync-projects.js",
-    "import-bookmarks": "node src/bookmark-processor.js",
-    "test": "node ./scripts/test.js",
-    "lint": "node ./scripts/lint.js",
-    "format": "node ./scripts/format.js --write",
-    "format:check": "node ./scripts/format.js --check",
-    "format:check:changed": "node ./scripts/format-check-changed.js",
-    "check": "node ./scripts/check.js",
-    "prepare": "husky"
+    "generate": "node -r ./scripts/register-ts.cjs ./scripts/generate.ts",
+    "dev": "node -r ./scripts/register-ts.cjs ./scripts/dev.ts",
+    "dev:offline": "node -r ./scripts/register-ts.cjs ./scripts/dev-offline.ts",
+    "init-config": "node -r ./scripts/register-ts.cjs ./scripts/init-config.ts",
+    "clean": "node -r ./scripts/register-ts.cjs ./scripts/clean.ts",
+    "build": "node -r ./scripts/register-ts.cjs ./scripts/build.ts",
+    "sync-articles": "node -r ./scripts/register-ts.cjs ./scripts/sync-articles.ts",
+    "sync-projects": "node -r ./scripts/register-ts.cjs ./scripts/sync-projects.ts",
+    "import-bookmarks": "node -r ./scripts/register-ts.cjs src/bookmark-processor.ts",
+    "test": "node -r ./scripts/register-ts.cjs ./scripts/test.ts",
+    "lint": "node -r ./scripts/register-ts.cjs ./scripts/lint.ts",
+    "format": "node -r ./scripts/register-ts.cjs ./scripts/format.ts --write",
+    "format:check": "node -r ./scripts/register-ts.cjs ./scripts/format.ts --check",
+    "format:check:changed": "node -r ./scripts/register-ts.cjs ./scripts/format-check-changed.ts",
+    "check:fast": "node -r ./scripts/register-ts.cjs ./scripts/check.ts && tsc --noEmit",
+    "check:browser": "npm run build && npm run test:browser",
+    "check": "npm run check:fast",
+    "prepare": "husky",
+    "dev:astro": "node -r ./scripts/register-ts.cjs ./scripts/dev-astro.ts",
+    "test:browser": "node -r ./scripts/register-ts.cjs ./scripts/test-browser.ts"
   },
   "keywords": [
     "navigation",
@@ -29,16 +37,21 @@
   "author": "Your Name",
   "license": "AGPL-3.0-only",
   "dependencies": {
-    "handlebars": "^4.7.9",
     "js-yaml": "^4.1.1",
     "markdown-it": "^14.1.1",
-    "rss-parser": "^3.13.0"
+    "rss-parser": "^3.13.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@types/node": "^25.8.0",
+    "astro": "^6.3.3",
     "esbuild": "^0.28.0",
     "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
+    "lint-staged": "^17.0.5",
+    "playwright": "^1.60.0",
     "prettier": "^3.8.3",
+    "prettier-plugin-astro": "^0.14.1",
     "serve": "^14.2.6"
   },
   "overrides": {
@@ -46,7 +59,7 @@
   },
   "lint-staged": {
     "**/*.js": "node ./node_modules/prettier/bin/prettier.cjs --write --ignore-unknown",
-    "**/*.{yml,yaml,md,css}": "node ./node_modules/prettier/bin/prettier.cjs --write --ignore-unknown",
+    "**/*.{astro,yml,yaml,md,css}": "node ./node_modules/prettier/bin/prettier.cjs --write --ignore-unknown",
     "**/!(package-lock).json": "node ./node_modules/prettier/bin/prettier.cjs --write --ignore-unknown"
   }
 }

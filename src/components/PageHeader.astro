@@ -1,0 +1,35 @@
+---
+import { formatDate } from '../lib/view-data/view-utils.ts';
+const { page } = Astro.props;
+const pageId = page?.pageId || '';
+const homePageId = page?.homePageId || '';
+const pageMeta = page?.pageMeta || null;
+---
+
+<div class="welcome-section">
+  <div class="welcome-section-main">
+    {
+      pageId === homePageId ? (
+        <>
+          <h2 data-editable="profile-title">{page.title}</h2>
+          <h3 data-editable="profile-subtitle">{page.subtitle}</h3>
+        </>
+      ) : (
+        <>
+          <div class="welcome-title-row">
+            <h2 data-editable="page-title">{page.title}</h2>
+            {pageMeta?.updatedAt && (
+              <span class="page-updated-inline" title={pageMeta.updatedAt}>
+                update: {formatDate(pageMeta.updatedAt, 'YYYY-MM-DD')} | from:{' '}
+                {pageMeta.updatedAtSource}
+              </span>
+            )}
+          </div>
+          <p class="subtitle" data-editable="page-subtitle">
+            {page.subtitle}
+          </p>
+        </>
+      )
+    }
+  </div>
+</div>

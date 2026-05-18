@@ -1,0 +1,15 @@
+// 运行时入口（由构建阶段打包输出 public/script.js，再由 Astro 复制到 dist/script.js）
+import { menavUpdateAppHeight } from './shared.ts';
+
+// 让页面在不同视口（含移动端地址栏变化）下保持正确高度
+menavUpdateAppHeight();
+window.addEventListener('resize', menavUpdateAppHeight);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', menavUpdateAppHeight);
+}
+
+require('./app/nested.ts');
+require('./app');
+
+// tooltip 独立模块：内部会按需监听 DOMContentLoaded
+require('./app/tooltip.ts');

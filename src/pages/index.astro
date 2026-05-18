@@ -1,0 +1,8 @@
+---
+import DefaultLayout from '../layouts/DefaultLayout.astro';
+import { prepareSiteRenderData } from '../lib/view-data/render-data.ts';
+
+const renderData = prepareSiteRenderData();
+---
+
+<DefaultLayout {...renderData} />

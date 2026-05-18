@@ -1,0 +1,56 @@
+---
+import { getFaviconFallbackUrl, getFaviconV2Url, isHttpUrl } from '../lib/view-data/view-utils.ts';
+import type { RenderContext } from '../types/render';
+import { DEFAULT_RENDER_CONTEXT } from '../lib/view-data/render-context.ts';
+import type { SiteItem } from '../types/site';
+
+interface Props {
+  site?: SiteItem;
+  renderContext?: RenderContext;
+  name?: string;
+  url?: string;
+  icon?: string;
+}
+
+const {
+  site = {},
+  renderContext = DEFAULT_RENDER_CONTEXT,
+  name = '',
+  url = '',
+  icon = 'fas fa-link',
+} = Astro.props;
+const faviconUrl = site.faviconUrl || '';
+const forceIconMode = site.forceIconMode || '';
+const iconsMode = renderContext.icons.mode;
+const shouldUseFavicon = forceIconMode ? forceIconMode === 'favicon' : iconsMode === 'favicon';
+const canUseGeneratedFavicon = shouldUseFavicon && isHttpUrl(url);
+const src =
+  faviconUrl || (canUseGeneratedFavicon ? getFaviconV2Url(url, renderContext.icons.region) : '');
+const fallback = canUseGeneratedFavicon
+  ? getFaviconFallbackUrl(url, renderContext.icons.region)
+  : '';
+const onError = fallback
+  ? `if (!this.dataset.faviconFallbackTried) { this.dataset.faviconFallbackTried = '1'; this.src = '${fallback}'; return; } this.classList.add('error'); this.previousElementSibling.classList.add('hidden'); this.nextElementSibling.classList.add('visible');`
+  : "this.classList.add('error'); this.previousElementSibling.classList.add('hidden'); this.nextElementSibling.classList.add('visible');";
+---
+
+<div class="site-card-icon" aria-hidden="true">
+  {
+    src ? (
+      <div class="icon-container">
+        <i class="fas fa-circle-notch fa-spin icon-placeholder" aria-hidden="true" />
+        <img
+          class="favicon-icon"
+          src={src}
+          alt={`${name} favicon`}
+          loading="lazy"
+          onload="this.classList.add('loaded'); this.previousElementSibling.classList.add('hidden');"
+          onerror={onError}
+        />
+        <i class:list={[icon, 'icon-fallback']} aria-hidden="true" />
+      </div>
+    ) : (
+      <i class:list={[icon, 'site-icon']} aria-hidden="true" />
+    )
+  }
+</div>

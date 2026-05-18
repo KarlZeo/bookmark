@@ -40,6 +40,8 @@
 
 [MarksVault](https://github.com/rbetree/MarksVault) 浏览器扩展可与 MeNav 集成，实现书签自动同步：
 
+> 它作为书签文件进入 MeNav 仓库的入口，负责把浏览器书签导出或推送为 HTML 文件，并放入仓库的 `bookmarks/` 目录；后续解析、配置生成和站点构建仍由 MeNav 完成。
+
 - **一键推送书签**：扩展将书签 HTML 文件推送到仓库的 `bookmarks/` 目录
 - **自动化处理**：GitHub Actions 检测到书签文件后自动运行导入脚本生成配置
 - **自动清理**：处理完成后会删除已导入的 HTML 文件，避免重复处理
@@ -103,7 +105,7 @@ MeNav 书签导入功能支持从以下浏览器导出的书签文件：
 
 ## 文件处理机制
 
-书签处理器 (`src/bookmark-processor.js`) 对书签文件进行以下处理：
+书签处理器 (`src/bookmark-processor.ts`) 对书签文件进行以下处理：
 
 1. **解析文件结构**：
    - 读取书签 HTML 文件
