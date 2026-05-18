@@ -451,6 +451,10 @@ categories:
         url: https://go.cqjs.link/
         description: 创奇导航
         icon: fas fa-icons
+      - name: XSUS机场
+        url: https://xsus1.com/
+        description: XSUS机场
+        icon: fas fa-icons
   - name: VPS
     icon: fas fa-tools
     sites:
