@@ -34,6 +34,13 @@ security:
   # 示例：
   # allowedSchemes: [http, https, mailto, tel, obsidian, vscode]
 
+# 主题设置：默认明暗模式（可选）
+# - mode: dark | light | system
+#   - dark/light：首屏默认主题；用户点击按钮切换后会写入 localStorage 并覆盖该默认值
+#   - system：跟随系统 prefers-color-scheme；用户手动切换后同样会写入 localStorage 并停止跟随
+theme:
+  mode: system # 可选: dark | light | system（默认 dark）
+
 # 字体设置：全站基础字体
 # - source: css | google | system
 # - css: 通过 cssUrl 引入第三方字体 CSS
@@ -41,7 +48,7 @@ security:
 # - system: 只使用本地/系统字体，不额外发起请求
 fonts:
   source: css
-  cssUrl: "https://fontsapi.zeoseven.com/292/main/result.css"
+  cssUrl: 'https://fontsapi.zeoseven.com/292/main/result.css'
   preload: true # 可选：使用 preload+onload 的方式非阻塞加载字体 CSS（更利于首屏性能）
   family: LXGW WenKai
   weight: normal
@@ -81,7 +88,7 @@ rss:
 # - username：你的 GitHub 用户名（例如 torvalds）
 # - heatmapColor：热力图主题色（不带 #，例如 339af0）
 github:
-  username: "KarlZeo" # 你的 GitHub 用户名（例如 torvalds；为空则 projects 页不展示热力图）
+  username: 'KarlZeo' # 你的 GitHub 用户名（例如 torvalds；为空则 projects 页不展示热力图）
   heatmapColor: 339af0
   cacheDir: dev # projects 仓库元信息缓存目录（默认 dev，仓库默认 gitignore）
 
