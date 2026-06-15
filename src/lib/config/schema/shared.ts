@@ -1,6 +1,5 @@
 import type { z as ZodNamespace } from 'zod';
-
-const { z } = require('zod') as typeof import('zod');
+import { z } from 'zod';
 
 function optionalTrimmedStringSchema(fieldName: string) {
   return z
@@ -36,16 +35,17 @@ const socialItemSchema = z.looseObject({
   icon: optionalTrimmedStringSchema('icon'),
 });
 
-const navigationSubmenuItemSchema = z.looseObject({
+const navigationSubmenuItemSchema = z.strictObject({
   name: optionalTrimmedStringSchema('name'),
   icon: optionalTrimmedStringSchema('icon'),
   slug: optionalTrimmedStringSchema('slug'),
 });
 
-const navigationItemSchema = z.looseObject({
-  id: optionalTrimmedStringSchema('id'),
+const navigationItemSchema = z.strictObject({
+  id: z.string({ error: 'id 必须是字符串' }).trim().min(1, { error: 'id 不能为空' }),
   name: optionalTrimmedStringSchema('name'),
   icon: optionalTrimmedStringSchema('icon'),
+  hidden: z.boolean({ error: 'hidden 必须是布尔值' }).optional(),
   isActive: z.boolean({ error: 'isActive 必须是布尔值' }).optional(),
   active: z.boolean({ error: 'active 必须是布尔值' }).optional(),
   submenu: z.array(navigationSubmenuItemSchema, { error: 'submenu 必须是数组' }).optional(),
@@ -128,7 +128,7 @@ export type SecurityConfig = ZodNamespace.output<SecuritySchema>;
 export type RssConfig = ZodNamespace.output<RssSchema>;
 export type GithubConfig = ZodNamespace.output<GithubSchema>;
 
-module.exports = {
+export {
   siteItemSchema,
   socialItemSchema,
   navigationSubmenuItemSchema,

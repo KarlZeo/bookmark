@@ -1,31 +1,38 @@
 ---
 import CardIcon from './CardIcon.astro';
-import { extractDomain, formatDate, getSafeUrl } from '../lib/view-data/view-utils.ts';
+import { formatDate } from '../lib/view-data/view-utils.ts';
+import type { CardViewModel } from '../types/card';
 import type { RenderContext } from '../types/render';
 import { DEFAULT_RENDER_CONTEXT } from '../lib/view-data/render-context.ts';
-import type { SiteItem } from '../types/site';
 
 interface Props {
-  site?: SiteItem;
-  style?: string;
-  type?: string;
+  card: CardViewModel;
   renderContext?: RenderContext;
 }
 
-const { site = {}, style = '', type = '', renderContext = DEFAULT_RENDER_CONTEXT } = Astro.props;
+const { card, renderContext = DEFAULT_RENDER_CONTEXT } = Astro.props;
 
-const cardType = type || site.type || 'site';
-const cardStyle = style || site.style || '';
-const name = site.name || '未命名站点';
-const url = site.url || '#';
-const icon = site.icon || (cardStyle === 'repo' ? 'fas fa-code' : 'fas fa-link');
-const description = site.description || extractDomain(url);
-const safeHref = getSafeUrl(url, renderContext.allowedSchemes);
-const faviconUrl = site.faviconUrl || '';
-const forceIconMode = site.forceIconMode || '';
-const tooltip = `${name} - ${description || extractDomain(url)}`;
-const useExternal = site.external;
-const shouldOpenExternal = Boolean(useExternal);
+const cardType = card.type;
+const cardStyle = card.style || '';
+const name = card.title;
+const url = card.url;
+const icon = card.icon || (cardStyle === 'repo' ? 'fas fa-code' : 'fas fa-link');
+const description = card.description;
+const safeHref = card.safeUrl;
+const faviconUrl = card.faviconUrl || '';
+const forceIconMode = card.forceIconMode || '';
+const tooltip = `${name} - ${description || url}`;
+const shouldOpenExternal = Boolean(card.external);
+const publishedAt = card.publishedAt || '';
+const source = card.source || '';
+const language = card.language || '';
+const languageColor = card.languageColor || '';
+const stars = card.stars;
+const forks = card.forks;
+const issues = card.issues;
+const hasRepoStats = Boolean(
+  language || stars !== undefined || forks !== undefined || issues !== undefined
+);
 ---
 
 {
@@ -43,27 +50,32 @@ const shouldOpenExternal = Boolean(useExternal);
       data-force-icon-mode={forceIconMode || undefined}
       data-description={description}
       data-tooltip={tooltip}
-      data-published-at={site.publishedAt || undefined}
-      data-source={site.source || undefined}
+      data-published-at={publishedAt || undefined}
+      data-source={source || undefined}
     >
       {cardType === 'article' ? (
         <>
           <div class="article-card-header">
-            <CardIcon site={site} renderContext={renderContext} name={name} url={url} icon={icon} />
+            <CardIcon
+              renderContext={renderContext}
+              name={name}
+              url={url}
+              icon={icon}
+              faviconUrl={faviconUrl}
+              forceIconMode={forceIconMode}
+            />
             <div class="article-card-title">
               <h3>{name}</h3>
             </div>
           </div>
           <div class="article-card-body">
-            {(site.publishedAt || site.source) && (
+            {(publishedAt || source) && (
               <div class="site-card-meta">
-                {site.publishedAt && (
-                  <span class="site-card-meta-date">
-                    {formatDate(site.publishedAt, 'YYYY-MM-DD')}
-                  </span>
+                {publishedAt && (
+                  <span class="site-card-meta-date">{formatDate(publishedAt, 'YYYY-MM-DD')}</span>
                 )}
-                {site.publishedAt && site.source && <span class="site-card-meta-sep">·</span>}
-                {site.source && <span class="site-card-meta-source">{site.source}</span>}
+                {publishedAt && source && <span class="site-card-meta-sep">·</span>}
+                {source && <span class="site-card-meta-source">{source}</span>}
               </div>
             )}
             <p>{description}</p>
@@ -76,30 +88,30 @@ const shouldOpenExternal = Boolean(useExternal);
             <div class="repo-title">{name}</div>
           </div>
           <div class="repo-desc">{description}</div>
-          {(site.language || site.stars || site.forks || site.issues) && (
+          {hasRepoStats && (
             <div class="repo-stats">
-              {site.language && (
+              {language && (
                 <div class="stat-item">
                   <span
                     class="lang-dot"
-                    style={`background-color: ${site.languageColor || '#909296'};`}
+                    style={`background-color: ${languageColor || '#909296'};`}
                   />
-                  {site.language}
+                  {language}
                 </div>
               )}
-              {site.stars && (
+              {stars !== undefined && (
                 <div class="stat-item">
-                  <i class="far fa-star" aria-hidden="true" /> {site.stars}
+                  <i class="far fa-star" aria-hidden="true" /> {stars}
                 </div>
               )}
-              {site.forks && (
+              {forks !== undefined && (
                 <div class="stat-item">
-                  <i class="fas fa-code-branch" aria-hidden="true" /> {site.forks}
+                  <i class="fas fa-code-branch" aria-hidden="true" /> {forks}
                 </div>
               )}
-              {site.issues && (
+              {issues !== undefined && (
                 <div class="stat-item">
-                  <i class="fas fa-exclamation-circle" aria-hidden="true" /> {site.issues}
+                  <i class="fas fa-exclamation-circle" aria-hidden="true" /> {issues}
                 </div>
               )}
             </div>
@@ -107,7 +119,14 @@ const shouldOpenExternal = Boolean(useExternal);
         </>
       ) : (
         <>
-          <CardIcon site={site} renderContext={renderContext} name={name} url={url} icon={icon} />
+          <CardIcon
+            renderContext={renderContext}
+            name={name}
+            url={url}
+            icon={icon}
+            faviconUrl={faviconUrl}
+            forceIconMode={forceIconMode}
+          />
           <div class="site-card-content">
             <h3>{name}</h3>
             <p>{description}</p>

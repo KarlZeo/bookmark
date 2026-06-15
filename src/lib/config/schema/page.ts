@@ -1,8 +1,7 @@
 import type { z as ZodNamespace, ZodType } from 'zod';
-import type { SiteItem, SiteItemSchema } from './shared';
-
-const { z } = require('zod') as typeof import('zod');
-const { siteItemSchema } = require('./shared.ts') as { siteItemSchema: SiteItemSchema };
+import { z } from 'zod';
+import type { SiteItem } from './shared';
+import { siteItemSchema } from './shared.ts';
 
 type CategoryNode = {
   name?: string;
@@ -35,7 +34,7 @@ const contentPageSchema = z.looseObject({
   file: z.string({ error: 'file 必须是字符串' }).trim().optional(),
 });
 
-const pageConfigSchema = z.looseObject({
+const pageConfigSchema = z.strictObject({
   title: z.string({ error: 'title 必须是字符串' }).trim().optional(),
   subtitle: z.string({ error: 'subtitle 必须是字符串' }).trim().optional(),
   template: z
@@ -44,7 +43,7 @@ const pageConfigSchema = z.looseObject({
     })
     .optional(),
   categories: z.array(categoryNodeSchema, { error: 'categories 必须是数组' }).optional(),
-  sites: z.array(siteItemSchema, { error: 'sites 必须是数组' }).optional(),
+  sites: z.never({ error: '页面顶层 sites 已不支持，请改为 categories[].sites' }).optional(),
   content: contentPageSchema.optional(),
 });
 
@@ -56,7 +55,7 @@ export type CategoryItem = ZodNamespace.output<CategoryNodeSchema>;
 export type PageConfig = ZodNamespace.output<PageConfigSchema>;
 export type ContentPageConfig = ZodNamespace.output<ContentPageSchema>;
 
-module.exports = {
+export {
   categoryNodeSchema,
   contentPageSchema,
   pageConfigSchema,

@@ -5,134 +5,33 @@ import type {
   RuntimeSearchIndexItem,
   RuntimeState,
 } from '../../types';
-import type { SearchIndexPayload } from '../../../types/search';
 
 const searchEngines = require('./search-engines.ts') as RuntimeSearchEngines;
-const highlightSearchTerm = require('./highlight.ts') as (
-  card: HTMLElement,
-  searchTerm: string
-) => void;
+const debounce = require('./debounce.ts') as (
+  fn: (value: string) => void,
+  delay: number
+) => (value: string) => void;
+const { createCardFromIndexItem } = require('./cards.ts') as {
+  createCardFromIndexItem: (item: RuntimeSearchIndexItem) => HTMLElement;
+};
+const { showSearchResults } = require('./results-ui.ts') as {
+  showSearchResults: (options: {
+    state: RuntimeState;
+    searchTerm: string;
+    matchedItems: RuntimeSearchIndexItem[];
+    searchResults: Map<string, HTMLElement[]>;
+    searchSections: HTMLElement[];
+    searchResultsPageElement: HTMLElement;
+    searchBoxElement: HTMLElement;
+  }) => void;
+};
+const { loadBuildSearchIndex } = require('./search-index-loader.ts') as {
+  loadBuildSearchIndex: (state: RuntimeState) => Promise<void>;
+};
 const { SELECTORS, qs, qsa } =
   require('../../dom/selectors.ts') as typeof import('../../dom/selectors');
 
-const SEARCH_INDEX_SCHEMA_VERSION = 1;
-const SEARCH_INDEX_URL = './search-index.json';
-
-function normalizeText(value: unknown): string {
-  return String(value === null || value === undefined ? '' : value).trim();
-}
-
-function createElement<K extends keyof HTMLElementTagNameMap>(
-  tagName: K,
-  className?: string,
-  text?: string
-): HTMLElementTagNameMap[K] {
-  const el = document.createElement(tagName);
-  if (className) el.className = className;
-  if (text !== undefined) el.textContent = text;
-  return el;
-}
-
-function normalizeIndexItem(raw: unknown): RuntimeSearchIndexItem | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const item = raw as Record<string, unknown>;
-  const pageId = normalizeText(item.pageId);
-  const title = normalizeText(item.title);
-  const url = normalizeText(item.url) || '#';
-  if (!pageId || !title) return null;
-
-  const description = normalizeText(item.description);
-  const searchText = normalizeText(item.searchText || `${title} ${description}`).toLowerCase();
-  const type = normalizeText(item.type) === 'article' ? 'article' : 'site';
-  const categoryPath = Array.isArray(item.categoryPath)
-    ? item.categoryPath.map((part) => normalizeText(part)).filter(Boolean)
-    : undefined;
-
-  return {
-    pageId,
-    title,
-    description,
-    url,
-    icon: normalizeText(item.icon) || 'fas fa-link',
-    type,
-    style: normalizeText(item.style),
-    categoryId: normalizeText(item.categoryId),
-    categoryName: normalizeText(item.categoryName),
-    categoryPath,
-    publishedAt: normalizeText(item.publishedAt),
-    source: normalizeText(item.source),
-    external: typeof item.external === 'boolean' ? item.external : undefined,
-    searchText,
-  };
-}
-
-function createCardFromIndexItem(item: RuntimeSearchIndexItem): HTMLElement {
-  const card = createElement('a');
-  const isRepo = item.style === 'repo';
-  const isArticle = item.type === 'article';
-
-  card.href = item.url || '#';
-  card.className = ['site-card', isRepo ? 'site-card-repo' : ''].filter(Boolean).join(' ');
-  card.dataset.type = isArticle ? 'article' : 'site';
-  card.dataset.name = item.title;
-  card.dataset.url = item.url || '#';
-  card.dataset.icon = item.icon || '';
-  card.dataset.description = item.description || '';
-  card.dataset.tooltip = `${item.title} - ${item.description || item.url || ''}`;
-  if (item.publishedAt) card.dataset.publishedAt = item.publishedAt;
-  if (item.source) card.dataset.source = item.source;
-  if (item.external) {
-    card.target = '_blank';
-    card.rel = 'noopener';
-  }
-
-  if (isArticle) {
-    const header = createElement('div', 'article-card-header');
-    const iconWrap = createElement('div', 'site-card-icon');
-    iconWrap.setAttribute('aria-hidden', 'true');
-    iconWrap.appendChild(createElement('i', `${item.icon || 'fas fa-pen'} site-icon`));
-    const titleWrap = createElement('div', 'article-card-title');
-    titleWrap.appendChild(createElement('h3', '', item.title));
-    header.append(iconWrap, titleWrap);
-
-    const body = createElement('div', 'article-card-body');
-    if (item.publishedAt || item.source) {
-      const meta = createElement('div', 'site-card-meta');
-      if (item.publishedAt)
-        meta.appendChild(
-          createElement('span', 'site-card-meta-date', item.publishedAt.slice(0, 10))
-        );
-      if (item.publishedAt && item.source)
-        meta.appendChild(createElement('span', 'site-card-meta-sep', '·'));
-      if (item.source)
-        meta.appendChild(createElement('span', 'site-card-meta-source', item.source));
-      body.appendChild(meta);
-    }
-    body.appendChild(createElement('p', '', item.description));
-    card.append(header, body);
-    return card;
-  }
-
-  if (isRepo) {
-    const header = createElement('div', 'repo-header');
-    header.appendChild(createElement('i', `${item.icon || 'fas fa-code'} repo-icon`));
-    header.appendChild(createElement('div', 'repo-title', item.title));
-    card.appendChild(header);
-    card.appendChild(createElement('div', 'repo-desc', item.description));
-    return card;
-  }
-
-  const iconWrap = createElement('div', 'site-card-icon');
-  iconWrap.setAttribute('aria-hidden', 'true');
-  iconWrap.appendChild(createElement('i', `${item.icon || 'fas fa-link'} site-icon`));
-  const content = createElement('div', 'site-card-content');
-  content.appendChild(createElement('h3', '', item.title));
-  content.appendChild(createElement('p', '', item.description));
-  card.append(iconWrap, content);
-  return card;
-}
-
-module.exports = function initSearch(state: RuntimeState, dom: RuntimeDom): RuntimeSearchApi {
+function initSearch(state: RuntimeState, dom: RuntimeDom): RuntimeSearchApi {
   const {
     searchInput,
     searchBox,
@@ -167,46 +66,10 @@ module.exports = function initSearch(state: RuntimeState, dom: RuntimeDom): Runt
   if (typeof state.isSearchActive !== 'boolean') {
     state.isSearchActive = false;
   }
-
-  async function loadBuildSearchIndex(): Promise<void> {
-    if (state.searchIndex.initialized || state.searchIndex.loading) return;
-
-    state.searchIndex.loading = true;
-
-    try {
-      const response = await fetch(SEARCH_INDEX_URL, { cache: 'no-cache' });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-      const payload = (await response.json()) as SearchIndexPayload;
-      if (payload.schemaVersion !== SEARCH_INDEX_SCHEMA_VERSION || !Array.isArray(payload.items)) {
-        throw new Error('search index schema mismatch');
-      }
-
-      const items = payload.items
-        .map((item) => normalizeIndexItem(item))
-        .filter((item: RuntimeSearchIndexItem | null): item is RuntimeSearchIndexItem =>
-          Boolean(item)
-        );
-
-      state.searchIndex.items = items;
-      state.searchIndex.error = undefined;
-      state.searchIndex.initialized = true;
-      state.searchIndex.loading = false;
-      state.searchIndex.source = 'build';
-    } catch (error) {
-      console.error('Error loading search index:', error);
-      state.searchIndex.items = [];
-      state.searchIndex.initialized = true;
-      state.searchIndex.loading = false;
-      state.searchIndex.source = 'build';
-      state.searchIndex.error = error instanceof Error ? error.message : String(error);
-    }
-  }
-
   // 初始化搜索索引：只使用构建期 search-index.json，不再从页面卡片生成索引。
   function initSearchIndex(): void {
     if (state.searchIndex.initialized || state.searchIndex.loading) return;
-    void loadBuildSearchIndex();
+    void loadBuildSearchIndex(state);
   }
 
   // 搜索功能
@@ -231,8 +94,6 @@ module.exports = function initSearch(state: RuntimeState, dom: RuntimeDom): Runt
     try {
       // 使用搜索索引进行搜索
       const searchResults = new Map<string, HTMLElement[]>();
-      let hasResults = false;
-
       // 使用更高效的搜索算法
       const matchedItems = state.searchIndex.items.filter((item: RuntimeSearchIndexItem) => {
         const text = item.searchText || `${item.title} ${item.description}`.toLowerCase();
@@ -252,79 +113,16 @@ module.exports = function initSearch(state: RuntimeState, dom: RuntimeDom): Runt
         // 构建期索引用数据动态生成结果卡片，不再依赖原页面 DOM 克隆。
         const card = createCardFromIndexItem(item);
         searchResults.get(item.pageId)?.push(card);
-        hasResults = true;
       });
 
-      // 使用 requestAnimationFrame 批量更新 DOM，减少重排重绘
-      requestAnimationFrame(() => {
-        try {
-          // 清空并隐藏所有搜索区域
-          searchSections.forEach((section: HTMLElement) => {
-            try {
-              const grid = section.querySelector('.sites-grid');
-              if (grid) {
-                grid.innerHTML = ''; // 使用 innerHTML 清空，比 removeChild 更高效
-              }
-              section.style.display = 'none';
-            } catch (sectionError) {
-              console.error('Error clearing search section');
-            }
-          });
-
-          // 使用 DocumentFragment 批量添加 DOM 元素，减少重排
-          searchResults.forEach((matches: HTMLElement[], pageId: string) => {
-            const section = searchResultsPageElement.querySelector<HTMLElement>(
-              `[data-section="${pageId}"]`
-            );
-            if (section) {
-              try {
-                const grid = section.querySelector('.sites-grid');
-                if (grid) {
-                  const fragment = document.createDocumentFragment();
-
-                  matches.forEach((card: HTMLElement) => {
-                    // 高亮匹配文本
-                    highlightSearchTerm(card, searchTerm);
-                    fragment.appendChild(card);
-                  });
-
-                  grid.appendChild(fragment);
-                  section.style.display = 'block';
-                }
-              } catch (gridError) {
-                console.error('Error updating search results grid');
-              }
-            }
-          });
-
-          // 更新搜索结果页面状态
-          const subtitle = searchResultsPageElement.querySelector('.subtitle');
-          if (subtitle) {
-            const emptyMessage = state.searchIndex.loading
-              ? '搜索索引加载中，请稍后再试'
-              : state.searchIndex.error
-                ? '搜索索引加载失败，请重新运行构建或刷新页面'
-                : '未找到匹配的结果';
-            subtitle.textContent = hasResults
-              ? `在所有页面中找到 ${matchedItems.length} 个匹配项`
-              : emptyMessage;
-          }
-
-          // 显示搜索结果页面
-          if (state.currentPageId !== 'search-results') {
-            state.currentPageId = 'search-results';
-            if (!state.pages) state.pages = qsa(SELECTORS.page);
-            state.pages.forEach((page: HTMLElement) => {
-              page.classList.toggle('active', page.id === 'search-results');
-            });
-          }
-
-          // 更新搜索状态样式
-          searchBoxElement.classList.toggle('has-results', hasResults);
-          searchBoxElement.classList.toggle('no-results', !hasResults);
-        } catch (uiError) {
-          console.error('Error updating search UI');
-        }
+      showSearchResults({
+        state,
+        searchTerm,
+        matchedItems,
+        searchResults,
+        searchSections,
+        searchResultsPageElement,
+        searchBoxElement,
       });
     } catch (searchError) {
       console.error('Error performing search');
@@ -386,19 +184,6 @@ module.exports = function initSearch(state: RuntimeState, dom: RuntimeDom): Runt
       console.error('Error in resetSearch');
     }
   }
-
-  // 搜索输入事件（使用防抖）
-  const debounce = (fn: (value: string) => void, delay: number): ((value: string) => void) => {
-    let timer: number | null = null;
-    return (value: string) => {
-      if (timer) clearTimeout(timer);
-      timer = window.setTimeout(() => {
-        fn(value);
-        timer = null;
-      }, delay);
-    };
-  };
-
   const debouncedSearch = debounce(performSearch, 300);
 
   searchInputElement.addEventListener('input', (e: Event) => {
@@ -575,4 +360,6 @@ module.exports = function initSearch(state: RuntimeState, dom: RuntimeDom): Runt
     resetSearch,
     performSearch,
   };
-};
+}
+
+module.exports = initSearch;

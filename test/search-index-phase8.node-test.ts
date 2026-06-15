@@ -1,10 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const os = require('node:os');
 const path = require('node:path');
 
-const { prepareSiteRenderData } = require('../src/lib/view-data/render-data.ts');
+const { buildTestSiteModel } = require('./helpers/site-model.ts');
 const {
   SEARCH_INDEX_SCHEMA_VERSION,
   buildSearchIndex,
@@ -22,10 +21,6 @@ function withRepoRoot(fn) {
 
 test('Phase 8：构建期搜索索引应扁平化页面、分类、站点和文章基础字段', () => {
   withRepoRoot(() => {
-    const previousCacheDir = process.env.RSS_CACHE_DIR;
-    const tmpCacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'menav-search-index-rss-'));
-    process.env.RSS_CACHE_DIR = tmpCacheDir;
-
     const config = {
       site: {
         title: 'Test Site',
@@ -60,6 +55,8 @@ test('Phase 8：构建期搜索索引应扁平化页面、分类、站点和文�
                     url: 'https://example.com/tool',
                     icon: 'fas fa-link',
                     description: 'Developer utility',
+                    faviconUrl: 'assets/menav.svg',
+                    forceIconMode: 'manual',
                   },
                 ],
               },
@@ -85,6 +82,11 @@ test('Phase 8：构建期搜索索引应扁平化页面、分类、站点和文�
                     url: 'https://github.com/example/repo-a',
                     icon: 'fas fa-code',
                     description: 'Repo description',
+                    language: 'TypeScript',
+                    languageColor: '#3178c6',
+                    stars: 42,
+                    forks: 7,
+                    issues: 3,
                   },
                 ],
               },
@@ -113,28 +115,26 @@ test('Phase 8：构建期搜索索引应扁平化页面、分类、站点和文�
       },
     };
 
-    try {
-      const renderData = prepareSiteRenderData(config);
-      const articlesPage = renderData.pages.find((page) => page.id === 'articles');
-      const articleItem = {
-        name: 'Article A',
-        url: 'https://blog.example.com/a',
-        icon: 'fas fa-pen',
-        description: 'Article summary',
-        publishedAt: '2026-01-01T00:00:00.000Z',
-        source: 'Example Blog',
-        external: true,
-      };
-      articlesPage.data.articlesItems = [articleItem];
-      articlesPage.data.articlesCategories = [
-        {
-          name: '最新文章',
-          icon: 'fas fa-rss',
-          items: [articleItem],
+    const articleItem = {
+      name: 'Article A',
+      url: 'https://blog.example.com/a',
+      icon: 'fas fa-pen',
+      description: 'Article summary',
+      publishedAt: '2026-01-01T00:00:00.000Z',
+      source: 'Example Blog',
+      external: true,
+    };
+    const model = buildTestSiteModel(config, {
+      externalData: {
+        articles: {
+          articles: {
+            items: [articleItem],
+            meta: { generatedAt: '2026-01-01T00:00:00.000Z' },
+          },
         },
-      ];
-
-      const index = buildSearchIndex(renderData.pages, renderData.renderContext);
+      },
+    });
+    const index = buildSearchIndex(model);
       const byTitle = new Map(index.items.map((item) => [String(item.title).toLowerCase(), item]));
 
       assert.equal(index.schemaVersion, SEARCH_INDEX_SCHEMA_VERSION);
@@ -144,7 +144,15 @@ test('Phase 8：构建期搜索索引应扁平化页面、分类、站点和文�
       assert.ok(byTitle.has('article a'), '应包含文章缓存条目');
       assert.equal(byTitle.get('example tool').categoryName, '开发');
       assert.deepEqual(byTitle.get('example tool').categoryPath, ['工具', '开发']);
+      assert.equal(byTitle.get('example tool').faviconUrl, 'assets/menav.svg');
+      assert.equal(byTitle.get('example tool').forceIconMode, 'manual');
       assert.equal(byTitle.get('article a').type, 'article');
+      assert.equal(byTitle.get('repo a').style, 'repo');
+      assert.equal(byTitle.get('repo a').language, 'TypeScript');
+      assert.equal(byTitle.get('repo a').languageColor, '#3178c6');
+      assert.equal(byTitle.get('repo a').stars, 42);
+      assert.equal(byTitle.get('repo a').forks, 7);
+      assert.equal(byTitle.get('repo a').issues, 3);
       assert.equal(byTitle.has('source a'), false, '文章缓存存在时不应索引扩展影子来源卡片');
       assert.equal(
         index.items.some((item) => item.pageId === 'search-results'),
@@ -155,21 +163,17 @@ test('Phase 8：构建期搜索索引应扁平化页面、分类、站点和文�
       assert.ok(!raw.includes('navigation'));
       assert.ok(!raw.includes('runtimeConfig'));
       assert.ok(!raw.includes('runtimeConfigJson'));
-    } finally {
-      if (previousCacheDir === undefined) {
-        delete process.env.RSS_CACHE_DIR;
-      } else {
-        process.env.RSS_CACHE_DIR = previousCacheDir;
-      }
-      fs.rmSync(tmpCacheDir, { recursive: true, force: true });
-    }
   });
 });
 
 test('Phase 12：runtime 搜索只依赖构建期索引，不保留页面卡片索引生成路径', () => {
   const repoRoot = path.resolve(__dirname, '..');
-  const runtimeSearchPath = path.join(repoRoot, 'src', 'runtime', 'app', 'search', 'index.ts');
-  const content = fs.readFileSync(runtimeSearchPath, 'utf8');
+  const runtimeSearchDir = path.join(repoRoot, 'src', 'runtime', 'app', 'search');
+  const content = fs
+    .readdirSync(runtimeSearchDir)
+    .filter((file) => file.endsWith('.ts'))
+    .map((file) => fs.readFileSync(path.join(runtimeSearchDir, file), 'utf8'))
+    .join('\n');
   const removedBuilder = ['build', 'Dom', 'Search', 'Index'].join('');
   const removedSource = ["source = '", 'dom', "'"].join('');
   const removedElementClone = ['item', '.', 'element'].join('');
@@ -179,4 +183,17 @@ test('Phase 12：runtime 搜索只依赖构建期索引，不保留页面卡片�
   assert.equal(content.includes(removedElementClone), false);
   assert.ok(content.includes('search-index.json'), 'runtime 搜索应读取构建期索引文件');
   assert.ok(content.includes('搜索索引加载失败'), '索引失败时应有用户可见提示');
+});
+
+test('Phase 12：buildSearchIndex 只接受 SiteModel，不保留 PageEntry[] 兼容路径', () => {
+  const repoRoot = path.resolve(__dirname, '..');
+  const content = fs.readFileSync(
+    path.join(repoRoot, 'src', 'lib', 'search-index', 'index.ts'),
+    'utf8'
+  );
+
+  assert.ok(content.includes('function buildSearchIndex(model: SiteModel)'));
+  assert.equal(content.includes('PageEntry'), false);
+  assert.equal(content.includes('RenderContext'), false);
+  assert.equal(content.includes('collectSearchSourcesForPage'), false);
 });

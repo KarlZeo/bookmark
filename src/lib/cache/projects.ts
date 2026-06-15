@@ -1,18 +1,8 @@
 import type { CategoryItem } from '../../types/page';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-
-const fs = require('node:fs') as typeof import('node:fs');
-const path = require('node:path') as typeof import('node:path');
-
-const { createLogger } = require(
-  path.join(process.cwd(), 'src', 'lib', 'logging', 'logger.ts')
-) as {
-  createLogger: (scope: string) => {
-    warn: (message: string, meta?: Record<string, unknown>) => void;
-  };
-};
+import type { RepoMeta } from '../../types/card';
+import fs from 'node:fs';
+import path from 'node:path';
+import { createLogger } from '../logging/logger.ts';
 
 type RenderConfigLike = {
   site?: {
@@ -52,13 +42,6 @@ type ProjectsHeatmapCache = {
     generatedAt: unknown;
     sourceUrl: unknown;
   };
-};
-
-type RepoMeta = {
-  language: string;
-  languageColor: string;
-  stars: number | null;
-  forks: number | null;
 };
 
 type ProjectsRepoCache = {
