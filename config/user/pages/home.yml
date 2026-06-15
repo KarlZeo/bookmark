@@ -528,7 +528,7 @@ categories:
         url: http://192.168.31.77:7090/
         description: unbalance
         icon: fas fa-icons
-  - taxonomy: Router
+  - name: Router
     icon: far fa-star
     sites:
       - name: OpenWrt
