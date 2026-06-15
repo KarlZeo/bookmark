@@ -528,6 +528,17 @@ categories:
         url: http://192.168.31.77:7090/
         description: unbalance
         icon: fas fa-icons
+  - taxonomy: Router
+    icon: far fa-star
+    sites:
+      - name: OpenWrt
+        url: http://192.168.31.226/
+        description: OpenWrt
+        icon: fas fa-icons
+      - name: Clash Dashboard
+        url: http://192.168.31.226:9090/ui/#/proxies
+        description: Clash Dashboard
+        icon: fas fa-icons
   - name: MetaData
     icon: fas fa-tools
     sites:
