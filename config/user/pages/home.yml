@@ -439,6 +439,10 @@ categories:
   - name: Proxy
     icon: fas fa-tools
     sites:
+      - name: 海豚测速
+        url: https://www.haitunt.org
+        description: 海豚测速
+        icon: fas fa-icons
       - name: v2neo
         url: https://v2neo.org/
         description: v2neo
