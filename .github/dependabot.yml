@@ -5,11 +5,10 @@ updates:
     directory: /
     target-branch: main
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: '09:00'
       timezone: Asia/Shanghai
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0
     labels:
       - dependencies
       - npm
@@ -21,42 +20,23 @@ updates:
         applies-to: security-updates
         patterns:
           - '*'
-      npm-minor-patch:
-        applies-to: version-updates
-        patterns:
-          - '*'
-        update-types:
-          - minor
-          - patch
 
   - package-ecosystem: github-actions
     directory: /
     target-branch: main
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: '09:15'
       timezone: Asia/Shanghai
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0
     labels:
       - dependencies
       - github-actions
     commit-message:
       prefix: ci
       include: scope
-    ignore:
-      - dependency-name: '*'
-        update-types:
-          - version-update:semver-major
     groups:
       security-updates:
         applies-to: security-updates
         patterns:
           - '*'
-      github-actions-minor-patch:
-        applies-to: version-updates
-        patterns:
-          - '*'
-        update-types:
-          - minor
-          - patch
