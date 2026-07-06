@@ -185,6 +185,10 @@ categories:
         url: https://jimaku.cc/
         description: Jimaku
         icon: fas fa-icons
+      - name: OTT影音搜寻
+        url: https://ott-search.com/
+        description: OTT影音搜寻
+        icon: fas fa-icons
   - name: Game
     icon: fas fa-tools
     sites:
