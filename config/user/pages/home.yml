@@ -540,7 +540,7 @@ categories:
         description: OpenWrt
         icon: fas fa-icons
       - name: Clash Dashboard
-        url: http://192.168.31.226:9090/ui/#/proxies
+        url: http://192.168.31.226:9090/ui/zashboard/#/proxies
         description: Clash Dashboard
         icon: fas fa-icons
   - name: MetaData
