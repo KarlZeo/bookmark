@@ -13,7 +13,7 @@ template: projects
 # - 运行 `npm run sync-projects` 会联网抓取 GitHub 仓库信息，并写入 dev/ 缓存（仓库默认 gitignore）
 # - `npm run build` 默认不联网；缓存缺失时卡片仅展示标题与描述
 categories:
-  - name: Github常用项目导航
+  - name: SteamOS常用项目导航
     icon: fas fa-code # 分类图标（Font Awesome）
     sites:
       - name: decky-lsfg-vk
@@ -56,6 +56,18 @@ categories:
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: Compatibility tool for Steam Play based on Wine and additional components
         url: https://github.com/GloriousEggroll/proton-ge-custom
+      - name: linuwux-runtime
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: LD_PRELOAD Runtime providing the host-side interpositions needed for specific CPUID-faulting + signal protocol under GE-Proton / CachyOS Proton.
+        url: https://github.com/brcly/linuwux-runtime
+      - name: proton-linuwux
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Automated Proton-GE and Proton-CachyOS builds patched with LinUwUx.patch.
+        url: https://github.com/xshaduwulfx/proton-linuwux
+      - name: hv-launcher
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: A quick readiness check and launch manager for hypervisor games
+        url: https://github.com/RemakeCode/hv-launcher
   - name: Switch相关导航
     icon: fas fa-code # 分类图标（Font Awesome）
     sites:
