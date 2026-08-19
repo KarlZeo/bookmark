@@ -20,6 +20,10 @@ categories:
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: Decky plugin to streamline installation and usage of lsfg-vk; the Lossless Scaling compatibility layer for linux
         url: https://github.com/xXJSONDeruloXx/decky-lsfg-vk
+      - name: MAKO
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Next-generation, Vulkan-powered graphics layer for Linux gaming, bringing Lossless Scaling frame generation and scaling to Steam Deck, Steam Machine and desktop Linux.
+        url: https://github.com/eugeniosegala/MAKO
       - name: decky-dlss-enabler
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: DLSS Enabler patch/unpatcher for SteamOS game mode
