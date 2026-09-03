@@ -381,6 +381,21 @@ categories:
         url: https://developer.apple.com/documentation
         description: Apple Developer Documentation
         icon: fas fa-icons
+  - name: AI
+    icon: fas fa-tools
+    sites:
+      - name: 黑与白公益站
+        url: https://ai.hybgzs.com
+        description: 黑与白公益站
+        icon: fas fa-icons
+      - name: 黑与白福利站NEXT
+        url: https://cdk.hybgzs.com/
+        description: 黑与白福利站NEXT
+        icon: fas fa-icons
+      - name: 吉吉AI
+        url: https://www.jiji.cc
+        description: 吉吉AI
+        icon: fas fa-icons
   - name: Software
     icon: fas fa-tools
     sites:
