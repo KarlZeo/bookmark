@@ -396,6 +396,10 @@ categories:
         url: https://www.jiji.cc
         description: 吉吉AI
         icon: fas fa-icons
+      - name: 咕咕嘎嘎公益站
+        url: https://api.fengshao1227.com/
+        description: 咕咕嘎嘎公益站
+        icon: fas fa-icons
   - name: Software
     icon: fas fa-tools
     sites:
