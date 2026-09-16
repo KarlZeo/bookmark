@@ -55,6 +55,35 @@ test('parseBookmarks：解析书签栏、根目录书签与图标映射', () => 
   assert.equal(tools.sites[0].name, 'Google');
 });
 
+test('parseBookmarks：解码 HTML 实体（&amp;/&#39; 等）并正确写入名称与 URL', () => {
+  const html = `
+<DL><p>
+  <DT><H3 PERSONAL_TOOLBAR_FOLDER="true">书签栏</H3>
+  <DL><p>
+    <DT><A HREF="https://example.com/?a=1&amp;b=2">Tom &amp; Jerry</A>
+    <DT><A HREF="https://example.com/it&#39;s">It&#x27;s Site</A>
+    <DT><H3>工具 &amp; 资料</H3>
+    <DL><p>
+      <DT><A HREF="https://docs.example.com/">Docs</A>
+    </DL><p>
+  </DL><p>
+</DL><p>
+`;
+
+  const bookmarks = parseBookmarks(html);
+
+  const root = bookmarks.categories.find((c) => c.name === '根目录书签');
+  assert.ok(root, '应解析出根目录书签分类');
+  assert.equal(root.sites[0].url, 'https://example.com/?a=1&b=2');
+  assert.equal(root.sites[0].name, 'Tom & Jerry');
+  assert.equal(root.sites[1].url, "https://example.com/it's");
+  assert.equal(root.sites[1].name, "It's Site");
+
+  const tools = bookmarks.categories.find((c) => c.name === '工具 & 资料');
+  assert.ok(tools, '文件夹名中的实体应解码');
+  assert.equal(tools.sites[0].name, 'Docs');
+});
+
 test('page-data：subgroups（第4层）应保留给 Astro 页面渲染', () => {
   const { prepareTestPageData } = require('./helpers/site-model.ts');
   const config = {
@@ -234,5 +263,95 @@ test('ensureUserConfigInitialized/ensureUserSiteYmlExists：可在空目录初�
     assert.equal(ensureUserSiteYmlExists(), true);
   } finally {
     process.chdir(originalCwd);
+  }
+});
+
+test('parseBookmarks：超过 4 层嵌套被截断并保留前 4 层', () => {
+  const html = `
+<DL><p>
+  <DT><H3 PERSONAL_TOOLBAR_FOLDER="true">书签栏</H3>
+  <DL><p>
+    <DT><H3>L1</H3>
+    <DL><p>
+      <DT><H3>L2</H3>
+      <DL><p>
+        <DT><H3>L3</H3>
+        <DL><p>
+          <DT><H3>L4</H3>
+          <DL><p>
+            <DT><A HREF="https://deep.example.com/">Deep</A>
+            <DT><H3>L5</H3>
+            <DL><p>
+              <DT><A HREF="https://deeper.example.com/">Deeper</A>
+            </DL><p>
+          </DL><p>
+        </DL><p>
+      </DL><p>
+    </DL><p>
+  </DL><p>
+</DL><p>
+`;
+  const bookmarks = parseBookmarks(html);
+  const l1 = bookmarks.categories.find((c) => c.name === 'L1');
+  assert.ok(l1, 'L1 应保留');
+  const l2 = l1.subcategories.find((c) => c.name === 'L2');
+  assert.ok(l2, 'L2 应保留');
+  const l3 = l2.groups.find((c) => c.name === 'L3');
+  assert.ok(l3, 'L3 应保留');
+  const l4 = l3.subgroups.find((c) => c.name === 'L4');
+  assert.ok(l4, 'L4 应保留');
+  assert.ok(
+    l4.sites.some((s) => s.name === 'Deep'),
+    'L4 直接书签应保留'
+  );
+  assert.ok(!l4.subgroups || l4.subgroups.length === 0, 'L5 应被截断');
+  assert.ok(!JSON.stringify(bookmarks).includes('Deeper'), 'L5 内容不应被解析');
+});
+
+test('parseBookmarks：嵌套文件夹内书签 URL 与名称解码实体', () => {
+  const html = `
+<DL><p>
+  <DT><H3 PERSONAL_TOOLBAR_FOLDER="true">书签栏</H3>
+  <DL><p>
+    <DT><H3>工具</H3>
+    <DL><p>
+      <DT><A HREF="https://example.com/?q=a&amp;b=1">R&amp;D</A>
+      <DT><A HREF="https://example.com/it&#39;s">It&#x27;s</A>
+    </DL><p>
+  </DL><p>
+</DL><p>
+`;
+  const bookmarks = parseBookmarks(html);
+  const tools = bookmarks.categories.find((c) => c.name === '工具');
+  assert.ok(tools, '应解析出“工具”分类');
+  assert.equal(tools.sites[0].url, 'https://example.com/?q=a&b=1');
+  assert.equal(tools.sites[0].name, 'R&D');
+  assert.equal(tools.sites[1].url, "https://example.com/it's");
+  assert.equal(tools.sites[1].name, "It's");
+});
+
+test('inferBookmarkIcon：子域专属图标优先于父域（长度降序）', () => {
+  const { inferBookmarkIcon } = require('../src/lib/bookmarks/icons.ts');
+  assert.equal(inferBookmarkIcon('https://drive.google.com/'), 'fab fa-google-drive');
+  assert.equal(inferBookmarkIcon('https://docs.google.com/'), 'fas fa-file-alt');
+  assert.equal(inferBookmarkIcon('https://www.google.com/'), 'fab fa-google');
+  assert.equal(inferBookmarkIcon('https://github.com/'), 'fab fa-github');
+  assert.equal(inferBookmarkIcon('https://unknown-example.com/'), 'fas fa-link');
+});
+
+test('upsertBookmarksNavInSiteYml：flow 风格 navigation（含换行）返回诊断且不改文件', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'menav-flow-test-'));
+  const filePath = path.join(tmp, 'site.yml');
+  const cases = ['title: T\nnavigation: []\n', 'title: T\nnavigation:\n  [{name: a, id: a}]\n'];
+  try {
+    for (const content of cases) {
+      fs.writeFileSync(filePath, content, 'utf8');
+      const result = upsertBookmarksNavInSiteYml(filePath);
+      assert.equal(result.updated, false);
+      assert.equal(result.reason, 'flow_navigation_not_supported');
+      assert.equal(fs.readFileSync(filePath, 'utf8'), content, 'flow 写法下文件应保持不变');
+    }
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 });

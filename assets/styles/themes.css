@@ -84,7 +84,7 @@ html.light-theme {
   --site-card-hover-bg: linear-gradient(145deg, #fafaf8, #eef0eb);
 
   --text-color: #333333;
-  --text-muted: #666666;
+  --text-muted: #5a5a5a;
   --text-bright: #000000;
 
   --border-color: rgba(0, 0, 0, 0.08);
@@ -94,13 +94,14 @@ html.light-theme {
   --scrollbar-color: rgba(0, 0, 0, 0.1);
   --scrollbar-hover-color: rgba(0, 0, 0, 0.2);
 
-  --accent-color: #7694b9;
-  --accent-hover: #6684a9;
-  --accent-rgb: 118, 148, 185;
+  --accent-color: #466387;
+  --accent-hover: #3a5574;
+  --accent-rgb: 70, 99, 135;
 
   --nav-item-color: #666666;
-  --success-color: #4caf50;
-  --error-color: #f44336;
+  /* 浅色主题加深语义色：满足非文本指示 ≥3:1，错误色同时满足文本 ≥4.5:1（深色主题保持 Apple 系统色不变） */
+  --success-color: #3d8b40;
+  --error-color: #c62828;
   --white-color: #ffffff;
 
   --gradient-color: linear-gradient(135deg, #7694b9 0%, #a855f7 50%, #ff6b6b 100%);

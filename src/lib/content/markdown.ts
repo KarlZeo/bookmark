@@ -1,4 +1,5 @@
 import MarkdownItModule from 'markdown-it';
+import { normalizeAllowedSchemes, sanitizeUrlOrHash } from '../../shared/sanitize-url.ts';
 
 type MarkdownItToken = {
   attrs: [string, string][] | null;
@@ -28,47 +29,8 @@ type MarkdownItConstructor = new (options: Record<string, unknown>) => MarkdownI
 
 const MarkdownIt = MarkdownItModule as MarkdownItConstructor;
 
-function normalizeAllowedSchemes(allowedSchemes: unknown): string[] {
-  if (!Array.isArray(allowedSchemes) || allowedSchemes.length === 0) {
-    return ['http', 'https', 'mailto', 'tel'];
-  }
-  return allowedSchemes
-    .map((scheme: unknown) =>
-      String(scheme || '')
-        .trim()
-        .toLowerCase()
-        .replace(/:$/, '')
-    )
-    .filter(Boolean);
-}
-
-function isRelativeUrl(url: unknown): boolean {
-  const value = String(url || '').trim();
-  return (
-    value.startsWith('#') ||
-    value.startsWith('/') ||
-    value.startsWith('./') ||
-    value.startsWith('../') ||
-    value.startsWith('?')
-  );
-}
-
 function sanitizeLinkHref(href: unknown, allowedSchemes: string[]): string {
-  const raw = String(href || '').trim();
-  if (!raw) return '#';
-  if (isRelativeUrl(raw)) return raw;
-
-  if (raw.startsWith('//')) return '#';
-
-  try {
-    const parsed = new URL(raw);
-    const scheme = String(parsed.protocol || '')
-      .toLowerCase()
-      .replace(/:$/, '');
-    return allowedSchemes.includes(scheme) ? raw : '#';
-  } catch {
-    return '#';
-  }
+  return sanitizeUrlOrHash(href, { allowedSchemes });
 }
 
 function createMarkdownIt({ allowedSchemes }: { allowedSchemes: unknown }): MarkdownItInstance {

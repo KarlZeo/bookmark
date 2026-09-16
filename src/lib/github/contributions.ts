@@ -99,4 +99,8 @@ function extractYearlyContributionsInnerHtml(html: string): string | null {
   return inner.trim() ? inner : null;
 }
 
-export { extractYearlyContributionsInnerHtml };
+function sanitizeContributionsHtml(html: unknown): string {
+  return sanitizeHtmlFragment(String(html || ''), GITHUB_CONTRIBUTIONS_HTML_POLICY);
+}
+
+export { extractYearlyContributionsInnerHtml, sanitizeContributionsHtml };

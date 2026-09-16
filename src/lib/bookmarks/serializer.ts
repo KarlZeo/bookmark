@@ -21,7 +21,9 @@ function generateBookmarksYaml(bookmarks: BookmarksData): string | null {
   });
 
   const deterministic = process.env.MENAV_BOOKMARKS_DETERMINISTIC === '1';
-  const timestampLine = deterministic ? '' : `# 由bookmark-processor.ts生成于 ${new Date().toISOString()}\n`;
+  const timestampLine = deterministic
+    ? ''
+    : `# 由bookmark-processor.ts生成于 ${new Date().toISOString()}\n`;
 
   return `# 自动生成的书签配置文件
 ${timestampLine}# 若要更新，请将新的书签HTML文件放入bookmarks/目录

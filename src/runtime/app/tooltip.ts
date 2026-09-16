@@ -52,7 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show tooltip on hover
     function onMouseOver(e: MouseEvent): void {
       const eventTarget = e.target as Element | null;
-      const target = eventTarget ? eventTarget.closest('[data-tooltip]') as HTMLElement | null : null;
+      const target = eventTarget
+        ? (eventTarget.closest('[data-tooltip]') as HTMLElement | null)
+        : null;
       if (!target) return;
 
       const tooltipText = target.getAttribute('data-tooltip');
@@ -68,7 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hide tooltip on mouse out
     function onMouseOut(e: MouseEvent): void {
       const eventTarget = e.target as Element | null;
-      const target = eventTarget ? eventTarget.closest('[data-tooltip]') as HTMLElement | null : null;
+      const target = eventTarget
+        ? (eventTarget.closest('[data-tooltip]') as HTMLElement | null)
+        : null;
       if (!target || target !== activeElement) return;
 
       // Check if we really left the element (not just went to a child)
@@ -111,9 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hoverMedia.addEventListener) {
     hoverMedia.addEventListener('change', syncTooltipEnabled);
   } else {
-    const addLegacyListener = (hoverMedia as unknown as {
-      addListener?: (listener: () => void) => void;
-    })['addListener'];
+    const addLegacyListener = (
+      hoverMedia as unknown as {
+        addListener?: (listener: () => void) => void;
+      }
+    )['addListener'];
     if (typeof addLegacyListener === 'function') {
       addLegacyListener.call(hoverMedia, syncTooltipEnabled);
     }

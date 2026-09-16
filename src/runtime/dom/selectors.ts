@@ -53,11 +53,17 @@ const SELECTORS = {
   dataTooltip: '[data-tooltip]',
 } as const;
 
-function qs<T extends HTMLElement = HTMLElement>(selector: string, root: ParentNode = document): T | null {
+function qs<T extends HTMLElement = HTMLElement>(
+  selector: string,
+  root: ParentNode = document
+): T | null {
   return root.querySelector(selector) as T | null;
 }
 
-function qsa<T extends HTMLElement = HTMLElement>(selector: string, root: ParentNode = document): T[] {
+function qsa<T extends HTMLElement = HTMLElement>(
+  selector: string,
+  root: ParentNode = document
+): T[] {
   return Array.from(root.querySelectorAll(selector)) as T[];
 }
 

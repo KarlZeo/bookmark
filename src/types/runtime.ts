@@ -1,4 +1,4 @@
-export type RuntimeMode = "development" | "production" | "test";
+export type RuntimeMode = 'development' | 'production' | 'test';
 
 export interface RuntimeContext {
   mode: RuntimeMode;

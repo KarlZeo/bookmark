@@ -36,7 +36,8 @@ function toCardViewModel(options: {
 
   const description = normalizeText(site.description) || extractDomain(url);
   const icon = normalizeText(site.icon) || 'fas fa-link';
-  const type: CardType = options.type || (normalizeText(site.type) === 'article' ? 'article' : 'site');
+  const type: CardType =
+    options.type || (normalizeText(site.type) === 'article' ? 'article' : 'site');
   const style = normalizeText(options.style) || normalizeText(site.style);
   const faviconUrl = normalizeText(site.faviconUrl);
   const forceIconMode = normalizeText(site.forceIconMode);

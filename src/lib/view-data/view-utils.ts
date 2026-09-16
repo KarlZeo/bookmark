@@ -1,5 +1,5 @@
 import type { IconRegion } from '../../types/render';
-import { DEFAULT_ALLOWED_SCHEMES, normalizeAllowedSchemes } from './render-context.ts';
+import { DEFAULT_ALLOWED_SCHEMES, sanitizeUrlOrHash } from '../../shared/sanitize-url.ts';
 import { escapeHtml } from '../security/html.ts';
 
 function extractDomain(url: unknown): string {
@@ -58,39 +58,8 @@ function getFaviconFallbackUrl(url: unknown, region: IconRegion = 'com'): string
   return buildFaviconV2Url(url, domain);
 }
 
-function isRelativeUrl(url: string): boolean {
-  return (
-    url.startsWith('#') ||
-    url.startsWith('/') ||
-    url.startsWith('./') ||
-    url.startsWith('../') ||
-    url.startsWith('?')
-  );
-}
-
 function getSafeUrl(url: unknown, allowedSchemes: string[] = DEFAULT_ALLOWED_SCHEMES): string {
-  const raw = String(url || '').trim();
-  if (!raw) return '#';
-
-  if (isRelativeUrl(raw)) return raw;
-
-  if (raw.startsWith('//')) {
-    console.warn(`[WARN] 已拦截不安全 URL（协议相对形式）：${raw}`);
-    return '#';
-  }
-
-  try {
-    const parsed = new URL(raw);
-    const scheme = String(parsed.protocol || '')
-      .toLowerCase()
-      .replace(/:$/, '');
-    if (normalizeAllowedSchemes(allowedSchemes).includes(scheme)) return raw;
-    console.warn(`[WARN] 已拦截不安全 URL scheme：${raw}`);
-    return '#';
-  } catch (error) {
-    console.warn(`[WARN] 已拦截无法解析的 URL：${raw}`);
-    return '#';
-  }
+  return sanitizeUrlOrHash(url, { allowedSchemes, label: 'view-utils.getSafeUrl' });
 }
 
 function attrs(attributes: Record<string, unknown>): string {

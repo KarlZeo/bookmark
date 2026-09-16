@@ -1,3 +1,6 @@
+const { decodeHtmlEntities } = require('../security/html.ts') as {
+  decodeHtmlEntities: (input: unknown) => string;
+};
 const { inferBookmarkIcon } = require('./icons.ts') as {
   inferBookmarkIcon: (url: unknown) => string;
 };
@@ -108,7 +111,7 @@ function parseBookmarks(htmlContent: string): BookmarksData {
     let folderMatch;
 
     while ((folderMatch = folderRegex.exec(bookmarkBarContent)) !== null) {
-      const folderName = folderMatch[1].trim();
+      const folderName = decodeHtmlEntities(folderMatch[1]).trim();
       const folderStart = folderMatch.index + folderMatch[0].length;
 
       // 找到这个文件夹内容的结束位置
@@ -158,8 +161,9 @@ function parseBookmarks(htmlContent: string): BookmarksData {
 
     while ((bookmarkMatch = bookmarkRegex.exec(bookmarkBarContent)) !== null) {
       const bookmarkPos = bookmarkMatch.index;
-      const url = bookmarkMatch[1];
-      const name = bookmarkMatch[2].trim();
+      // 浏览器导出的书签会将 & 编码为 &amp;，需先解码实体再写入站点名称与 URL
+      const url = decodeHtmlEntities(bookmarkMatch[1]);
+      const name = decodeHtmlEntities(bookmarkMatch[2]).trim();
 
       // 检查这个书签是否在任何子文件夹范围内
       let inFolder = false;
@@ -197,7 +201,7 @@ function parseBookmarks(htmlContent: string): BookmarksData {
     let scanMatch;
 
     while ((scanMatch = scanRegex.exec(htmlContent)) !== null) {
-      const folderName = scanMatch[2].trim();
+      const folderName = decodeHtmlEntities(scanMatch[2]).trim();
       const folderStart = scanMatch.index;
       const folderHeaderEnd = scanMatch.index + scanMatch[0].length;
 
@@ -306,6 +310,11 @@ function parseBookmarks(htmlContent: string): BookmarksData {
           folder.sites = currentLevelSites;
         }
       } else {
+        // 到达最大层级（level >= 4）时不再递归解析子文件夹，深层嵌套将被截断
+        // 此时若仍检测到子文件夹，输出警告提示用户数据会丢失
+        if (hasSubfolders) {
+          log.warn(`文件夹 "${folderName}" 超过 4 层的嵌套已被截断，深层子文件夹将被忽略`);
+        }
         // 解析书签
         folder.sites = currentLevelSites;
       }
@@ -335,7 +344,7 @@ function parseBookmarks(htmlContent: string): BookmarksData {
     let folderMatch;
 
     while ((folderMatch = folderRegex.exec(folderContent)) !== null) {
-      const folderName = folderMatch[1].trim();
+      const folderName = decodeHtmlEntities(folderMatch[1]).trim();
       const folderStart = folderMatch.index;
       const folderHeaderEnd = folderMatch.index + folderMatch[0].length;
 
@@ -385,8 +394,9 @@ function parseBookmarks(htmlContent: string): BookmarksData {
 
     while ((bookmarkMatch = bookmarkRegex.exec(folderContent)) !== null) {
       const bookmarkPos = bookmarkMatch.index;
-      const url = bookmarkMatch[1];
-      const name = bookmarkMatch[2].trim();
+      // 浏览器导出的书签会将 & 编码为 &amp;，需先解码实体再写入站点名称与 URL
+      const url = decodeHtmlEntities(bookmarkMatch[1]);
+      const name = decodeHtmlEntities(bookmarkMatch[2]).trim();
 
       // 检查这个书签是否在任何子文件夹范围内
       let inSubfolder = false;

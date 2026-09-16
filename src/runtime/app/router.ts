@@ -79,8 +79,10 @@ module.exports = function initRouting(
     }
   }
 
-  // 初始化（在 window load 时执行）
-  window.addEventListener('load', () => {
+  // 初始化：app/index.ts 已在 DOMContentLoaded 调用 initRouting，DOM 已就绪；
+  // 不再等待 window.load（避免依赖 FontAwesome CDN 等外链资源，导致深链/导航交互延迟）；
+  // 依赖布局测量的滚动已在滚动逻辑内用 setTimeout 延迟
+  {
     // 获取可能在 HTML 生成后才存在的 DOM 元素
     const categories = qsa(SELECTORS.category);
     const navItems = qsa(SELECTORS.navItem);
@@ -347,7 +349,14 @@ module.exports = function initRouting(
 
       // 深链接：支持 ?page=<id>#<categorySlug>
       if (route.hash) {
-        setTimeout(() => {
+        setTimeout(async () => {
+          // 初始化已提前到 DOMContentLoaded，字体（含 FontAwesome @font-face）可能未就绪，
+          // 等待字体加载完成后再测量滚动位置，避免布局测量偏差
+          try {
+            await document.fonts.ready;
+          } catch (error) {
+            // 忽略字体等待失败，继续滚动
+          }
           const found = scrollToCategoryInPage(pageId, {
             categoryId: route.hash,
             categoryName: route.hash,
@@ -430,11 +439,24 @@ module.exports = function initRouting(
           setActiveNavByPageId(pageId);
 
           const wasSamePage = normalizeText(state.currentPageId) === normalizeText(pageId);
+          // 提前计算目标 hash（写入仍以 scroll 命中为前提，此处仅用于同页重复点击的短路判断）
+          const nextHash = normalizeText(categoryId) || normalizeText(categoryName);
+          // 同页重复点击同一子菜单：当前 URL 已指向 (pageId, nextHash)。
+          // 用与 setUrlState 内部一致的判据（buildRoutePath 结果 === 当前 URL 含 hash）识别并短路，
+          // 避免"先清空 hash 再重写 hash"重复 push 完全相同的 ?page=X#cat 条目（Back 需按 N 次）。
+          const isRepeatedSameTarget =
+            wasSamePage &&
+            Boolean(nextHash) &&
+            buildRoutePath(window.location.href, { pageId, hash: nextHash }) ===
+              `${window.location.pathname}${window.location.search}${window.location.hash}`;
 
           // 显示对应页面
           showPage(pageId);
-          // 先同步 page 参数并清空旧 hash，避免跨页残留；后续若找到分类再写入新的 hash
-          setUrlState({ pageId, hash: '' }, { replace: false });
+          // 先同步 page 参数并清空旧 hash，避免跨页残留；后续若找到分类再写入新的 hash。
+          // 同页时 replace 当前条目避免产生"同页无 hash"的冗余历史；跨页时 pushState 进入新页。
+          if (!isRepeatedSameTarget) {
+            setUrlState({ pageId, hash: '' }, { replace: wasSamePage });
+          }
 
           // 等待页面切换完成后滚动到对应分类
           setTimeout(() => {
@@ -442,8 +464,7 @@ module.exports = function initRouting(
             if (!found) return;
 
             // 由于对子菜单 click 做了 preventDefault，这里手动同步 hash（不触发浏览器默认跳转）
-            const nextHash = normalizeText(categoryId) || normalizeText(categoryName);
-            if (nextHash) {
+            if (nextHash && !isRepeatedSameTarget) {
               setUrlState({ pageId, hash: nextHash }, { replace: !wasSamePage });
             }
           }, 25); // 延迟时间
@@ -472,7 +493,7 @@ module.exports = function initRouting(
     } else {
       console.error('Category toggle button not found');
     }
-  });
+  }
 
   return { showPage };
 };

@@ -128,7 +128,10 @@ function getGithubUsernameFromConfig(config: ConfigLike): string {
   return username;
 }
 
-async function fetchTextWithTimeout(url: string, { timeoutMs, headers }: FetchTextOptions): Promise<string> {
+async function fetchTextWithTimeout(
+  url: string,
+  { timeoutMs, headers }: FetchTextOptions
+): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 

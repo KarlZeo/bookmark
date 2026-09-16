@@ -10,7 +10,7 @@ const searchEngines = require('./search-engines.ts') as RuntimeSearchEngines;
 const debounce = require('./debounce.ts') as (
   fn: (value: string) => void,
   delay: number
-) => (value: string) => void;
+) => ((value: string) => void) & { cancel: () => void };
 const { createCardFromIndexItem } = require('./cards.ts') as {
   createCardFromIndexItem: (item: RuntimeSearchIndexItem) => HTMLElement;
 };
@@ -129,8 +129,12 @@ function initSearch(state: RuntimeState, dom: RuntimeDom): RuntimeSearchApi {
     }
   }
 
+  const debouncedSearch = debounce(performSearch, 300);
+
   // 重置搜索状态
   function resetSearch(): void {
+    // 取消挂起的防抖搜索：页面切换/清空输入时，避免挂起任务稍后仍触发本地搜索覆盖当前页面
+    debouncedSearch.cancel();
     if (!state.isSearchActive) return;
 
     state.isSearchActive = false;
@@ -184,7 +188,6 @@ function initSearch(state: RuntimeState, dom: RuntimeDom): RuntimeSearchApi {
       console.error('Error in resetSearch');
     }
   }
-  const debouncedSearch = debounce(performSearch, 300);
 
   searchInputElement.addEventListener('input', (e: Event) => {
     // 只有在选择了本地搜索时，才在输入时实时显示本地搜索结果
@@ -287,6 +290,10 @@ function initSearch(state: RuntimeState, dom: RuntimeDom): RuntimeSearchApi {
 
         // 更新当前搜索引擎
         if (engine && searchEngines[engine]) {
+          // 引擎变更时取消挂起的本地搜索，避免切换后仍触发 performSearch
+          if (state.currentSearchEngine !== engine) {
+            debouncedSearch.cancel();
+          }
           // 如果搜索引擎变更，且之前有活跃的本地搜索结果，重置搜索状态
           if (state.currentSearchEngine !== engine && state.isSearchActive) {
             resetSearch();
@@ -340,6 +347,8 @@ function initSearch(state: RuntimeState, dom: RuntimeDom): RuntimeSearchApi {
   // 搜索框事件处理
   searchInputElement.addEventListener('keyup', (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
+      // 取消挂起的本地搜索，避免 Escape 后仍触发 performSearch
+      debouncedSearch.cancel();
       searchInputElement.value = '';
       resetSearch();
     } else if (e.key === 'Enter') {

@@ -44,7 +44,7 @@ config/
 
 ## 配置加载机制
 
-MeNav 配置系统采用“完全替换”策略（不合并），按以下优先级选择**唯一**的一套配置目录：
+MeNav 配置系统采用"完全替换"策略（不合并），按以下优先级选择**唯一**的一套配置目录：
 
 1. 若存在 `config/user/`，则只加载该目录下的配置，并**完全忽略** `config/_default/`
 2. 否则加载 `config/_default/` 作为默认配置
@@ -88,7 +88,7 @@ MeNav 配置系统采用“完全替换”策略（不合并），按以下优�
 
 ## 配置详解
 
-本章节用于补齐“怎么配才是对的”这类细节说明。为了避免示例长期过时，字段与结构的权威参考始终以默认配置为准：
+本章节用于补齐"怎么配才是对的"这类细节说明。为了避免示例长期过时，字段与结构的权威参考始终以默认配置为准：
 
 - 全局配置：[`_default/site.yml`](_default/site.yml)
 - 页面配置：[`_default/pages/`](_default/pages/)
@@ -147,159 +147,13 @@ MeNav 配置系统采用“完全替换”策略（不合并），按以下优�
    - `social`：数组；每一项支持 `name`、`url`、`icon` 字符串，用于侧边栏底部社交链接
 
 7. **导航**
-   - `navigation[]`：数组；每项支持 `id`、`name`、`icon` 字符串，以及可选的 `hidden` 布尔值
-   - `id` 必填、唯一，必须匹配 `^[a-z][a-z0-9-]*# MeNav 配置目录
-
-## 目录
-
-- [目录概述](#目录概述)
-- [配置目录结构](#配置目录结构)
-- [配置加载机制](#配置加载机制)
-- [推荐用法](#推荐用法)
-- [模块化配置文件](#模块化配置文件)
-  - [网站基础配置](#网站基础配置)
-  - [页面配置](#页面配置)
-- [配置详解](#配置详解)
-  - [site.yml 常用字段](#siteyml-常用字段)
-  - [pages/ 页面配置](#pages-页面配置)
-  - [多层级嵌套配置（2-4层）](#多层级嵌套配置2-4层)
-- [配置优先级](#配置优先级)
-- [配置示例](#配置示例)
-- [最佳实践](#最佳实践)
-
-## 目录概述
-
-`config` 目录包含 MeNav 项目的所有配置文件，采用模块化的 YAML 格式组织。这些配置文件定义了网站的内容、结构、布局和功能，是定制个人导航站的核心。
-
-## 配置目录结构
-
-配置系统采用分层结构，清晰分离默认配置和用户配置：
-
-```
-config/
-├── _default/           # 默认配置目录
-│   ├── site.yml        # 默认网站基础配置（含导航配置）
-│   └── pages/          # 默认页面配置
-│       ├── common.yml   # 示例：默认首页（navigation 第一项）
-│       ├── projects.yml # 项目页
-│       ├── articles.yml # 文章页
-│       └── bookmarks.yml # 书签页
-└── user/               # 用户配置目录（覆盖默认配置）
-    ├── site.yml        # 用户自定义网站配置（含导航配置）
-    └── pages/          # 用户自定义页面配置
-        ├── common.yml  # 示例：与 navigation 第一项对应
-        └── ...
-```
-
-## 配置加载机制
-
-MeNav 配置系统采用“完全替换”策略（不合并），按以下优先级选择**唯一**的一套配置目录：
-
-1. 若存在 `config/user/`，则只加载该目录下的配置，并**完全忽略** `config/_default/`
-2. 否则加载 `config/_default/` 作为默认配置
-
-也就是说：`config/user/` 一旦存在，就需要包含一套完整的配置（例如 `site.yml` 与必要的 `pages/*.yml`），系统不会把缺失部分从默认配置补齐。
-
-## 推荐用法
-
-为避免文档与配置字段长期不同步，建议按以下方式使用与维护：
-
-1. **首次使用**：运行 `npm run init-config`，从 `config/_default/` 初始化一套完整的 `config/user/`，再按需修改。
-2. **字段与结构的权威参考**：
-   - 全局配置：[`_default/site.yml`](_default/site.yml)
-   - 页面配置：[`_default/pages/`](_default/pages/)
-3. **多层级嵌套书签示例**：[`_default/pages/bookmarks.yml`](_default/pages/bookmarks.yml)（包含2层、3层、4层结构示例；`subgroups` 可参考下方说明或由导入脚本生成）
-
-## 模块化配置文件
-
-### 网站基础配置
-
-`site.yml` 定义网站的基本信息和全局设置：
-
-- 网站标题、描述和关键词
-- 作者信息和版权声明
-- 字体配置、图标模式等全局设置
-- 全局元数据和站点参数
-- 个人资料和社交媒体链接
-- 导航菜单配置（侧边栏导航项、页面标题和图标、页面顺序和可见性）
-
-> **注意**：导航配置仅支持写在 `site.yml` 的 `navigation` 字段中。
-
-### 页面配置
-
-`pages/` 目录下的配置文件定义各个页面的内容：
-
-- `common.yml`: 示例首页（本质上是普通页面；首页由 navigation 第一项决定，不要求必须叫 home）
-- `projects.yml`: 项目展示配置
-- `articles.yml`: 文章列表配置
-- `bookmarks.yml`: 书签页面配置
-- 其他自定义页面配置（可按需新增/删除；与 `site.yml -> navigation[].id` 对应）
-
-## 配置详解
-
-本章节用于补齐“怎么配才是对的”这类细节说明。为了避免示例长期过时，字段与结构的权威参考始终以默认配置为准：
-
-- 全局配置：[`_default/site.yml`](_default/site.yml)
-- 页面配置：[`_default/pages/`](_default/pages/)
-
-### site.yml 常用字段
-
-`site.yml` 会经过 `src/lib/config/schema/site.ts` 校验；字段类型与可选值以 schema 和默认配置保持一致。schema 覆盖的顶层字段包括：`title`、`description`、`keywords`、`author`、`favicon`、`logo_text`、`logo`、`footer`、`icons`、`security`、`theme`、`fonts`、`profile`、`rss`、`github`、`social`、`navigation`。常用项如下：
-
-1. **基础信息**
-   - `title`、`description`、`keywords`、`author`：字符串，用于站点标题、描述、关键词与署名
-   - `favicon`、`logo_text`、`logo`、`footer`：字符串（`logo` 也可为 `null`），用于站点图标、Logo 文本和页脚
-
-2. **图标模式（隐私相关）**
-   - `icons.mode: favicon | manual`
-   - `favicon`：会请求第三方服务（Google）获取站点 favicon，失败自动回退到 Font Awesome 图标
-   - `manual`：完全使用手动 Font Awesome 图标，不发起外部请求（适合内网/离线/隐私敏感场景）
-   - `icons.region: com | cn`（默认 `com`）
-     - `com`：优先使用 `gstatic.com`（国际版），失败后回退到 `gstatic.cn`（中国版）
-     - `cn`：优先使用 `gstatic.cn`（中国版），失败后回退到 `gstatic.com`（国际版）
-     - 说明：如果你在中国大陆且访问 gstatic.com 较慢，建议设置为 `cn` 以提升图标加载速度
-   - 站点级覆盖（可选，写在 `pages/*.yml` 的每个 `sites[]` 节点上）：
-     - `faviconUrl`：为单个站点指定图标链接（可远程或本地相对路径；本地建议以 `assets/` 开头，构建会复制到静态产物同路径），优先级最高
-     - `forceIconMode: favicon | manual`：强制该站点使用指定模式（不设置则跟随全局 `icons.mode`）
-     - 优先级：`faviconUrl` > `forceIconMode` > 全局 `icons.mode`
-     - 示例：
-       ```yml
-       sites:
-         - name: 'Ant Design'
-           url: 'https://ant.design/'
-           icon: 'fas fa-th'
-           forceIconMode: manual # 强制使用手动图标，绕过 favicon 默认"地球"图标
-         - name: 'Example'
-           url: 'https://example.com/'
-           faviconUrl: 'https://example.com/favicon.png' # 单站点自定义 favicon
-       ```
-
-3. **安全策略（链接白名单）**
-   - `security.allowedSchemes`：允许在页面中渲染为可点击链接的 URL scheme 白名单
-   - 默认仅允许：`http/https/mailto/tel` + 所有相对链接（`#`、`/`、`./`、`../`、`?` 开头）
-   - 其他 scheme 会被安全降级为 `#` 并输出告警；如需支持 `obsidian://`、`vscode://` 等协议，可在此显式放行
-
-4. **字体**
-   - `fonts`：对象，用于设置全站基础字体（`body` 等）
-   - `fonts.source: css | google | system`（分别表示第三方 CSS、Google Fonts、系统字体）
-   - `fonts.cssUrl`、`fonts.family`：字符串；`fonts.weight`：字符串或数字
-   - 可选 `fonts.preload: true`：用 `preload + onload` 的方式非阻塞加载外链字体 CSS（更利于首屏性能）
-   - 首页副标题（渐变发光样式）使用全站基础字体（跟随 `fonts` 配置）
-
-5. **主题（默认明暗模式）**
-   - `theme.mode: dark | light | system`
-   - `dark/light`：首屏默认主题；用户点击按钮切换后会写入 localStorage 并覆盖该默认值
-   - `system`：跟随系统 `prefers-color-scheme`；用户手动切换后同样会写入 localStorage 并停止跟随
-
-6. **顶部欢迎信息与社交链接**
-   - `profile`：对象；`profile.title` / `profile.subtitle` 为字符串，分别对应首页顶部主标题与副标题
-   - `social`：数组；每一项支持 `name`、`url`、`icon` 字符串，用于侧边栏底部社交链接
-
-，并与 `pages/<id>.yml` 对应（例如 `id: common` 对应 `pages/common.yml`）
+   - `navigation[]`：数组；每项支持 `id`、`name`、`icon` 字符串，以及可选的 `hidden` 布尔值与 `submenu` 子菜单数组
+   - `id` 必填、唯一，必须匹配 `^[a-z][a-z0-9-]*$`，并与 `pages/<id>.yml` 对应（例如 `id: common` 对应 `pages/common.yml`）
    - `hidden: true` 用于隐藏页：页面仍可通过 `/?page=<id>` 访问，也会进入运行时路由和搜索索引，但不会显示在侧边栏主导航或子菜单中
    - 默认首页由 `navigation` 数组顺序决定：**第一项即为首页（默认打开页）**，不再使用 `active` 字段
    - 图标使用 Font Awesome 类名字符串（例如 `fas fa-home`、`fab fa-github`）
    - 导航显示顺序与数组顺序一致，可通过调整数组顺序改变导航顺序
+   - 可选 `submenu`：数组，每项支持 `name`、`icon`、`slug`，用于在侧边栏子菜单面板中渲染页面分类锚点（`slug` 对应页面内分类锚点 id，点击滚动定位到对应分类）
 
 8. **RSS（articles Phase 2）**
    - `rss.*`：仅用于 `npm run sync-articles`（联网抓取 RSS/Atom 并写入缓存）
@@ -328,7 +182,7 @@ MeNav 配置系统采用“完全替换”策略（不合并），按以下优�
 >
 > `pages/*.yml` 必须由 `navigation[]` 声明；未声明的页面文件会让构建报错。若页面需要存在但不显示在侧边栏，请在对应导航项写 `hidden: true`。
 >
-> 支持“可删除”：如果 `navigation` 中存在某个页面 `id`，但 `pages/<id>.yml` 不存在，构建仍会生成该页面（标题回退为导航名称、分类为空、模板默认使用通用 `page`）。
+> 支持"可删除"：如果 `navigation` 中存在某个页面 `id`，但 `pages/<id>.yml` 不存在，构建仍会生成该页面（标题回退为导航名称、分类为空、模板默认使用通用 `page`）。
 >
 > 常用字段：`title`、`subtitle` 为字符串；`template` 可选 `page | projects | articles | bookmarks | content | search-results`；`categories` 为数组；`content.file` 为字符串。
 >
@@ -338,7 +192,7 @@ MeNav 配置系统采用“完全替换”策略（不合并），按以下优�
 
 #### 通用 page 页面配置（推荐，用于 friends 等普通页面）
 
-对不需要特殊渲染的页面（例如“友链/朋友”页），建议使用通用 `page` 模板，并保持 `categories -> sites`（可选更深层级）：
+对不需要特殊渲染的页面（例如"友链/朋友"页），建议使用通用 `page` 模板，并保持 `categories -> sites`（可选更深层级）：
 
 ```yaml
 title: 示例页面
@@ -359,7 +213,7 @@ categories:
 
 #### 内容页（template: content）
 
-内容页用于承载“关于 / 帮助 / 使用说明 / 更新日志 / 迁移指南 / 隐私说明”等纯文本内容。
+内容页用于承载"关于 / 帮助 / 使用说明 / 更新日志 / 迁移指南 / 隐私说明"等纯文本内容。
 
 配置要点：
 
@@ -438,16 +292,16 @@ categories:
 - 分类节点（`categories`、`subcategories`、`groups`、`subgroups`）允许扩展元数据，方便导入工具或外部数据源保留额外信息。
 - `sites[]` 条目允许扩展元数据，例如 projects/RSS 缓存产生的 `stars`、`language`、`publishedAt` 等字段。
 
-如果遇到“不支持的字段”错误，请先检查字段是否拼写错误，或是否应移动到 `sites[]` / 分类节点等允许扩展的位置。
+如果遇到"不支持的字段"错误，请先检查字段是否拼写错误，或是否应移动到 `sites[]` / 分类节点等允许扩展的位置。
 
 ## 配置优先级
 
-MeNav 配置系统采用“完全替换”策略：只会选择一套目录加载，不会把 `user` 与 `_default` 混合合并。
+MeNav 配置系统采用"完全替换"策略：只会选择一套目录加载，不会把 `user` 与 `_default` 混合合并。
 
 - 若存在 `config/user/`：只加载 `config/user/`，并**完全忽略** `config/_default/`
 - 否则：加载 `config/_default/`
 
-在“同一套目录”内，各文件的关系是：
+在"同一套目录"内，各文件的关系是：
 
 - `site.yml`：站点全局配置（包含 `navigation` 等）
 - `pages/*.yml`：各页面配置（文件名需与 `navigation.id` 对应）
@@ -547,7 +401,7 @@ categories:
    - 定期备份您的用户配置
 
 4. **配置验证**:
-   - 修改配置后运行 `npm run check`（快速检查：JS 语法与 Astro 检查 + 单测 + 构建 + 审计）
+   - 修改配置后运行 `npm run check`（快速检查：lint + 单元测试 + 构建 + 审计 + 类型检查）
    - 若修改了运行时交互、路由、搜索或页面 DOM 契约，再运行 `npm run check:browser`
    - 需要本地预览时运行 `npm run dev`；如果只想离线使用现有缓存，运行 `npm run dev:offline`（命令入口见 [`../README.md#快速开始`](../README.md#快速开始)）
    - 确保 YAML 语法正确无误

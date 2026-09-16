@@ -42,10 +42,13 @@ const fontAwesomePreload = `<link rel="preload" href="${fontAwesomeCssUrl}" as="
 ---
 
 <!doctype html>
-<html lang="zh-CN" data-theme-mode={themeMode}>
+<html lang="zh-CN" data-theme-mode={themeMode} class="no-js">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script is:inline>
+      document.documentElement.classList.remove('no-js');
+    </script>
     <meta name="menav-version" content={version} />
     <title data-editable="site-title">{site.title}</title>
     <meta name="description" content={site.description} data-editable="site-description" />
@@ -105,7 +108,10 @@ const fontAwesomePreload = `<link rel="preload" href="${fontAwesomeCssUrl}" as="
         </div>
 
         <div class="sidebar-social" data-container="social-links">
-          <SocialLinks social={config.social || []} />
+          <SocialLinks
+            social={config.social || []}
+            allowedSchemes={renderContext?.allowedSchemes}
+          />
         </div>
 
         <div class="sidebar-footer">

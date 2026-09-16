@@ -24,7 +24,6 @@ function getInput(input: SiteModelInput | ResolvedConfig): SiteModelInput {
   return isResolvedConfig(input) ? { config: input } : input;
 }
 
-
 function prepareNavigationData(config: ResolvedConfig, activePageId?: string): NavigationItem[] {
   return config.navigation
     .filter((nav) => !nav.hidden)
@@ -105,7 +104,8 @@ function applyPageKindData(
 
   if (templateName === 'articles') {
     const articleExternal = externalData.articles?.[pageId];
-    data.articlesItems = articleExternal && Array.isArray(articleExternal.items) ? articleExternal.items : [];
+    data.articlesItems =
+      articleExternal && Array.isArray(articleExternal.items) ? articleExternal.items : [];
     data.articlesMeta = articleExternal ? articleExternal.meta || null : null;
     data.articlesCategories = data.articlesItems.length
       ? buildArticlesCategoriesByPageCategories(data.categories, data.articlesItems)
@@ -216,7 +216,9 @@ function assignCardsToPage(page: PageEntry, config: ResolvedConfig): CardViewMod
   if (page.id === 'search-results') return [];
 
   if (page.templateName === 'articles' && Array.isArray(data.articlesItems)) {
-    const articlesCategories = Array.isArray(data.articlesCategories) ? data.articlesCategories : [];
+    const articlesCategories = Array.isArray(data.articlesCategories)
+      ? data.articlesCategories
+      : [];
     if (articlesCategories.length > 0) {
       const articleCards = articlesCategories.flatMap((category) =>
         assignCardsToCategory(page.id, category, config, style, [], 'article')
@@ -296,6 +298,14 @@ function buildSiteModel(input: SiteModelInput | ResolvedConfig): SiteModel {
     page.data.navigationData = page.data.navigation;
   });
 
+  // 搜索结果页的 data-section 容器需覆盖全部导航页（含 hidden 页）；
+  // 否则 hidden 页内容有索引但无容器可展示，搜索结果命中被静默丢弃
+  const searchResultsNavigation: NavigationItem[] = config.navigation.map((nav) => ({
+    ...nav,
+    isActive: false,
+    active: false,
+    id: String(nav.id).trim(),
+  }));
   pages.push({
     id: 'search-results',
     isActive: false,
@@ -305,8 +315,8 @@ function buildSiteModel(input: SiteModelInput | ResolvedConfig): SiteModel {
       currentPage: 'search-results',
       title: '搜索结果',
       subtitle: '在所有页面中找到的匹配项',
-      navigation: navigationData,
-      navigationData,
+      navigation: searchResultsNavigation,
+      navigationData: searchResultsNavigation,
       categories: [],
     },
   });
@@ -328,8 +338,4 @@ function buildSiteModel(input: SiteModelInput | ResolvedConfig): SiteModel {
   };
 }
 
-export {
-  buildSiteModel,
-  prepareNavigationData,
-  preparePageData,
-};
+export { buildSiteModel, prepareNavigationData, preparePageData };

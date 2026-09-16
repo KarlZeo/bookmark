@@ -36,8 +36,9 @@ const src =
 const fallback = canUseGeneratedFavicon
   ? getFaviconFallbackUrl(url, renderContext.icons.region)
   : '';
+// fallback 含用户 URL 的编码值，用 JSON.stringify 嵌入内联 onerror，避免单引号/反斜杠截断 JS 字符串
 const onError = fallback
-  ? `if (!this.dataset.faviconFallbackTried) { this.dataset.faviconFallbackTried = '1'; this.src = '${fallback}'; return; } this.classList.add('error'); this.previousElementSibling.classList.add('hidden'); this.nextElementSibling.classList.add('visible');`
+  ? `if (!this.dataset.faviconFallbackTried) { this.dataset.faviconFallbackTried = '1'; this.src = ${JSON.stringify(fallback)}; return; } this.classList.add('error'); this.previousElementSibling.classList.add('hidden'); this.nextElementSibling.classList.add('visible');`
   : "this.classList.add('error'); this.previousElementSibling.classList.add('hidden'); this.nextElementSibling.classList.add('visible');";
 ---
 

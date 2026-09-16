@@ -53,10 +53,13 @@ const ICON_MAPPING: Record<string, string> = {
   steam: 'fab fa-steam',
 };
 
+// 按 keyword 长度降序排列，更具体的域名（如 drive.google.com）优先于宽泛域名（如 google.com）匹配
+const ICON_KEYWORDS = Object.keys(ICON_MAPPING).sort((a, b) => b.length - a.length);
+
 function inferBookmarkIcon(url: unknown): string {
   const raw = String(url || '');
-  for (const [keyword, iconClass] of Object.entries(ICON_MAPPING)) {
-    if (raw.includes(keyword)) return iconClass;
+  for (const keyword of ICON_KEYWORDS) {
+    if (raw.includes(keyword)) return ICON_MAPPING[keyword];
   }
   return 'fas fa-link';
 }

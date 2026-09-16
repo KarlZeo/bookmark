@@ -4,7 +4,8 @@ const highlightSearchTerm = require('./highlight.ts') as (
   card: HTMLElement,
   searchTerm: string
 ) => void;
-const { SELECTORS, qsa } = require('../../dom/selectors.ts') as typeof import('../../dom/selectors');
+const { SELECTORS, qsa } =
+  require('../../dom/selectors.ts') as typeof import('../../dom/selectors');
 
 type SearchResultsUiOptions = {
   state: RuntimeState;
@@ -97,4 +98,3 @@ function showSearchResults(options: SearchResultsUiOptions): void {
 module.exports = {
   showSearchResults,
 };
-

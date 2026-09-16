@@ -26,7 +26,8 @@ export function getSubmenuForNavItem(
     return null;
   }
 
-  const pages = config.pages && typeof config.pages === 'object' ? (config.pages as AnyRecord) : config;
+  const pages =
+    config.pages && typeof config.pages === 'object' ? (config.pages as AnyRecord) : config;
   const pageConfig = pages[String(navItem.id)] as PageConfigLike | undefined;
   if (pageConfig && Array.isArray(pageConfig.categories)) return pageConfig.categories;
 

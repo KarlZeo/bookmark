@@ -7,9 +7,40 @@ type UpsertBookmarksNavResult =
   | { updated: true; reason: 'added_navigation_block' | 'updated_navigation_block' }
   | {
       updated: false;
-      reason: 'site_yml_not_object' | 'already_present' | 'navigation_not_array';
+      reason:
+        | 'site_yml_not_object'
+        | 'already_present'
+        | 'navigation_not_array'
+        | 'flow_navigation_not_supported';
     }
   | { updated: false; reason: 'error'; error: unknown };
+
+// 判断 navigation 在源文本中是否为 flow（内联）写法：
+// 同行（navigation: [...]）或换行缩进（navigation: 下一行 [..]）均视为 flow；
+// 块序列（navigation: 下一行以 - 开头）返回 false
+function isFlowNavigation(lines: string[], navLineIndex: number): boolean {
+  if (/^navigation\s*:\s*[\[{]/.test(lines[navLineIndex])) return true;
+
+  for (let i = navLineIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i].trim();
+    if (line === '' || line.startsWith('#')) continue;
+    return line.startsWith('[') || line.startsWith('{');
+  }
+
+  return false;
+}
+
+// 写回并做 YAML 自检：若产物无法被解析（写坏），回滚为原始内容
+function writeSiteYmlAndVerify(siteYmlPath: string, content: string, original: string): boolean {
+  try {
+    fs.writeFileSync(siteYmlPath, content, 'utf8');
+    yaml.load(content);
+    return true;
+  } catch (error) {
+    fs.writeFileSync(siteYmlPath, original, 'utf8');
+    return false;
+  }
+}
 
 function upsertBookmarksNavInSiteYml(siteYmlPath: string): UpsertBookmarksNavResult {
   try {
@@ -25,7 +56,9 @@ function upsertBookmarksNavInSiteYml(siteYmlPath: string): UpsertBookmarksNavRes
 
     if (
       Array.isArray(navigation) &&
-      navigation.some((item) => item && typeof item === 'object' && 'id' in item && item.id === 'bookmarks')
+      navigation.some(
+        (item) => item && typeof item === 'object' && 'id' in item && item.id === 'bookmarks'
+      )
     ) {
       return { updated: false, reason: 'already_present' };
     }
@@ -36,6 +69,12 @@ function upsertBookmarksNavInSiteYml(siteYmlPath: string): UpsertBookmarksNavRes
 
     const lines = raw.split(/\r?\n/);
     const navLineIndex = lines.findIndex((line) => /^navigation\s*:/.test(line));
+
+    if (navLineIndex >= 0 && isFlowNavigation(lines, navLineIndex)) {
+      // flow 风格（navigation: [...] / navigation: {...}，含换行缩进写法）：
+      // 按行插入块序列会与 flow 写法冲突，直接返回诊断，由调用方提示用户手动添加，而不是写坏 site.yml
+      return { updated: false, reason: 'flow_navigation_not_supported' };
+    }
 
     const itemIndent = '  ';
     const propIndent = `${itemIndent}  `;
@@ -48,7 +87,14 @@ function upsertBookmarksNavInSiteYml(siteYmlPath: string): UpsertBookmarksNavRes
     if (navLineIndex === -1) {
       const normalized = raw.endsWith('\n') ? raw : `${raw}\n`;
       const spacer = normalized.trim().length === 0 ? '' : '\n';
-      fs.writeFileSync(siteYmlPath, `${normalized}${spacer}navigation:\n${snippet.join('\n')}\n`, 'utf8');
+      const added = `${normalized}${spacer}navigation:\n${snippet.join('\n')}\n`;
+      if (!writeSiteYmlAndVerify(siteYmlPath, added, raw)) {
+        return {
+          updated: false,
+          reason: 'error',
+          error: new Error('写入 navigation 后 YAML 自检失败'),
+        };
+      }
       return { updated: true, reason: 'added_navigation_block' };
     }
 
@@ -66,7 +112,14 @@ function upsertBookmarksNavInSiteYml(siteYmlPath: string): UpsertBookmarksNavRes
     if (insertAt > 0 && updatedLines[insertAt - 1].trim() !== '') snippet.unshift('');
     updatedLines.splice(insertAt, 0, ...snippet);
 
-    fs.writeFileSync(siteYmlPath, `${updatedLines.join('\n')}\n`, 'utf8');
+    const updatedContent = `${updatedLines.join('\n')}\n`;
+    if (!writeSiteYmlAndVerify(siteYmlPath, updatedContent, raw)) {
+      return {
+        updated: false,
+        reason: 'error',
+        error: new Error('写入 navigation 后 YAML 自检失败'),
+      };
+    }
     return { updated: true, reason: 'updated_navigation_block' };
   } catch (error) {
     return { updated: false, reason: 'error', error };

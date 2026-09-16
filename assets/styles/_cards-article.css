@@ -9,7 +9,7 @@
   margin: 0 0 8px 0;
   font-size: 0.75rem;
   color: var(--nav-item-color);
-  opacity: 0.9;
+  /* 移除 opacity 叠加：保证卡片 meta 小字对比度 ≥4.5:1（light #666666 对白底 5.7:1，dark #98989d 对卡片底 4.8:1） */
   display: flex;
   align-items: center;
   gap: 0.4rem;

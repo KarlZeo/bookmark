@@ -1,7 +1,6 @@
 import type { ResolvedConfig } from '../../types/config';
 import type { IconMode, IconRegion, RenderContext } from '../../types/render';
-
-const DEFAULT_ALLOWED_SCHEMES = ['http', 'https', 'mailto', 'tel'];
+import { DEFAULT_ALLOWED_SCHEMES, normalizeAllowedSchemes } from '../../shared/sanitize-url.ts';
 
 const DEFAULT_RENDER_CONTEXT: RenderContext = {
   icons: {
@@ -17,23 +16,6 @@ function normalizeIconMode(value: unknown): IconMode {
 
 function normalizeIconRegion(value: unknown): IconRegion {
   return value === 'cn' ? 'cn' : 'com';
-}
-
-function normalizeAllowedSchemes(value: unknown): string[] {
-  if (!Array.isArray(value) || value.length === 0) {
-    return [...DEFAULT_ALLOWED_SCHEMES];
-  }
-
-  const schemes = value
-    .map((scheme) =>
-      String(scheme || '')
-        .trim()
-        .toLowerCase()
-        .replace(/:$/, '')
-    )
-    .filter(Boolean);
-
-  return schemes.length > 0 ? schemes : [...DEFAULT_ALLOWED_SCHEMES];
 }
 
 function createRenderContext(config: ResolvedConfig | null | undefined): RenderContext {
