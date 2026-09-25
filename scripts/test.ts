@@ -55,7 +55,11 @@ async function main() {
   if (!fs.existsSync(distNodeIndex)) {
     const buildLibResult = spawnSync(
       process.execPath,
-      ['-r', path.join(__dirname, 'register-ts.cjs'), path.join(repoRoot, 'scripts', 'build-lib.ts')],
+      [
+        '-r',
+        path.join(__dirname, 'register-ts.cjs'),
+        path.join(repoRoot, 'scripts', 'build-lib.ts'),
+      ],
       {
         cwd: repoRoot,
         stdio: isVerbose() ? 'inherit' : 'pipe',

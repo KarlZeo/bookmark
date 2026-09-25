@@ -74,6 +74,9 @@ test('Phase 9 runtime：router 应绑定 popstate 并用 pushState 记录导航�
   );
 
   assert.match(router, /addEventListener\('popstate'/);
+  // 导航项点击：跨页 pushState（保留新页历史）
   assert.match(router, /setUrlState\(\{ pageId, hash: '' \}, \{ replace: false \}\)/);
+  // 子菜单点击（双 pushState 修复）：同页 replace 当前条目，避免冗余中间历史态
+  assert.match(router, /setUrlState\(\{ pageId, hash: '' \}, \{ replace: wasSamePage \}\)/);
   assert.ok(!router.includes('/<id>'), 'router 不应恢复旧路径回跳模型');
 });

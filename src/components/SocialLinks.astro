@@ -1,31 +1,37 @@
 ---
 import type { SocialItem } from '../types/site';
+import { DEFAULT_ALLOWED_SCHEMES } from '../lib/view-data/render-context.ts';
+import { getSafeUrl } from '../lib/view-data/view-utils.ts';
 
 interface Props {
   social?: SocialItem[];
+  allowedSchemes?: string[];
 }
 
-const { social = [] } = Astro.props;
+const { social = [], allowedSchemes = DEFAULT_ALLOWED_SCHEMES } = Astro.props;
 ---
 
 {
-  social.map((item) => (
-    <a
-      href={item.url}
-      class="social-icon"
-      target="_blank"
-      rel="noopener"
-      title={item.name}
-      aria-label={item.name}
-      data-type="social-link"
-      data-name={item.name}
-      data-url={item.url}
-      data-icon={item.icon}
-    >
-      <i class={item.icon} aria-hidden="true" />
-      <span class="nav-text visually-hidden" data-editable="social-link-name">
-        {item.name}
-      </span>
-    </a>
-  ))
+  social.map((item) => {
+    const safeUrl = getSafeUrl(item.url, allowedSchemes);
+    return (
+      <a
+        href={safeUrl}
+        class="social-icon"
+        target="_blank"
+        rel="noopener"
+        title={item.name}
+        aria-label={item.name}
+        data-type="social-link"
+        data-name={item.name}
+        data-url={safeUrl}
+        data-icon={item.icon}
+      >
+        <i class={item.icon} aria-hidden="true" />
+        <span class="nav-text visually-hidden" data-editable="social-link-name">
+          {item.name}
+        </span>
+      </a>
+    );
+  })
 }

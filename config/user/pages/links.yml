@@ -67,11 +67,19 @@ categories:
       - name: proton-linuwux
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: Automated Proton-GE and Proton-CachyOS builds patched with LinUwUx.patch.
-        url: https://github.com/xshaduwulfx/proton-linuwux
+        url: https://codeberg.org/xshaduwulfx/proton-linuwux
       - name: hv-launcher
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: A quick readiness check and launch manager for hypervisor games
         url: https://github.com/RemakeCode/hv-launcher
+      - name: CreamDeck
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: A Decky Loader plugin for unlocking game DLCs
+        url: https://github.com/Qiming-Liu/CreamDeck
+      - name: HV-Decky
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: HV-Decky - Decky Plugin for HV bypass
+        url: https://cs.rin.ru/forum/viewtopic.php?t=159990
   - name: Switch相关导航
     icon: fas fa-code # 分类图标（Font Awesome）
     sites:

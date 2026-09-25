@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { SiteItem } from './shared';
 import { siteItemSchema } from './shared.ts';
 
-type CategoryNode = {
+export type CategoryNode = {
   name?: string;
   icon?: string;
   slug?: string;
@@ -55,8 +55,4 @@ export type CategoryItem = ZodNamespace.output<CategoryNodeSchema>;
 export type PageConfig = ZodNamespace.output<PageConfigSchema>;
 export type ContentPageConfig = ZodNamespace.output<ContentPageSchema>;
 
-export {
-  categoryNodeSchema,
-  contentPageSchema,
-  pageConfigSchema,
-};
+export { categoryNodeSchema, contentPageSchema, pageConfigSchema };

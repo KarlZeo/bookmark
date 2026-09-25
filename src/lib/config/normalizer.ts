@@ -26,6 +26,18 @@ export function ensureConfigDefaults(config: MutableRecord | null | undefined): 
 
   result.site = isRecord(result.site) ? result.site : {};
   result.navigation = Array.isArray(result.navigation) ? result.navigation : [];
+  // 校验只验证不转换：导航 id 可能带前后空白，统一 trim，避免运行时 ?page= 断链与子菜单丢失
+  const navigationItems = Array.isArray(result.navigation) ? result.navigation : [];
+  result.navigation = navigationItems.map((item) => {
+    if (isRecord(item) && typeof item.id === 'string') {
+      return { ...item, id: item.id.trim() };
+    }
+    return item;
+  });
+  // 同步 site 内嵌导航引用，避免 site.navigation 保留未 trim 的 id（防止模板误读断链）
+  if (isRecord(result.site)) {
+    (result.site as MutableRecord).navigation = result.navigation;
+  }
   result.pages = isRecord(result.pages) ? result.pages : {};
 
   result.fonts = isRecord(result.fonts) ? result.fonts : {};
@@ -51,11 +63,8 @@ export function ensureConfigDefaults(config: MutableRecord | null | undefined): 
   site.favicon = site.favicon || 'menav.svg';
   site.logo = site.logo || null;
   site.footer = site.footer || '';
-  site.theme = site.theme || {
-    primary: '#4a89dc',
-    background: '#f5f7fa',
-    modeToggle: true,
-  };
+  // 主题 schema 仅允许 mode: dark|light|system，默认 dark（与 config/_default/site.yml 及文档一致）
+  site.theme = site.theme || { mode: 'dark' };
 
   const profile = result.profile as MutableRecord;
   profile.title = profile.title || '欢迎使用';
@@ -80,9 +89,11 @@ export function ensureConfigDefaults(config: MutableRecord | null | undefined): 
       });
     }
 
-    if (Array.isArray(typedNode.subcategories)) typedNode.subcategories.forEach(processNodeSitesRecursively);
+    if (Array.isArray(typedNode.subcategories))
+      typedNode.subcategories.forEach(processNodeSitesRecursively);
     if (Array.isArray(typedNode.groups)) typedNode.groups.forEach(processNodeSitesRecursively);
-    if (Array.isArray(typedNode.subgroups)) typedNode.subgroups.forEach(processNodeSitesRecursively);
+    if (Array.isArray(typedNode.subgroups))
+      typedNode.subgroups.forEach(processNodeSitesRecursively);
   }
 
   function processCategoryDefaults(category: CategoryLike): void {

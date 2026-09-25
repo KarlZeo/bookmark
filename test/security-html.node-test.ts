@@ -1,8 +1,15 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { htmlToText } = require('../src/lib/security/html.ts');
+const { htmlToText, sanitizeHtmlFragment } = require('../src/lib/security/html.ts');
+const { getSafeUrl } = require('../src/lib/view-data/view-utils.ts');
 const { extractYearlyContributionsInnerHtml } = require('../src/lib/github/contributions.ts');
+
+const LINK_POLICY = {
+  allowedTags: new Set(['a', 'span']),
+  globalAttributes: new Set(['href', 'class']),
+  uriAttributes: new Set(['href']),
+};
 
 test('security/html：RSS HTML 转文本时跳过脚本样式并解码实体', () => {
   const text = htmlToText(
@@ -89,4 +96,41 @@ test('github/contributions：保留 tool-tip 元素及其无障碍文本，过�
   assert.ok(inner.includes('ContributionCalendar-day'));
   assert.ok(inner.includes('data-level="0"'));
   assert.ok(inner.includes('data-level="2"'));
+});
+
+test('security/html：sanitize 拦截反斜杠协议相对 href，且文本实体消毒幂等', () => {
+  // /\evil.com 应被拦截（WHATWG 在 authority 位置将反斜杠视为正斜杠）
+  const backslash = sanitizeHtmlFragment('<a href="/\\evil.com">x</a>', LINK_POLICY);
+  assert.equal(backslash, '<a>x</a>');
+
+  // //evil.com 应被拦截
+  const protoRel = sanitizeHtmlFragment('<a href="//evil.com">x</a>', LINK_POLICY);
+  assert.equal(protoRel, '<a>x</a>');
+
+  // 正常相对链接保留
+  const normal = sanitizeHtmlFragment('<a href="/path">x</a>', LINK_POLICY);
+  assert.equal(normal, '<a href="/path">x</a>');
+
+  // 文本节点消毒幂等：已转义实体再消毒一次不升档
+  const once = sanitizeHtmlFragment('<span>Nov &amp; Dec</span>', LINK_POLICY);
+  assert.equal(once, '<span>Nov &amp; Dec</span>');
+  const twice = sanitizeHtmlFragment(once, LINK_POLICY);
+  assert.equal(twice, '<span>Nov &amp; Dec</span>');
+});
+
+test('security/view-utils：getSafeUrl 拦截协议相对与反斜杠协议相对 URL', () => {
+  const allowed = ['http', 'https', 'mailto', 'tel'];
+
+  // 协议相对（// 与 /\）均应降级为 #
+  assert.equal(getSafeUrl('//evil.com', allowed), '#');
+  assert.equal(getSafeUrl('/\\evil.com', allowed), '#');
+  assert.equal(getSafeUrl('/\\t/evil.com', allowed), '#');
+
+  // 正常相对路径与合法 scheme 保留
+  assert.equal(getSafeUrl('/path', allowed), '/path');
+  assert.equal(getSafeUrl('./x', allowed), './x');
+  assert.equal(getSafeUrl('https://example.com', allowed), 'https://example.com');
+
+  // 危险 scheme 降级
+  assert.equal(getSafeUrl('javascript:alert(1)', allowed), '#');
 });

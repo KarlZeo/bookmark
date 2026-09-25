@@ -171,6 +171,30 @@ body.loaded .layout {
   opacity: 1;
 }
 
+/* 无 JS 兜底：脚本被禁用或加载失败时，页面仍可见、可滚动 */
+html.no-js .layout {
+  opacity: 1;
+}
+html.no-js body {
+  overflow: auto;
+}
+/* 无 JS：侧边栏整体允许纵向滚动，避免超首屏导航被裁剪、键盘不可达 */
+html.no-js .sidebar {
+  overflow-y: auto;
+}
+/* 无 JS：放开内容区裁剪，让常驻导航完整显示 */
+html.no-js .sidebar-content {
+  overflow: visible;
+}
+/* 无 JS：移动端侧栏恒定可见（不再依赖 JS 切换 .active），作为静态导航 */
+html.no-js .sidebar {
+  transform: translateX(0);
+}
+/* 无 JS：菜单切换按钮依赖 JS，禁用时无可点击行为，直接隐藏 */
+html.no-js .menu-toggle {
+  display: none;
+}
+
 /* 移动端基础样式 */
 .mobile-buttons {
   display: none;

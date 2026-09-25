@@ -71,7 +71,9 @@ function getNodeLibBuildOptions(repoRoot: string): Record<string, unknown> {
 
 function getOutputBytes(result: BuildResultLike): number {
   const outputs = result?.metafile?.outputs || null;
-  const outKey = outputs ? Object.keys(outputs).find((key) => key.endsWith('dist-node/index.cjs')) : '';
+  const outKey = outputs
+    ? Object.keys(outputs).find((key) => key.endsWith('dist-node/index.cjs'))
+    : '';
   return outKey && outputs && outputs[outKey] ? outputs[outKey].bytes || 0 : 0;
 }
 

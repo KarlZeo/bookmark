@@ -1,3 +1,5 @@
+import type { UpsertBookmarksNavResult } from './lib/bookmarks/writer.ts';
+
 const fs = require('node:fs') as typeof import('node:fs');
 const path = require('node:path') as typeof import('node:path');
 const { FileError, wrapAsyncError } = require('./lib/errors.ts') as {
@@ -16,19 +18,18 @@ const { createLogger, isVerbose, startTimer } = require('./lib/logging/logger.ts
   isVerbose: () => boolean;
   startTimer: () => () => number;
 };
-const {
-  ensureUserConfigInitialized,
-  ensureUserSiteYmlExists,
-} = require('./lib/config/init.ts') as {
-  ensureUserConfigInitialized: () => { initialized: boolean; source: string };
-  ensureUserSiteYmlExists: () => boolean;
-};
+const { ensureUserConfigInitialized, ensureUserSiteYmlExists } =
+  require('./lib/config/init.ts') as {
+    ensureUserConfigInitialized: () => { initialized: boolean; source: string };
+    ensureUserSiteYmlExists: () => boolean;
+  };
 const { parseBookmarks } = require('./lib/bookmarks/parser.ts') as {
   parseBookmarks: (htmlContent: string) => BookmarksData;
 };
-const { generateBookmarksYaml: serializeBookmarksYaml } = require('./lib/bookmarks/serializer.ts') as {
-  generateBookmarksYaml: (bookmarks: BookmarksData) => string | null;
-};
+const { generateBookmarksYaml: serializeBookmarksYaml } =
+  require('./lib/bookmarks/serializer.ts') as {
+    generateBookmarksYaml: (bookmarks: BookmarksData) => string | null;
+  };
 const { upsertBookmarksNavInSiteYml } = require('./lib/bookmarks/writer.ts') as {
   upsertBookmarksNavInSiteYml: (siteYmlPath: string) => UpsertBookmarksNavResult;
 };
@@ -53,14 +54,6 @@ type BookmarkCategory = {
 type BookmarksData = {
   categories: BookmarkCategory[];
 };
-
-type UpsertBookmarksNavResult =
-  | { updated: true; reason: 'added_navigation_block' | 'updated_navigation_block' }
-  | {
-      updated: false;
-      reason: 'site_yml_not_object' | 'already_present' | 'navigation_not_array';
-    }
-  | { updated: false; reason: 'error'; error: unknown };
 
 type NavigationUpdateResult =
   | { updated: true; target: 'site.yml'; reason: string }
@@ -205,7 +198,8 @@ async function main() {
     log.info('写入配置文件', { path: MODULAR_OUTPUT_FILE });
     try {
       ensureUserConfigInitialized();
-      if (!fs.existsSync(CONFIG_USER_PAGES_DIR)) fs.mkdirSync(CONFIG_USER_PAGES_DIR, { recursive: true });
+      if (!fs.existsSync(CONFIG_USER_PAGES_DIR))
+        fs.mkdirSync(CONFIG_USER_PAGES_DIR, { recursive: true });
       fs.writeFileSync(MODULAR_OUTPUT_FILE, yamlContent, 'utf8');
 
       if (!fs.existsSync(MODULAR_OUTPUT_FILE)) {
@@ -220,13 +214,21 @@ async function main() {
       log.info('更新导航配置（确保包含 bookmarks 入口）');
       const navUpdateResult = updateNavigationWithBookmarks();
       if (navUpdateResult.updated) {
-        log.ok('导航配置已更新', { target: navUpdateResult.target, reason: navUpdateResult.reason });
+        log.ok('导航配置已更新', {
+          target: navUpdateResult.target,
+          reason: navUpdateResult.reason,
+        });
       } else if (navUpdateResult.reason === 'already_present') {
         log.ok('导航配置已包含书签入口，无需更新', { target: navUpdateResult.target });
       } else if (navUpdateResult.reason === 'no_site_yml') {
         log.warn('未找到可用的 site.yml，无法自动更新导航', { path: USER_SITE_YML });
       } else if (navUpdateResult.reason === 'navigation_not_array') {
         log.warn('site.yml 中 navigation 不是数组，无法自动更新导航', { path: USER_SITE_YML });
+      } else if (navUpdateResult.reason === 'flow_navigation_not_supported') {
+        log.warn(
+          'site.yml 中 navigation 为内联（flow）写法，无法自动插入书签入口，请手动在 navigation 中添加 bookmarks 项',
+          { path: USER_SITE_YML }
+        );
       } else if (navUpdateResult.reason === 'error') {
         log.warn('导航更新失败，请手动检查配置文件格式（详见错误信息）');
         if (navUpdateResult.error !== undefined) {

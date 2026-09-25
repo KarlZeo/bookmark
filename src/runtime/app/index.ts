@@ -8,13 +8,17 @@ import type {
 } from '../types';
 
 const initUi = require('./ui.ts') as (state: RuntimeState, dom: RuntimeDom) => RuntimeUiApi;
-const initSearch = require('./search/index.ts') as (state: RuntimeState, dom: RuntimeDom) => RuntimeSearchApi;
+const initSearch = require('./search/index.ts') as (
+  state: RuntimeState,
+  dom: RuntimeDom
+) => RuntimeSearchApi;
 const initRouting = require('./router.ts') as (
   state: RuntimeState,
   dom: RuntimeDom,
   api: { ui: RuntimeUiApi; search: RuntimeSearchApi }
 ) => RuntimeRoutingApi;
-const { SELECTORS, byId, qs, qsa } = require('../dom/selectors.ts') as typeof import('../dom/selectors');
+const { SELECTORS, byId, qs, qsa } =
+  require('../dom/selectors.ts') as typeof import('../dom/selectors');
 const { getRuntimeConfig } = require('../runtime-config.ts') as typeof import('../runtime-config');
 
 function detectHomePageId(): string {
@@ -30,7 +34,9 @@ function detectHomePageId(): string {
         ? config.data.pageRegistry
         : null;
     const firstId =
-      pageRegistry && pageRegistry[0] && pageRegistry[0].id ? String(pageRegistry[0].id).trim() : '';
+      pageRegistry && pageRegistry[0] && pageRegistry[0].id
+        ? String(pageRegistry[0].id).trim()
+        : '';
     if (firstId) return firstId;
   } catch (error) {
     // 忽略解析错误，继续使用 DOM 推断

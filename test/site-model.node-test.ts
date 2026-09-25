@@ -99,6 +99,14 @@ test('SiteModel：hidden 页面可访问但不出现在侧边栏导航', () => {
   assert.equal(model.pageTemplates.secret, 'page');
   assert.ok(model.pages.some((page) => page.id === 'secret'));
   assert.ok(model.searchSources.some((card) => card.pageId === 'secret'));
+  // 搜索结果页的 data-section 容器应覆盖 hidden 页，避免 hidden 页命中被静默丢弃
+  const searchResults = model.pages.find((page) => page.id === 'search-results');
+  assert.ok(searchResults);
+  assert.ok(
+    Array.isArray(searchResults.data.navigation) &&
+      searchResults.data.navigation.some((item) => item.id === 'secret'),
+    'search-results 页 data.navigation 应包含 hidden 页'
+  );
   assert.equal(
     model.runtimeConfig.data.pageRegistry.some((item) => item.id === 'secret'),
     true

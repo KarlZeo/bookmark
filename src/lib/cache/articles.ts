@@ -196,4 +196,4 @@ function buildArticlesCategoriesByPageCategories(
   return displayCategories;
 }
 
-export { tryLoadArticlesFeedCache, buildArticlesCategoriesByPageCategories };
+export { getArticlesCacheDir, tryLoadArticlesFeedCache, buildArticlesCategoriesByPageCategories };

@@ -33,6 +33,17 @@ type SchemaLike = {
   ) => { success: true } | { success: false; error: { issues: ZodIssueLike[] } };
 };
 
+// loadModularConfig 仅将 fonts/profile/social/icons/navigation 提升到顶层并在顶层单独校验；
+// theme/security/rss/github 保留在 config.site 内，仅由 siteConfigSchema 校验，不能过滤。
+// 此处忽略 site 内嵌的已提升子字段 issue，避免同一对象被 siteConfigSchema 与顶层子 schema 重复校验。
+const SITE_SUB_SCHEMA_PREFIXES = [
+  'site.navigation',
+  'site.fonts',
+  'site.profile',
+  'site.social',
+  'site.icons',
+];
+
 const TOP_LEVEL_NON_PAGE_KEYS = new Set([
   '_meta',
   'categories',
@@ -56,6 +67,18 @@ const TOP_LEVEL_NON_PAGE_KEYS = new Set([
 
 function isRecord(value: unknown): value is AnyRecord {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function isSiteSubSchemaIssue(issue: ValidationIssue, config: AnyRecord): boolean {
+  const prefix = SITE_SUB_SCHEMA_PREFIXES.find(
+    (p) => issue.path === p || issue.path.startsWith(`${p}.`) || issue.path.startsWith(`${p}[`)
+  );
+  if (!prefix) return false;
+  // 仅当该子字段确实被 loadModularConfig 提升到顶层（与 site 侧同一引用）时才过滤 site 侧重复 issue；
+  // falsy 子配置（navigation: null 等）未被提升时，site 侧校验错误必须保留，避免静默吞错
+  const field = prefix.slice('site.'.length);
+  const site = isRecord(config.site) ? config.site : {};
+  return config[field] === site[field];
 }
 
 function appendPath(basePath: string, segments: PropertyKey[]): string {
@@ -113,7 +136,9 @@ function collectSchemaIssues(
 function getPageValidationEntries(config: AnyRecord): [string, unknown][] {
   const pages = isRecord(config.pages)
     ? config.pages
-    : Object.fromEntries(Object.entries(config).filter(([key]) => !TOP_LEVEL_NON_PAGE_KEYS.has(key)));
+    : Object.fromEntries(
+        Object.entries(config).filter(([key]) => !TOP_LEVEL_NON_PAGE_KEYS.has(key))
+      );
   return Object.entries(pages);
 }
 
@@ -148,7 +173,9 @@ function collectNavigationIdIssues(config: AnyRecord, issues: ValidationIssue[])
 function collectPageFileIdIssues(config: AnyRecord, issues: ValidationIssue[]): void {
   const pages = isRecord(config.pages)
     ? config.pages
-    : Object.fromEntries(Object.entries(config).filter(([key]) => !TOP_LEVEL_NON_PAGE_KEYS.has(key)));
+    : Object.fromEntries(
+        Object.entries(config).filter(([key]) => !TOP_LEVEL_NON_PAGE_KEYS.has(key))
+      );
   Object.keys(pages).forEach((id) => {
     const issue = getPageIdIssue(id);
     if (issue) {
@@ -167,7 +194,14 @@ export function getConfigValidationErrors(config: unknown): ValidationIssue[] {
     return [{ path: '$', message: '配置必须是对象' }];
   }
 
-  collectSchemaIssues(issues, siteConfigSchema, config.site, 'site');
+  // site.yml 的子配置已提升到顶层并单独校验，此处仅校验 site 纯字段，
+  // 过滤 site 内嵌子字段的重复 issue（同一对象引用，避免错误信息重复与路径分叉）
+  const siteIssues: ValidationIssue[] = [];
+  collectSchemaIssues(siteIssues, siteConfigSchema, config.site, 'site');
+  siteIssues
+    .filter((issue) => !isSiteSubSchemaIssue(issue, config))
+    .forEach((issue) => issues.push(issue));
+
   collectSchemaIssues(
     issues,
     zArray(navigationItemSchema, 'navigation 必须是数组'),

@@ -2,6 +2,7 @@ import type { CategoryItem } from '../../types/page';
 import type { RepoMeta } from '../../types/card';
 import fs from 'node:fs';
 import path from 'node:path';
+import { sanitizeContributionsHtml } from '../github/contributions.ts';
 import { createLogger } from '../logging/logger.ts';
 
 type RenderConfigLike = {
@@ -99,9 +100,14 @@ function tryLoadProjectsHeatmapCache(
     const html = parsed.html ? String(parsed.html) : '';
     if (!username || !html) return null;
 
+    // 缓存由 sync 脚本写盘时已消毒，但读取端位于渲染边界，统一在此二次消毒，
+    // 确保无论缓存来源如何，注入 DOM 前必经白名单过滤（纵深防御）
+    const safeHtml = sanitizeContributionsHtml(html);
+    if (!safeHtml) return null;
+
     return {
       username,
-      html,
+      html: safeHtml,
       meta: {
         pageId: parsed.pageId || pageId,
         generatedAt: parsed.generatedAt || '',

@@ -8,10 +8,7 @@ function optionalTrimmedStringSchema(fieldName: string) {
     .optional();
 }
 
-const urlStringSchema = z
-  .string({ error: 'url 必须是字符串' })
-  .trim()
-  .optional();
+const urlStringSchema = z.string({ error: 'url 必须是字符串' }).trim().optional();
 
 const iconModeSchema = z.enum(['favicon', 'manual'], {
   error: 'mode 必须是 favicon 或 manual',
@@ -57,7 +54,9 @@ const profileSchema = z.looseObject({
 });
 
 const fontsSchema = z.looseObject({
-  source: z.enum(['css', 'google', 'system'], { error: 'source 必须是 css、google 或 system' }).optional(),
+  source: z
+    .enum(['css', 'google', 'system'], { error: 'source 必须是 css、google 或 system' })
+    .optional(),
   cssUrl: optionalTrimmedStringSchema('cssUrl'),
   preload: z.boolean({ error: 'preload 必须是布尔值' }).optional(),
   family: optionalTrimmedStringSchema('family'),
@@ -70,7 +69,9 @@ const iconsSchema = z.looseObject({
 });
 
 const themeSchema = z.looseObject({
-  mode: z.enum(['dark', 'light', 'system'], { error: 'mode 必须是 dark、light 或 system' }).optional(),
+  mode: z
+    .enum(['dark', 'light', 'system'], { error: 'mode 必须是 dark、light 或 system' })
+    .optional(),
 });
 
 const securitySchema = z.looseObject({
@@ -100,7 +101,9 @@ const rssSchema = z.looseObject({
 
 const githubSchema = z.looseObject({
   username: optionalTrimmedStringSchema('username'),
-  heatmapColor: z.union([z.string(), z.number()], { error: 'heatmapColor 必须是字符串或数字' }).optional(),
+  heatmapColor: z
+    .union([z.string(), z.number()], { error: 'heatmapColor 必须是字符串或数字' })
+    .optional(),
   cacheDir: optionalTrimmedStringSchema('cacheDir'),
 });
 

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist-node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "allowJs": true,
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force",
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo/lib.tsbuildinfo",
+    "types": ["node"],
+    "lib": ["es2022", "dom"]
+  },
+  "include": ["src/lib/index.ts", "src/types/vendor.d.ts"]
+}

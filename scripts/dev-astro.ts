@@ -90,7 +90,10 @@ function collectDirectories(rootDir: string): string[] {
   return dirs;
 }
 
-function createPrepareWatcher(repoRoot: string, onChange: (changedPath: string) => void): PrepareWatcher {
+function createPrepareWatcher(
+  repoRoot: string,
+  onChange: (changedPath: string) => void
+): PrepareWatcher {
   const watchers = new Map<string, import('node:fs').FSWatcher>();
   let refreshTimer: NodeJS.Timeout | null = null;
 
@@ -177,7 +180,10 @@ function createDebouncedPrepare(repoRoot: string): (changedPath: string) => void
   };
 }
 
-function startAstroDev(repoRoot: string, argv: string[]): import('node:child_process').ChildProcess {
+function startAstroDev(
+  repoRoot: string,
+  argv: string[]
+): import('node:child_process').ChildProcess {
   const astroCli = resolveAstroCli(repoRoot);
   const registerScript = path.join(__dirname, 'register-ts.cjs');
   const args = ['dev', ...resolveAstroDevArgs(argv)];
@@ -188,7 +194,10 @@ function startAstroDev(repoRoot: string, argv: string[]): import('node:child_pro
   });
 }
 
-function stopChild(child: import('node:child_process').ChildProcess | null, signal: NodeJS.Signals): void {
+function stopChild(
+  child: import('node:child_process').ChildProcess | null,
+  signal: NodeJS.Signals
+): void {
   if (!child || child.killed) return;
   try {
     child.kill(signal);

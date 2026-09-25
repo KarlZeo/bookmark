@@ -1,3 +1,5 @@
+import { isSafeUriValue } from '../../shared/sanitize-url.ts';
+
 function escapeHtml(unsafe: unknown): string {
   if (unsafe === undefined || unsafe === null) {
     return '';
@@ -38,6 +40,28 @@ const NAMED_HTML_ENTITIES: Record<string, string> = {
   lt: '<',
   nbsp: ' ',
   quot: '"',
+  // 常见 HTML4 命名实体（书签/文本保真度：避免 © ® — … 等显示为字面文本）
+  bull: '•',
+  copy: '©',
+  deg: '°',
+  divide: '÷',
+  euro: '€',
+  hellip: '…',
+  ldquo: '“',
+  lsquo: '‘',
+  mdash: '—',
+  middot: '·',
+  ndash: '–',
+  para: '¶',
+  plusmn: '±',
+  pound: '£',
+  rdquo: '”',
+  reg: '®',
+  rsquo: '’',
+  sect: '§',
+  times: '×',
+  trade: '™',
+  yen: '¥',
 };
 
 const HTML_VOID_TAGS = new Set([
@@ -304,17 +328,7 @@ function htmlToText(input: unknown): string {
 }
 
 function isSafeUriAttribute(value: string): boolean {
-  const trimmed = value.trim();
-  if (!trimmed) return false;
-  if (trimmed.startsWith('#')) return true;
-  if (trimmed.startsWith('/') && !trimmed.startsWith('//')) return true;
-
-  try {
-    const url = new URL(trimmed);
-    return url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'mailto:';
-  } catch {
-    return false;
-  }
+  return isSafeUriValue(value);
 }
 
 function isAllowedAttribute(
@@ -350,8 +364,11 @@ function sanitizeHtmlFragment(input: unknown, policy: HtmlSanitizePolicy): strin
 
   while (index < source.length) {
     if (source[index] !== '<') {
-      output.push(escapeHtml(source[index]));
-      index += 1;
+      // 按文本片段先解码实体再统一转义：对"已消毒一次"的输入幂等，且真实实体不会被双编码显示
+      let end = index;
+      while (end < source.length && source[end] !== '<') end += 1;
+      output.push(escapeHtml(decodeHtmlEntities(source.slice(index, end))));
+      index = end;
       continue;
     }
 
@@ -407,5 +424,5 @@ function sanitizeHtmlFragment(input: unknown, policy: HtmlSanitizePolicy): strin
   return output.join('');
 }
 
-export { escapeHtml, decodeHtmlEntities, htmlToText, sanitizeHtmlFragment };
+export { escapeHtml, decodeHtmlEntities, htmlToText, isSafeUriAttribute, sanitizeHtmlFragment };
 export type { HtmlSanitizePolicy };

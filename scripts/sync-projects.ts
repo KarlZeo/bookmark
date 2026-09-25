@@ -195,7 +195,10 @@ function findProjectsPages(config: ConfigLike): ProjectPage[] {
   return pages;
 }
 
-async function fetchJsonWithTimeout(url: string, { timeoutMs, headers }: FetchJsonOptions): Promise<unknown> {
+async function fetchJsonWithTimeout(
+  url: string,
+  { timeoutMs, headers }: FetchJsonOptions
+): Promise<unknown> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -207,7 +210,10 @@ async function fetchJsonWithTimeout(url: string, { timeoutMs, headers }: FetchJs
   }
 }
 
-async function loadLanguageColors(settings: ProjectSettings, cacheBaseDir: string): Promise<LanguageColors> {
+async function loadLanguageColors(
+  settings: ProjectSettings,
+  cacheBaseDir: string
+): Promise<LanguageColors> {
   const cachePath = path.join(cacheBaseDir, 'github-colors.json');
 
   try {
@@ -251,7 +257,10 @@ async function fetchRepoMeta(
   };
 
   const apiUrl = `https://api.github.com/repos/${repo.owner}/${repo.repo}`;
-  const rawData = await fetchJsonWithTimeout(apiUrl, { timeoutMs: settings.fetch.timeoutMs, headers });
+  const rawData = await fetchJsonWithTimeout(apiUrl, {
+    timeoutMs: settings.fetch.timeoutMs,
+    headers,
+  });
   const data = rawData && typeof rawData === 'object' ? (rawData as GithubApiRepo) : {};
 
   const language = data && data.language ? String(data.language) : '';

@@ -1,6 +1,7 @@
 import type { NestedStructureNode } from '../types';
 
-const { SELECTORS, byId, qs, qsa } = require('../dom/selectors.ts') as typeof import('../dom/selectors');
+const { SELECTORS, byId, qs, qsa } =
+  require('../dom/selectors.ts') as typeof import('../dom/selectors');
 
 // 多层级嵌套书签功能
 function getCollapsibleNestedContainers(root: ParentNode | null): HTMLElement[] {
@@ -168,7 +169,9 @@ function toggleCategories(): void {
   if (!activePage) return;
 
   const allElements = getCollapsibleNestedContainers(activePage);
-  const collapsedElements = allElements.filter((element) => element.classList.contains('collapsed'));
+  const collapsedElements = allElements.filter((element) =>
+    element.classList.contains('collapsed')
+  );
   if (allElements.length === 0) return;
 
   if (collapsedElements.length >= allElements.length / 2) {

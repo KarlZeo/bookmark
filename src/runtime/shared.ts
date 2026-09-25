@@ -2,6 +2,8 @@ import type { MenavConfig } from './types';
 
 const { SELECTORS, qs, byId } = require('./dom/selectors.ts') as typeof import('./dom/selectors');
 const { getRuntimeConfig } = require('./runtime-config.ts') as typeof import('./runtime-config');
+const { sanitizeUrlOrHash } =
+  require('../shared/sanitize-url.ts') as typeof import('../shared/sanitize-url');
 
 function menavExtractDomain(url: unknown): string {
   if (!url) return '';
@@ -48,43 +50,11 @@ function menavGetAllowedUrlSchemes(): string[] {
   return ['http', 'https', 'mailto', 'tel'];
 }
 
-function menavIsRelativeUrl(url: unknown): boolean {
-  const s = String(url || '').trim();
-  return (
-    s.startsWith('#') ||
-    s.startsWith('/') ||
-    s.startsWith('./') ||
-    s.startsWith('../') ||
-    s.startsWith('?')
-  );
-}
-
 function menavSanitizeUrl(rawUrl: unknown, contextLabel: string): string {
-  if (rawUrl === undefined || rawUrl === null) return '#';
-  const url = String(rawUrl).trim();
-  if (!url) return '#';
-
-  if (menavIsRelativeUrl(url)) return url;
-
-  // 明确拒绝协议相对 URL（//example.com），避免意外绕过策略
-  if (url.startsWith('//')) {
-    console.warn(`[MeNav][安全] 已拦截不安全 URL（协议相对形式）：${contextLabel || ''}`, url);
-    return '#';
-  }
-
-  try {
-    const parsed = new URL(url);
-    const scheme = String(parsed.protocol || '')
-      .toLowerCase()
-      .replace(/:$/, '');
-    const allowed = menavGetAllowedUrlSchemes();
-    if (allowed.includes(scheme)) return url;
-    console.warn(`[MeNav][安全] 已拦截不安全 URL scheme：${contextLabel || ''}`, url);
-    return '#';
-  } catch (e) {
-    console.warn(`[MeNav][安全] 已拦截无法解析的 URL：${contextLabel || ''}`, url);
-    return '#';
-  }
+  return sanitizeUrlOrHash(rawUrl, {
+    allowedSchemes: menavGetAllowedUrlSchemes(),
+    label: contextLabel,
+  });
 }
 
 // class token 清洗：仅允许字母/数字/下划线/中划线与空格分隔，避免属性/事件注入

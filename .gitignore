@@ -6,6 +6,7 @@ npm-debug.log*
 dist/
 dist-node/
 .astro/
+.tsbuildinfo/
 public/assets/
 public/pinyin-match.js
 public/script.js

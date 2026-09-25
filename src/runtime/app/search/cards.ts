@@ -16,13 +16,14 @@ const { createCardIcon } = require('./icons.ts') as {
     forceIconMode?: string;
   }) => HTMLElement;
 };
+const { menavSanitizeUrl } = require('../../shared.ts') as typeof import('../../shared');
 
 function createCardFromIndexItem(item: RuntimeSearchIndexItem): HTMLElement {
   const card = createElement('a');
   const isRepo = item.style === 'repo';
   const isArticle = item.type === 'article';
 
-  card.href = item.url || '#';
+  card.href = menavSanitizeUrl(item.url, 'search-card');
   card.className = ['site-card', isRepo ? 'site-card-repo' : ''].filter(Boolean).join(' ');
   card.dataset.type = isArticle ? 'article' : 'site';
   card.dataset.name = item.title;

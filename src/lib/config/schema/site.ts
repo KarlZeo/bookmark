@@ -52,8 +52,4 @@ export type SiteConfig = ZodNamespace.output<SiteConfigSchema>;
 export type ModularConfig = ZodNamespace.output<ModularConfigSchema> & Record<string, unknown>;
 export type RenderConfig = ZodNamespace.output<RenderConfigSchema>;
 
-export {
-  siteConfigSchema,
-  modularConfigSchema,
-  renderConfigSchema,
-};
+export { siteConfigSchema, modularConfigSchema, renderConfigSchema };

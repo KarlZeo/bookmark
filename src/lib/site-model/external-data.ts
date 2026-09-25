@@ -2,7 +2,10 @@ import type { ResolvedConfig } from '../../types/config';
 import type { SiteExternalData } from '../../types/model';
 import fs from 'node:fs';
 import path from 'node:path';
-import { buildArticlesCategoriesByPageCategories, tryLoadArticlesFeedCache } from '../cache/articles.ts';
+import {
+  buildArticlesCategoriesByPageCategories,
+  tryLoadArticlesFeedCache,
+} from '../cache/articles.ts';
 import {
   buildProjectsMeta,
   tryLoadProjectsHeatmapCache,
