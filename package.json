@@ -14,7 +14,7 @@
     "dist-node"
   ],
   "engines": {
-    "node": ">=22.12"
+    "node": ">=22.23.4"
   },
   "homepage": "https://rbetree.github.io/menav",
   "scripts": {
@@ -25,6 +25,7 @@
     "clean": "node -r ./scripts/register-ts.cjs ./scripts/clean.ts",
     "build:lib": "node -r ./scripts/register-ts.cjs ./scripts/build-lib.ts",
     "build": "node -r ./scripts/register-ts.cjs ./scripts/build.ts",
+    "build:snapshot": "node -r ./scripts/register-ts.cjs ./scripts/build-snapshot.ts",
     "sync": "node -r ./scripts/register-ts.cjs ./scripts/sync.ts",
     "sync-articles": "node -r ./scripts/register-ts.cjs ./scripts/sync-articles.ts",
     "sync-projects": "node -r ./scripts/register-ts.cjs ./scripts/sync-projects.ts",
@@ -40,6 +41,14 @@
     "prepare": "husky",
     "dev:astro": "node -r ./scripts/register-ts.cjs ./scripts/dev-astro.ts",
     "test:browser": "node -r ./scripts/register-ts.cjs ./scripts/test-browser.ts",
+    "backend:dev": "npm --prefix workers run dev",
+    "backend:init": "node -r ./scripts/register-ts.cjs ./scripts/backend-init.ts",
+    "backend:doctor": "node -r ./scripts/register-ts.cjs ./scripts/backend-doctor.ts",
+    "backend:deploy": "npm run backend:doctor && npm --prefix workers run deploy",
+    "backend:deploy:test": "npm run backend:doctor -- --config wrangler.test.jsonc && npm --prefix workers run deploy:test",
+    "backend:check": "npm --prefix workers run check",
+    "backend:test": "npm --prefix workers test",
+    "backend:seed": "node -r ./scripts/register-ts.cjs ./scripts/generate-seed.ts --output workers/.seed.json",
     "prepack": "npm run build:lib"
   },
   "keywords": [
@@ -50,32 +59,31 @@
   "author": "Your Name",
   "license": "AGPL-3.0-only",
   "dependencies": {
-    "js-yaml": "^4.3.1",
-    "markdown-it": "^14.2.0",
+    "js-yaml": "^4.3.2",
+    "markdown-it": "^14.3.3",
     "rss-parser": "^3.13.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@types/node": "^26.0.0",
-    "astro": "^7.1.6",
+    "astro": "^7.4.4",
     "esbuild": "^0.28.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
     "playwright": "^1.61.1",
     "prettier": "^3.8.4",
     "prettier-plugin-astro": "^0.14.1",
-    "serve": "^14.2.6",
     "typescript": "^5.9.3"
   },
   "overrides": {
-    "brace-expansion": "1.1.18",
+    "brace-expansion": "1.1.21",
     "esbuild": "$esbuild",
-    "fast-uri": "3.1.5",
+    "fast-uri": "3.1.9",
     "linkify-it": "5.0.2",
     "nanoid": "3.3.18",
-    "sharp": "0.35.0",
-    "svgo": "4.0.2"
+    "sharp": "0.35.5",
+    "svgo": "4.1.0"
   },
   "lint-staged": {
     "**/*.js": "node ./node_modules/prettier/bin/prettier.cjs --write --ignore-unknown",
