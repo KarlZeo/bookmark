@@ -80,6 +80,14 @@ categories:
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: HV-Decky - Decky Plugin for HV bypass
         url: https://cs.rin.ru/forum/viewtopic.php?t=159990
+      - name: SteamAnyAspectRatioMods
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Play your favorite games at the aspect ratio you want, on the platform you choose. This collection provides easy to use, cross platform aspect ratio fixes for games in Proton/Wine/Linux/MacOS/SteamOS/Windows.
+        url: https://github.com/TLin-Y/SteamAnyAspectRatioMods
+      - name: Decky-Game-Cheats-Manager
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Decky Loader plugin bringing GCM to SteamOS
+        url: https://github.com/Qiming-Liu/Decky-Game-Cheats-Manager
   - name: Switch相关导航
     icon: fas fa-code # 分类图标（Font Awesome）
     sites:
