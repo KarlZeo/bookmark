@@ -92,6 +92,10 @@ categories:
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: OptiScaler bridges upscaling/frame gen across GPUs. Supports DLSS2+/XeSS/FSR2+ inputs, replaces native upscalers, enables FSR-FG/XeFG on non-FG titles. Supports Nukem mod for DLSSG-to-FSR3 FG.
         url: https://github.com/optiscaler/OptiScaler
+      - name: fsr4-lite-steam-machine
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: A Decky plugin that runs AMD's FSR 4.1.2 Lite in your games on the Steam Machine, Steam Deck or any SteamOS device, through OptiScaler. One button per game, and up to 20 FPS more than full FSR 4.1 on the Steam Machine.
+        url: https://github.com/db1522/fsr4-lite-steam-machine
       - name: HelixSR
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: Drop-in FSR 3.1 upscaler for Direct3D 12 that runs DLSS's network (Model E) on AMD GPUs
