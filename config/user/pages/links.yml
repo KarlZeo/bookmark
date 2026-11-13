@@ -88,6 +88,22 @@ categories:
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: Decky Loader plugin bringing GCM to SteamOS
         url: https://github.com/Qiming-Liu/Decky-Game-Cheats-Manager
+      - name: OptiScaler
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: OptiScaler bridges upscaling/frame gen across GPUs. Supports DLSS2+/XeSS/FSR2+ inputs, replaces native upscalers, enables FSR-FG/XeFG on non-FG titles. Supports Nukem mod for DLSSG-to-FSR3 FG.
+        url: https://github.com/optiscaler/OptiScaler
+      - name: HelixSR
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Drop-in FSR 3.1 upscaler for Direct3D 12 that runs DLSS's network (Model E) on AMD GPUs
+        url: https://github.com/lonewolf0622/HelixSR
+      - name: DeckyHelixSRManager
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Decky Loader plugin for Steam Deck and other SteamOS/Bazzite handhelds, download, build and install HelixSR (a DLSS-based FSR 3.1 replacement) per game, directly or through OptiScaler, and check that it's working.
+        url: https://github.com/PeroTuncay/DeckyHelixSRManager
+      - name: HelixSR-Decky
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Independent Decky plugin by Blackheart909 for per-game HelixSR installation, updates and diagnostics on SteamOS
+        url: https://github.com/dawoodtogoo2020-code/HelixSR-Decky
   - name: Switch相关导航
     icon: fas fa-code # 分类图标（Font Awesome）
     sites:
