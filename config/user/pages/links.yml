@@ -108,6 +108,10 @@ categories:
         icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
         description: Independent Decky plugin by Blackheart909 for per-game HelixSR installation, updates and diagnostics on SteamOS
         url: https://github.com/dawoodtogoo2020-code/HelixSR-Decky
+      - name: CE Decky
+        icon: fab fa-github # 手动图标（manual 模式显示；favicon 模式下作为回退）
+        description: Manage Cheat Engine tables and live table controls from SteamOS Game Mode. A Decky Loader plugin.
+        url: https://github.com/goooroooX/CE-Decky
   - name: Switch相关导航
     icon: fas fa-code # 分类图标（Font Awesome）
     sites:
